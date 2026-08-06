@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Reports - Hameed's Bistro
+</title>
+
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<link rel="stylesheet" href="../css/reports.css">
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+<header class="admin-header">
+
+
+
+<div class="admin-title">
+
+
+<h2>
+Sales Reports
+</h2>
+
+
+</div>
+
+
+
+
+
+
+<div class="admin-actions">
+
+
+<button id="refreshBtn">
+🔄
+</button>
+
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<main class="admin-container">
+
+
+
+<h1>
+Business Reports
+</h1>
+
+
+
+
+
+
+
+
+<div class="report-cards">
+
+
+
+<div class="report-card">
+
+
+<h3>
+Today's Sales
+</h3>
+
+
+<p id="todaySales">
+
+RM 0.00
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="report-card">
+
+
+<h3>
+Total Orders
+</h3>
+
+
+<p id="totalOrders">
+
+0
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="report-card">
+
+
+<h3>
+Completed Orders
+</h3>
+
+
+<p id="completedOrders">
+
+0
+
+</p>
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="report-section">
+
+
+
+<h2>
+Category Wise Sales
+</h2>
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+<th>
+Category
+</th>
+
+
+<th>
+Sales
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="categoryReport">
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="report-section">
+
+
+
+<h2>
+Item Wise Sales
+</h2>
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+<th>
+Item
+</th>
+
+
+<th>
+Quantity
+</th>
+
+
+<th>
+Amount
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="itemReport">
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="export-buttons">
+
+
+
+<button id="exportPdfBtn">
+
+Export PDF
+
+</button>
+
+
+
+
+
+<button id="exportExcelBtn">
+
+Export Excel
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+<script type="module" src="../js/reports.js"></script>
+
+
+</body>
+
+
+</html>
