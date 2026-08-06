@@ -1,0 +1,268 @@
+/* pos/css/attendance.css */
+
+
+
+.attendance-card{
+
+
+    background:white;
+
+    padding:20px;
+
+    margin-bottom:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 3px 10px rgba(
+
+        0,
+
+        0,
+
+        0,
+
+        0.15
+
+    );
+
+
+}
+
+
+
+
+
+
+
+.attendance-card h3{
+
+
+    color:#0066cc;
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+
+
+
+
+.attendance-card select{
+
+
+    width:100%;
+
+    height:45px;
+
+    padding:10px;
+
+    margin-bottom:15px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+
+
+#checkInBtn{
+
+
+    background:#008000;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+
+
+#checkInBtn:hover{
+
+
+    background:#006600;
+
+
+}
+
+
+
+
+
+
+
+
+
+.attendance-table-box{
+
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    box-shadow:0 3px 10px rgba(
+
+        0,
+
+        0,
+
+        0,
+
+        0.15
+
+    );
+
+    overflow-x:auto;
+
+
+}
+
+
+
+
+
+
+
+.attendance-table-box table{
+
+
+    width:100%;
+
+    border-collapse:collapse;
+
+
+}
+
+
+
+
+
+
+
+.attendance-table-box th{
+
+
+    background:#003366;
+
+    color:white;
+
+    padding:12px;
+
+
+}
+
+
+
+
+
+
+
+.attendance-table-box td{
+
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #ddd;
+
+
+}
+
+
+
+
+
+
+
+
+.attendance-status{
+
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    color:white;
+
+    background:#008000;
+
+    font-size:13px;
+
+
+}
+
+
+
+
+
+
+
+
+.checkout-btn{
+
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+
+
+@media(max-width:700px){
+
+
+
+.attendance-table-box{
+
+
+    font-size:12px;
+
+
+}
+
+
+
+}
