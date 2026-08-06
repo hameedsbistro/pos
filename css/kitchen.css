@@ -1,32 +1,18 @@
-/* pos/css/kitchen.css */
-
-
-
 *{
-
-    margin:0;
-
-    padding:0;
-
-    box-sizing:border-box;
-
-    font-family:Arial,sans-serif;
-
+box-sizing:border-box;
 }
-
 
 
 
 body{
 
+margin:0;
 
-    background:#111;
+font-family:Arial, sans-serif;
 
-    color:white;
-
+background:#f5f6fa;
 
 }
-
 
 
 
@@ -36,21 +22,39 @@ body{
 /* HEADER */
 
 
-.kitchen-header{
+.admin-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:15px 25px;
+
+background:#ffffff;
+
+border-bottom:1px solid #ddd;
+
+}
 
 
-    height:70px;
 
-    background:#003366;
+.admin-title h2{
 
-    display:flex;
+margin:0;
 
-    justify-content:space-between;
+font-size:28px;
 
-    align-items:center;
+}
 
-    padding:0 25px;
 
+
+.admin-title h3{
+
+margin:5px 0 0;
+
+color:#555;
 
 }
 
@@ -60,40 +64,54 @@ body{
 
 
 
-.kitchen-header h1{
+/* USER PANEL */
 
 
-    font-size:30px;
+.kitchen-user-panel{
 
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+}
+
+
+
+.kitchen-user-panel span{
+
+font-size:16px;
 
 }
 
 
 
+.kitchen-user-panel button{
 
+padding:10px 15px;
 
+border:none;
 
+border-radius:6px;
 
-.kitchen-header button{
+cursor:pointer;
 
+background:#1976d2;
 
-    background:#008000;
+color:white;
 
-    color:white;
-
-    border:none;
-
-    padding:12px 20px;
-
-    border-radius:8px;
-
-    font-size:18px;
-
-    cursor:pointer;
-
+font-weight:bold;
 
 }
 
+
+
+.kitchen-user-panel button:hover{
+
+opacity:.85;
+
+}
 
 
 
@@ -107,21 +125,7 @@ body{
 
 .kitchen-container{
 
-
-    display:grid;
-
-    grid-template-columns:repeat(
-
-        3,
-
-        1fr
-
-    );
-
-    gap:20px;
-
-    padding:20px;
-
+padding:20px;
 
 }
 
@@ -130,37 +134,109 @@ body{
 
 
 
+
+
+/* SECTION */
+
+
+.kitchen-section-select{
+
+background:white;
+
+padding:15px;
+
+border-radius:10px;
+
+margin-bottom:20px;
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+}
+
+
+
+.kitchen-section-select label{
+
+font-size:18px;
+
+font-weight:bold;
+
+}
+
+
+
+.kitchen-section-select select{
+
+padding:10px;
+
+font-size:16px;
+
+border-radius:6px;
+
+border:1px solid #ccc;
+
+}
+
+
+
+
+
+
+
+
+/* BOARD */
+
+
+.kitchen-board{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:15px;
+
+}
+
+
+
+
+
+
+
+/* COLUMN */
 
 
 .kitchen-column{
 
+background:white;
 
-    background:#222;
+border-radius:12px;
 
-    border-radius:12px;
+padding:15px;
 
-    padding:15px;
+min-height:500px;
 
-    min-height:600px;
-
+box-shadow:0 2px 8px rgba(0,0,0,.1);
 
 }
-
-
-
-
 
 
 
 .kitchen-column h2{
 
+text-align:center;
 
-    text-align:center;
+margin-top:0;
 
-    margin-bottom:15px;
+font-size:22px;
 
-    font-size:25px;
+border-bottom:2px solid #ddd;
 
+padding-bottom:10px;
 
 }
 
@@ -176,50 +252,61 @@ body{
 
 .kitchen-card{
 
+background:#ffffff;
 
-    background:white;
+border-radius:10px;
 
-    color:black;
+padding:15px;
 
-    padding:15px;
+margin-bottom:15px;
 
-    border-radius:12px;
+border-left:6px solid #1976d2;
 
-    margin-bottom:15px;
-
+box-shadow:0 2px 6px rgba(0,0,0,.15);
 
 }
-
-
-
-
-
 
 
 
 .kitchen-card h3{
 
+margin:0 0 10px;
 
-    color:#003366;
-
-    margin-bottom:10px;
-
+font-size:20px;
 
 }
-
-
-
-
 
 
 
 .kitchen-card p{
 
+margin:5px 0;
 
-    margin:6px 0;
+font-size:17px;
 
-    font-size:16px;
+}
 
+
+
+.kitchen-card button{
+
+width:100%;
+
+padding:10px;
+
+margin-top:10px;
+
+border:none;
+
+border-radius:6px;
+
+background:#2e7d32;
+
+color:white;
+
+font-size:16px;
+
+cursor:pointer;
 
 }
 
@@ -228,17 +315,32 @@ body{
 
 
 
+/* TV SCREEN */
 
-.kitchen-items{
+
+@media(min-width:1500px){
 
 
-    background:#f1f1f1;
+.kitchen-column h2{
 
-    padding:10px;
+font-size:32px;
 
-    border-radius:8px;
+}
 
-    margin-top:10px;
+
+.kitchen-card h3{
+
+font-size:28px;
+
+}
+
+
+
+.kitchen-card p{
+
+font-size:24px;
+
+}
 
 
 }
@@ -246,60 +348,25 @@ body{
 
 
 
-
-
-
-.kitchen-status-btn{
-
-
-    width:100%;
-
-    margin-top:10px;
-
-    padding:10px;
-
-    border:none;
-
-    border-radius:8px;
-
-    background:#008000;
-
-    color:white;
-
-    cursor:pointer;
-
-
-}
-
-
-
-
-
+/* MOBILE */
 
 
 @media(max-width:900px){
 
 
+.kitchen-board{
 
-.kitchen-container{
-
-
-    grid-template-columns:1fr;
-
+grid-template-columns:1fr;
 
 }
 
 
 
+.kitchen-user-panel{
 
-.kitchen-column{
-
-
-    min-height:auto;
-
+flex-wrap:wrap;
 
 }
-
 
 
 }
