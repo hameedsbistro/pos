@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Staff Attendance
+</title>
+
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<link rel="stylesheet" href="../css/attendance.css">
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+<header class="admin-header">
+
+
+
+<div class="admin-title">
+
+
+<h2>
+Staff Attendance
+</h2>
+
+
+</div>
+
+
+
+
+
+
+<div class="admin-actions">
+
+
+<button id="refreshBtn">
+🔄
+</button>
+
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<main class="admin-container">
+
+
+
+<h1>
+Today's Attendance
+</h1>
+
+
+
+
+
+
+
+
+
+<div class="attendance-card">
+
+
+
+<h3>
+Staff Check In
+</h3>
+
+
+
+
+
+<select id="staffSelect">
+
+
+<option value="">
+Select Staff
+</option>
+
+
+</select>
+
+
+
+
+
+
+
+<button id="checkInBtn">
+
+Check In
+
+</button>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="attendance-table-box">
+
+
+
+<table>
+
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Staff Name
+</th>
+
+
+<th>
+Role
+</th>
+
+
+<th>
+Check In
+</th>
+
+
+<th>
+Check Out
+</th>
+
+
+<th>
+Working Time
+</th>
+
+
+<th>
+Status
+</th>
+
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="attendanceTable">
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+
+</div>
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+
+<script type="module" src="../js/attendance.js"></script>
+
+
+</body>
+
+</html>
