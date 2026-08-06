@@ -6,45 +6,49 @@ const translations = {
 
 en: {
 
+title: "Menu & Ordering System",
 
-title:
-"Menu & Ordering System",
+welcome: "Welcome",
 
+dineIn: "Dine In",
 
-dineIn:
-"Dine In",
+takeAway: "Take Away",
 
+companyProfile: "Company Profile",
 
-takeAway:
-"Take Away",
+popular: "Popular Top 15 Items",
 
+myOrders: "My Orders",
 
-companyProfile:
-"Company Profile",
+contact: "Contact Us",
 
+login: "Login",
 
-popular:
-"Popular Top 15 Items",
+admin: "Admin",
 
+cart: "Cart",
 
-myOrders:
-"My Orders",
+refresh: "Refresh",
 
+home: "Home",
 
-contact:
-"Contact Us",
+back: "Back",
 
+language: "Language",
 
-login:
-"Login",
+menu: "Menu",
 
+order: "Order Now",
 
-cart:
-"Cart",
+checkout: "Checkout",
 
+total: "Total",
 
-refresh:
-"Refresh"
+placeOrder: "Place Order",
+
+cancel: "Cancel",
+
+confirm: "Confirm"
 
 
 },
@@ -57,44 +61,49 @@ refresh:
 ms: {
 
 
-title:
-"Sistem Menu & Pesanan",
+title: "Sistem Menu & Pesanan",
 
+welcome: "Selamat Datang",
 
-dineIn:
-"Makan Di Sini",
+dineIn: "Makan Di Sini",
 
+takeAway: "Bawa Pulang",
 
-takeAway:
-"Bawa Pulang",
+companyProfile: "Profil Syarikat",
 
+popular: "15 Item Popular",
 
-companyProfile:
-"Profil Syarikat",
+myOrders: "Pesanan Saya",
 
+contact: "Hubungi Kami",
 
-popular:
-"15 Item Popular",
+login: "Log Masuk",
 
+admin: "Admin",
 
-myOrders:
-"Pesanan Saya",
+cart: "Troli",
 
+refresh: "Segar Semula",
 
-contact:
-"Hubungi Kami",
+home: "Laman Utama",
 
+back: "Kembali",
 
-login:
-"Log Masuk",
+language: "Bahasa",
 
+menu: "Menu",
 
-cart:
-"Troli",
+order: "Pesan Sekarang",
 
+checkout: "Bayaran",
 
-refresh:
-"Segar Semula"
+total: "Jumlah",
+
+placeOrder: "Buat Pesanan",
+
+cancel: "Batal",
+
+confirm: "Sahkan"
 
 
 },
@@ -107,44 +116,49 @@ refresh:
 ta: {
 
 
-title:
-"மெனு மற்றும் ஆர்டர் அமைப்பு",
+title: "மெனு மற்றும் ஆர்டர் அமைப்பு",
 
+welcome: "வரவேற்கிறோம்",
 
-dineIn:
-"இங்கே சாப்பிடுங்கள்",
+dineIn: "இங்கே சாப்பிடுங்கள்",
 
+takeAway: "எடுத்து செல்லுங்கள்",
 
-takeAway:
-"எடுத்து செல்லுங்கள்",
+companyProfile: "நிறுவன சுயவிவரம்",
 
+popular: "பிரபலமான 15 உணவுகள்",
 
-companyProfile:
-"நிறுவன சுயவிவரம்",
+myOrders: "எனது ஆர்டர்கள்",
 
+contact: "எங்களை தொடர்பு கொள்ளவும்",
 
-popular:
-"பிரபலமான 15 உணவுகள்",
+login: "உள்நுழைவு",
 
+admin: "நிர்வாகி",
 
-myOrders:
-"எனது ஆர்டர்கள்",
+cart: "வண்டி",
 
+refresh: "புதுப்பிக்கவும்",
 
-contact:
-"எங்களை தொடர்பு கொள்ளவும்",
+home: "முகப்பு",
 
+back: "பின்",
 
-login:
-"உள்நுழைவு",
+language: "மொழி",
 
+menu: "மெனு",
 
-cart:
-"வண்டி",
+order: "ஆர்டர் செய்ய",
 
+checkout: "செலுத்த",
 
-refresh:
-"புதுப்பிக்கவும்"
+total: "மொத்தம்",
+
+placeOrder: "ஆர்டர் இடு",
+
+cancel: "ரத்து",
+
+confirm: "உறுதி"
 
 
 },
@@ -157,44 +171,49 @@ refresh:
 zh: {
 
 
-title:
-"菜单和订购系统",
+title: "菜单和订购系统",
 
+welcome: "欢迎",
 
-dineIn:
-"堂食",
+dineIn: "堂食",
 
+takeAway: "外带",
 
-takeAway:
-"外带",
+companyProfile: "公司简介",
 
+popular: "热门15种商品",
 
-companyProfile:
-"公司简介",
+myOrders: "我的订单",
 
+contact: "联系我们",
 
-popular:
-"热门15种商品",
+login: "登录",
 
+admin: "管理员",
 
-myOrders:
-"我的订单",
+cart: "购物车",
 
+refresh: "刷新",
 
-contact:
-"联系我们",
+home: "主页",
 
+back: "返回",
 
-login:
-"登录",
+language: "语言",
 
+menu: "菜单",
 
-cart:
-"购物车",
+order: "立即订购",
 
+checkout: "结账",
 
-refresh:
-"刷新"
+total: "总计",
+
+placeOrder: "下订单",
+
+cancel: "取消",
+
+confirm: "确认"
 
 
 },
@@ -207,44 +226,49 @@ refresh:
 hi: {
 
 
-title:
-"मेनू और ऑर्डरिंग सिस्टम",
+title: "मेनू और ऑर्डरिंग सिस्टम",
 
+welcome: "स्वागत है",
 
-dineIn:
-"यहीं खाएं",
+dineIn: "यहीं खाएं",
 
+takeAway: "ले जाएं",
 
-takeAway:
-"ले जाएं",
+companyProfile: "कंपनी प्रोफाइल",
 
+popular: "लोकप्रिय 15 आइटम",
 
-companyProfile:
-"कंपनी प्रोफाइल",
+myOrders: "मेरे ऑर्डर",
 
+contact: "संपर्क करें",
 
-popular:
-"लोकप्रिय 15 आइटम",
+login: "लॉगिन",
 
+admin: "व्यवस्थापक",
 
-myOrders:
-"मेरे ऑर्डर",
+cart: "कार्ट",
 
+refresh: "रिफ्रेश",
 
-contact:
-"संपर्क करें",
+home: "होम",
 
+back: "वापस",
 
-login:
-"लॉगिन",
+language: "भाषा",
 
+menu: "मेनू",
 
-cart:
-"कार्ट",
+order: "ऑर्डर करें",
 
+checkout: "चेकआउट",
 
-refresh:
-"रिफ्रेश"
+total: "कुल",
+
+placeOrder: "ऑर्डर करें",
+
+cancel: "रद्द करें",
+
+confirm: "पुष्टि करें"
 
 
 },
@@ -257,44 +281,49 @@ refresh:
 bn: {
 
 
-title:
-"মেনু এবং অর্ডারিং সিস্টেম",
+title: "মেনু এবং অর্ডারিং সিস্টেম",
 
+welcome: "স্বাগতম",
 
-dineIn:
-"এখানে খাবেন",
+dineIn: "এখানে খাবেন",
 
+takeAway: "নিয়ে যাবেন",
 
-takeAway:
-"নিয়ে যাবেন",
+companyProfile: "কোম্পানি প্রোফাইল",
 
+popular: "জনপ্রিয় ১৫টি আইটেম",
 
-companyProfile:
-"কোম্পানি প্রোফাইল",
+myOrders: "আমার অর্ডার",
 
+contact: "যোগাযোগ করুন",
 
-popular:
-"জনপ্রিয় ১৫টি আইটেম",
+login: "লগইন",
 
+admin: "অ্যাডমিন",
 
-myOrders:
-"আমার অর্ডার",
+cart: "কার্ট",
 
+refresh: "রিফ্রেশ",
 
-contact:
-"যোগাযোগ করুন",
+home: "হোম",
 
+back: "পিছনে",
 
-login:
-"লগইন",
+language: "ভাষা",
 
+menu: "মেনু",
 
-cart:
-"কার্ট",
+order: "অর্ডার করুন",
 
+checkout: "চেকআউট",
 
-refresh:
-"রিফ্রেশ"
+total: "মোট",
+
+placeOrder: "অর্ডার দিন",
+
+cancel: "বাতিল",
+
+confirm: "নিশ্চিত করুন"
 
 
 }
@@ -328,33 +357,46 @@ return localStorage.getItem(
 
 
 
+
+
 function changeLanguage(){
 
 
-let lang =
-getLanguage();
+
+const lang = getLanguage();
+
 
 
 
 document.querySelectorAll(
+
 "[data-i18n]"
+
 )
+
 .forEach(element=>{
 
 
-let key =
+const key =
+
 element.dataset.i18n;
 
 
 
+
 if(
+
 translations[lang]
+
 &&
+
 translations[lang][key]
+
 ){
 
 
 element.innerText =
+
 translations[lang][key];
 
 
@@ -374,7 +416,27 @@ translations[lang][key];
 
 
 
+
+
 document.addEventListener(
+
 "DOMContentLoaded",
+
 changeLanguage
+
 );
+
+
+
+
+
+
+
+
+export {
+
+changeLanguage,
+
+getLanguage
+
+};
