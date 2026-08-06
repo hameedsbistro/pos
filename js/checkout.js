@@ -1,209 +1,90 @@
-import { db } from "./firebase.js";
-
-import { changeLanguage } from "./language.js";
+// pos/js/checkout.js
 
 
-import {
-
-
-collection,
-
-addDoc,
-
-serverTimestamp
-
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { supabase } from "./supabase.js";
 
 
 
 
+// ELEMENTS
+
+const checkoutBtn =
+document.getElementById("checkoutBtn");
 
 
 
-let cart =
+const customerNameInput =
+document.getElementById("customerName");
 
-JSON.parse(
+
+
+const paymentMethodInput =
+document.getElementById("paymentMethod");
+
+
+
+
+
+
+// GET CART
+
+
+function getCart(){
+
+
+return JSON.parse(
 
 localStorage.getItem("cart")
 
+) || [];
+
+
+}
+
+
+
+
+
+
+
+
+// GET KITCHEN SECTION
+
+
+async function getKitchenSection(category){
+
+
+
+const {data,error}=
+
+await supabase
+
+.from("kitchen_mapping")
+
+.select("section")
+
+.eq(
+"category",
+category
 )
 
-||
+.single();
 
-[];
 
 
 
 
+if(error || !data){
 
 
+return "Main Kitchen";
 
 
-let orderType = "Dine In";
+}
 
 
-let paymentMethod = "Cash";
 
-
-
-
-
-
-
-
-
-const checkoutItems =
-
-document.getElementById(
-
-"checkoutItems"
-
-);
-
-
-
-
-
-
-const checkoutTotal =
-
-document.getElementById(
-
-"checkoutTotal"
-
-);
-
-
-
-
-
-
-
-
-
-// SHOW ORDER SUMMARY
-
-
-
-function showOrderSummary(){
-
-
-
-checkoutItems.innerHTML="";
-
-
-
-let total = 0;
-
-
-
-
-
-
-cart.forEach(item=>{
-
-
-
-
-
-let itemTotal =
-
-Number(item.price)
-
-*
-
-item.quantity;
-
-
-
-
-
-
-
-total += itemTotal;
-
-
-
-
-
-
-
-
-let div =
-
-document.createElement(
-
-"div"
-
-);
-
-
-
-
-
-div.className =
-
-"checkout-item";
-
-
-
-
-
-
-div.innerHTML = `
-
-
-
-<span>
-
-${item.itemName}
-
-×
-
-${item.quantity}
-
-</span>
-
-
-
-
-
-<span>
-
-RM ${itemTotal.toFixed(2)}
-
-</span>
-
-
-
-`;
-
-
-
-
-
-
-checkoutItems.appendChild(div);
-
-
-
-});
-
-
-
-
-
-
-
-
-checkoutTotal.innerText =
-
-total.toFixed(2);
+return data.section;
 
 
 
@@ -217,53 +98,50 @@ total.toFixed(2);
 
 
 
+// CREATE ORDER NUMBER
+
+
+function generateOrderNumber(){
+
+
+let date =
+new Date();
 
 
 
-// ORDER TYPE BUTTONS
+return (
 
+"HB" +
 
+date.getFullYear() +
 
-document.getElementById(
+(date.getMonth()+1)
 
-"dineInBtn"
+.toString()
 
-)
+.padStart(2,"0")
 
-.onclick = ()=>{
++
 
+date.getDate()
 
-orderType="Dine In";
+.toString()
 
+.padStart(2,"0")
 
-document.getElementById(
++
 
-"dineInBtn"
+Date.now()
 
-)
+.toString()
 
-.classList.add(
-
-"active"
-
-);
-
-
-document.getElementById(
-
-"takeAwayBtn"
-
-)
-
-.classList.remove(
-
-"active"
+.slice(-5)
 
 );
 
 
+}
 
-};
 
 
 
@@ -272,146 +150,15 @@ document.getElementById(
 
 
 
-document.getElementById(
+// CHECKOUT
 
-"takeAwayBtn"
 
-)
+checkoutBtn.onclick = async()=>{
 
-.onclick = ()=>{
 
 
-orderType="Take Away";
-
-
-document.getElementById(
-
-"takeAwayBtn"
-
-)
-
-.classList.add(
-
-"active"
-
-);
-
-
-document.getElementById(
-
-"dineInBtn"
-
-)
-
-.classList.remove(
-
-"active"
-
-);
-
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-
-// PAYMENT BUTTONS
-
-
-
-document.querySelectorAll(
-
-".payment-method button"
-
-)
-
-.forEach(button=>{
-
-
-
-button.onclick=()=>{
-
-
-
-paymentMethod =
-
-button.dataset.payment;
-
-
-
-
-
-
-
-document.querySelectorAll(
-
-".payment-method button"
-
-)
-
-.forEach(btn=>{
-
-
-btn.classList.remove(
-
-"active"
-
-);
-
-
-});
-
-
-
-
-
-
-
-button.classList.add(
-
-"active"
-
-);
-
-
-
-};
-
-
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-// PLACE ORDER
-
-
-
-document.getElementById(
-
-"placeOrderBtn"
-
-)
-
-.onclick = async ()=>{
+const cart =
+getCart();
 
 
 
@@ -420,21 +167,15 @@ document.getElementById(
 if(cart.length===0){
 
 
-
 alert(
-
 "Cart is empty"
-
 );
-
 
 
 return;
 
 
-
 }
-
 
 
 
@@ -443,29 +184,19 @@ return;
 
 let customerName =
 
-document.getElementById(
+customerNameInput?.value ||
 
-"customerName"
-
-)
-
-.value;
+"Walk In Customer";
 
 
 
 
 
+let paymentMethod =
 
+paymentMethodInput?.value ||
 
-let customerPhone =
-
-document.getElementById(
-
-"customerPhone"
-
-)
-
-.value;
+"Cash";
 
 
 
@@ -473,25 +204,23 @@ document.getElementById(
 
 
 
-if(!customerName || !customerPhone){
+let totalAmount =
+
+cart.reduce(
+
+(sum,item)=>
 
 
+sum +
 
-alert(
+(Number(item.price) *
 
-"Please enter customer details"
+Number(item.quantity)),
+
+
+0
 
 );
-
-
-
-return;
-
-
-
-}
-
-
 
 
 
@@ -505,57 +234,209 @@ try{
 
 
 
-await addDoc(
-
-collection(
-
-db,
-
-"orders"
-
-),
-
-{
+// CREATE ORDER
 
 
 
+const orderNumber =
+
+generateOrderNumber();
+
+
+
+
+
+
+const {data:order,error:orderError}=
+
+await supabase
+
+.from("orders")
+
+.insert({
+
+
+
+order_number:
+orderNumber,
+
+
+customer_name:
 customerName,
 
 
-customerPhone,
+order_type:
+localStorage.getItem("orderType")
+
+|| "Dine In",
 
 
-orderType,
+
+table_number:
+localStorage.getItem("tableNumber")
+
+|| null,
 
 
+
+total_amount:
+totalAmount,
+
+
+
+payment_method:
 paymentMethod,
 
 
 
-items:cart,
+status:
+"New"
 
 
 
-total:Number(
-
-checkoutTotal.innerText
-
-),
+})
 
 
 
-status:"Pending",
+.select()
+
+.single();
 
 
 
-createdAt:
 
-serverTimestamp()
+
+
+
+if(orderError){
+
+throw orderError;
+
+}
+
+
+
+
+
+
+
+// CREATE ORDER ITEMS
+
+
+
+let orderItems=[];
+
+
+
+
+
+
+for(let item of cart){
+
+
+
+
+
+let section =
+
+await getKitchenSection(
+
+item.category
+
+);
+
+
+
+
+
+
+orderItems.push({
+
+
+
+order_id:
+
+order.id,
+
+
+
+item_name:
+
+item.itemName,
+
+
+
+category:
+
+item.category,
+
+
+
+quantity:
+
+Number(item.quantity),
+
+
+
+price:
+
+Number(item.price),
+
+
+
+section:
+
+section
+
+
+
+});
+
+
 
 
 
 }
 
+
+
+
+
+
+
+const {error:itemError}=
+
+await supabase
+
+.from("order_items")
+
+.insert(orderItems);
+
+
+
+
+
+
+if(itemError){
+
+throw itemError;
+
+}
+
+
+
+
+
+
+
+
+
+// CLEAR CART
+
+
+
+localStorage.removeItem(
+"cart"
 );
 
 
@@ -566,20 +447,11 @@ serverTimestamp()
 
 alert(
 
-"Order Placed Successfully"
+"Order placed successfully\nOrder No: "
 
-);
++
 
-
-
-
-
-
-
-
-localStorage.removeItem(
-
-"cart"
+orderNumber
 
 );
 
@@ -591,7 +463,9 @@ localStorage.removeItem(
 
 window.location.href=
 
-"index.html";
+"success.html";
+
+
 
 
 
@@ -607,9 +481,14 @@ catch(error){
 console.log(error);
 
 
+
 alert(
 
-"Order Failed"
+"Order Failed: "
+
++
+
+error.message
 
 );
 
@@ -620,54 +499,3 @@ alert(
 
 
 };
-
-
-
-
-
-
-
-
-
-
-
-// HEADER BUTTONS
-
-
-
-document.getElementById(
-
-"backBtn"
-
-)
-
-?.addEventListener(
-
-"click",
-
-()=>{
-
-
-history.back();
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-
-// START
-
-
-
-showOrderSummary();
-
-
-changeLanguage();
