@@ -2,36 +2,49 @@ import { supabase } from "./supabase.js";
 
 
 
-let currentUser = null;
-let attendanceId = null;
+async function checkKitchenAccess(){
 
-
-
-// LOGIN CHECK
-
-async function checkKitchenLogin(){
 
 
 const {
 data:{user}
+
 }= await supabase.auth.getUser();
 
 
 
+
+
+// NO LOGIN
+
 if(!user){
 
-window.location.href="../login.html";
+
+window.location.href="../kitchen-login.html";
+
 
 return;
+
 
 }
 
 
 
 
-const {data:userData,error}=
 
-await supabase
+
+
+
+// GET USER ROLE
+
+
+const {
+
+data:userData,
+
+error
+
+}= await supabase
 
 .from("users")
 
@@ -48,13 +61,19 @@ user.email
 
 
 
+
+
 if(error || !userData){
+
 
 await supabase.auth.signOut();
 
-window.location.href="../login.html";
+
+window.location.href="../kitchen-login.html";
+
 
 return;
+
 
 }
 
@@ -62,7 +81,10 @@ return;
 
 
 
+
+
 // ONLY ADMIN AND COOK
+
 
 
 if(
@@ -74,15 +96,16 @@ userData.role !== "cook"
 ){
 
 
+
+await supabase.auth.signOut();
+
+
 alert(
 "Kitchen access denied"
 );
 
 
-await supabase.auth.signOut();
-
-
-window.location.href="../login.html";
+window.location.href="../kitchen-login.html";
 
 
 return;
@@ -92,253 +115,68 @@ return;
 
 
 
-currentUser = userData;
 
 
+
+
+// SHOW USER
+
+
+const nameElement =
 
 document.getElementById(
 "userName"
-).innerText =
+);
 
+
+
+const roleElement =
+
+document.getElementById(
+"userRole"
+);
+
+
+
+
+
+if(nameElement)
+
+nameElement.innerText =
 userData.name;
 
 
 
-document.getElementById(
-"userRole"
-).innerText =
 
+
+if(roleElement)
+
+roleElement.innerText =
 userData.role;
 
 
 
-loadAttendance();
 
 
 
-}
 
+// SAVE CURRENT USER
 
 
+localStorage.setItem(
 
+"kitchenUser",
 
-
-
-
-
-// CHECK IN
-
-
-document.getElementById(
-"checkInBtn"
-)?.addEventListener(
-"click",
-async()=>{
-
-
-
-if(!currentUser)
-return;
-
-
-
-
-let now = new Date();
-
-
-
-
-
-const {data,error}=
-
-await supabase
-
-.from("attendance")
-
-.insert({
-
-user_id:
-currentUser.id,
-
-
-name:
-currentUser.name,
-
-
-role:
-currentUser.role,
-
-
-date:
-now.toISOString()
-.split("T")[0],
-
-
-check_in:
-now.toISOString(),
-
-
-status:
-"working"
-
-
-})
-
-.select()
-
-.single();
-
-
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-attendanceId=data.id;
-
-
-alert(
-"Checked In"
-);
-
-
-
-});
-
-
-
-
-
-
-
-
-
-// CHECK OUT
-
-
-document.getElementById(
-"checkOutBtn"
-)?.addEventListener(
-"click",
-async()=>{
-
-
-
-if(!attendanceId){
-
-alert(
-"Please Check In first"
-);
-
-return;
-
-}
-
-
-
-
-
-await supabase
-
-.from("attendance")
-
-.update({
-
-check_out:
-new Date().toISOString(),
-
-
-status:
-"completed"
-
-
-})
-
-.eq(
-
-"id",
-
-attendanceId
+JSON.stringify(userData)
 
 );
 
 
 
-alert(
-"Checked Out"
-);
-
-
-
-});
-
-
-
-
-
-
-
-
-
-// FIND TODAY ATTENDANCE
-
-
-async function loadAttendance(){
-
-
-
-const today =
-
-new Date()
-
-.toISOString()
-
-.split("T")[0];
-
-
-
-
-const {data}=
-
-await supabase
-
-.from("attendance")
-
-.select("*")
-
-.eq(
-"user_id",
-currentUser.id
-)
-
-.eq(
-"date",
-today
-)
-
-.maybeSingle();
-
-
-
-
-
-if(data){
-
-attendanceId=data.id;
-
 }
 
 
 
-}
 
 
 
@@ -348,24 +186,39 @@ attendanceId=data.id;
 // LOGOUT
 
 
-document.getElementById(
-"logoutBtn"
-)?.addEventListener(
+document
+.getElementById("logoutBtn")
+?.addEventListener(
+
 "click",
+
 async()=>{
+
 
 
 await supabase.auth.signOut();
 
 
-window.location.href="../login.html";
 
-
-});
-
-
-
+localStorage.removeItem(
+"kitchenUser"
+);
 
 
 
-checkKitchenLogin();
+window.location.href="../kitchen-login.html";
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+checkKitchenAccess();
