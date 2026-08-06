@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Orders Management
+</title>
+
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<link rel="stylesheet" href="../css/orders.css">
+
+
+</head>
+
+
+<body>
+
+
+
+
+<header class="admin-header">
+
+
+<div class="admin-title">
+
+
+<h2>
+Orders Management
+</h2>
+
+
+</div>
+
+
+
+
+<div class="admin-actions">
+
+
+<button id="refreshBtn">
+🔄
+</button>
+
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+<main class="admin-container">
+
+
+
+<h1>
+Customer Orders
+</h1>
+
+
+
+
+
+<div class="order-filter">
+
+
+<button data-status="All">
+All
+</button>
+
+
+
+<button data-status="New">
+New
+</button>
+
+
+
+<button data-status="Accepted">
+Accepted
+</button>
+
+
+
+<button data-status="Preparing">
+Preparing
+</button>
+
+
+
+<button data-status="Ready">
+Ready
+</button>
+
+
+
+<button data-status="Completed">
+Completed
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="orders-table-box">
+
+
+
+<table>
+
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Order No
+</th>
+
+
+<th>
+Customer
+</th>
+
+
+<th>
+Type
+</th>
+
+
+<th>
+Table
+</th>
+
+
+<th>
+Amount
+</th>
+
+
+<th>
+Status
+</th>
+
+
+<th>
+Action
+</th>
+
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="ordersTable">
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+<script type="module" src="../js/orders.js"></script>
+
+
+</body>
+
+
+</html>
