@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Admin Menu Management
+</title>
+
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<link rel="stylesheet" href="../css/admin-menu.css">
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+<!-- HEADER -->
+
+
+<header class="admin-header">
+
+
+<div class="admin-title">
+
+
+<img 
+src="../images/logo.png"
+class="admin-logo">
+
+
+<h2>
+Menu Management
+</h2>
+
+
+</div>
+
+
+
+
+
+
+<div class="admin-actions">
+
+
+<button id="refreshBtn">
+🔄
+</button>
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<!-- MAIN -->
+
+
+<main class="admin-container">
+
+
+
+<h1>
+Menu Management
+</h1>
+
+
+
+
+
+
+
+
+<!-- CSV UPLOAD -->
+
+
+<div class="menu-upload-box">
+
+
+<h3>
+Upload Menu CSV
+</h3>
+
+
+
+<input 
+type="file"
+id="csvFile"
+accept=".csv">
+
+
+
+<button id="uploadCsvBtn">
+
+Upload CSV
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- ADD ITEM -->
+
+
+<div class="add-menu-box">
+
+
+
+<h3>
+Add New Item
+</h3>
+
+
+
+
+
+
+<input 
+type="text"
+id="category"
+placeholder="Category">
+
+
+
+
+
+<input 
+type="text"
+id="itemName"
+placeholder="Item Name">
+
+
+
+
+
+<input 
+type="number"
+id="dineInPrice"
+placeholder="Dine In Price">
+
+
+
+
+
+
+<input 
+type="number"
+id="takeAwayPrice"
+placeholder="Take Away Price">
+
+
+
+
+
+<input 
+type="text"
+id="image"
+placeholder="Image Path">
+
+
+
+
+
+<label>
+
+<input 
+type="checkbox"
+id="popular">
+
+Popular Top 15
+
+</label>
+
+
+
+
+
+
+<button id="saveMenuBtn">
+
+Save Item
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- MENU TABLE -->
+
+
+<div class="menu-table-box">
+
+
+<h3>
+Current Menu
+</h3>
+
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+<th>
+Category
+</th>
+
+
+<th>
+Item
+</th>
+
+
+<th>
+Dine In
+</th>
+
+
+<th>
+Take Away
+</th>
+
+
+<th>
+Popular
+</th>
+
+
+<th>
+Action
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="menuTable">
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script type="module" src="../js/admin-menu.js"></script>
+
+
+</body>
+
+</html>
