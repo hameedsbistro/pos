@@ -20,16 +20,13 @@ from
 
 
 
-const uploadBtn =
+const uploadBtn = document.getElementById("uploadCsvBtn");
 
-document.getElementById(
-"uploadCsvBtn"
-);
+
 
 
 
 if(uploadBtn){
-
 
 
 uploadBtn.addEventListener(
@@ -40,11 +37,7 @@ async()=>{
 
 
 
-const file =
-
-document.getElementById(
-"csvFile"
-).files[0];
+const file = document.getElementById("csvFile").files[0];
 
 
 
@@ -53,9 +46,7 @@ document.getElementById(
 if(!file){
 
 
-alert(
-"Please select CSV file"
-);
+alert("Please select CSV file");
 
 
 return;
@@ -69,42 +60,56 @@ return;
 
 
 
-const reader =
-
-new FileReader();
+const reader = new FileReader();
 
 
 
 
 
 
-
-reader.onload = async function(e){
-
-
-
-let text = e.target.result;
+reader.onload = async function(event){
 
 
 
-
-
-let rows =
-
-text.split("\n");
+const csvText = event.target.result;
 
 
 
 
 
+const rows = csvText
+.split("\n")
+.map(row=>row.trim())
+.filter(row=>row !== "");
 
-let headers =
 
-rows[0]
+
+
+
+
+if(rows.length < 2){
+
+
+alert("CSV file is empty");
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+// CSV HEADER
+
+
+const headers = rows[0]
 .split(",")
-.map(
-x=>x.trim()
-);
+.map(header=>header.trim());
 
 
 
@@ -113,36 +118,20 @@ x=>x.trim()
 
 
 
-for(let i=1;i<rows.length;i++){
+for(let i = 1; i < rows.length; i++){
 
 
 
-if(rows[i].trim()==="")
-
-continue;
-
-
-
-
-
-
-
-let values =
-
-rows[i]
+const values = rows[i]
 .split(",")
-.map(
-x=>x.trim()
-);
+.map(value=>value.trim());
 
 
 
 
 
 
-
-
-let item = {};
+const item = {};
 
 
 
@@ -153,7 +142,7 @@ headers.forEach(
 (header,index)=>{
 
 
-item[header]=values[index];
+item[header] = values[index] || "";
 
 
 }
@@ -166,26 +155,28 @@ item[header]=values[index];
 
 
 
+
+
 await addDoc(
 
-collection(
-db,
-"menu"
-),
+collection(db,"menu"),
 
 {
 
 
 category:
 
-item["Category"],
+item["Category"] || "",
 
 
 
 
-item["itemName"]:
 
-item["Item Name"],
+itemName:
+
+item["Item Name"] || "",
+
+
 
 
 
@@ -194,7 +185,8 @@ dineInPrice:
 
 Number(
 item["Dine In Price"]
-),
+) || 0,
+
 
 
 
@@ -204,7 +196,8 @@ takeAwayPrice:
 
 Number(
 item["Take Away Price"]
-),
+) || 0,
+
 
 
 
@@ -212,7 +205,8 @@ item["Take Away Price"]
 
 image:
 
-item["Image"],
+item["Image"] || "",
+
 
 
 
@@ -220,7 +214,13 @@ item["Image"],
 
 popular:
 
-item["Popular"]==="true",
+String(
+item["Popular"]
+)
+.toLowerCase()
+===
+"true",
+
 
 
 
@@ -240,16 +240,18 @@ new Date()
 
 
 
-
-
 }
 
 
 
 
 
+
+
 alert(
-"CSV Upload Completed"
+
+"CSV Upload Completed Successfully"
+
 );
 
 
@@ -262,9 +264,7 @@ location.reload();
 
 
 
-
 };
-
 
 
 
@@ -275,12 +275,10 @@ reader.readAsText(file);
 
 
 
+
+
 }
 
-
-
 );
-
-
 
 }
