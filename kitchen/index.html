@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Kitchen Display - Hameed's Bistro
+</title>
+
+
+<link rel="stylesheet" href="kitchen.css">
+
+
+</head>
+
+
+<body>
+
+
+
+<header class="kitchen-header">
+
+
+<div>
+
+<h1>
+Hameed's Bistro
+</h1>
+
+
+<h2>
+Kitchen Display
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="kitchen-user">
+
+
+<span>
+Welcome:
+<b id="userName"></b>
+</span>
+
+
+
+<button id="checkInBtn">
+Check In
+</button>
+
+
+
+<button id="checkOutBtn">
+Check Out
+</button>
+
+
+
+<button id="logoutBtn">
+Logout
+</button>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<main>
+
+
+
+<!-- SECTION -->
+
+
+<div class="section-bar">
+
+
+<select id="sectionSelect">
+
+
+<option>
+Select Section
+</option>
+
+
+</select>
+
+
+<button id="refreshBtn">
+🔄 Refresh
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- ORDER DISPLAY -->
+
+
+<section class="orders-area">
+
+
+<h2>
+New Orders
+</h2>
+
+
+
+<div id="newOrders"
+class="order-grid">
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- READY / COMPLETED BUTTON -->
+
+
+<div class="status-buttons">
+
+
+<button id="readyBtn">
+
+Ready Orders
+
+</button>
+
+
+
+<button id="completedBtn">
+
+Completed Orders
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+
+<script type="module" src="js/kitchen-auth.js"></script>
+
+<script type="module" src="js/kitchen-attendance.js"></script>
+
+<script type="module" src="js/kitchen.js"></script>
+
+
+
+</body>
+
+
+</html>
