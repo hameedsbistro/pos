@@ -1,32 +1,22 @@
 // pos/js/admin.js
 
 
-
-import { auth, db } from "./firebase.js";
-
+import { db } from "./firebase.js";
 
 
 import {
 
-onAuthStateChanged,
 
-signOut
+collection,
 
-}
+getDocs,
 
-from
+query,
 
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+where,
 
+orderBy
 
-
-
-
-import {
-
-doc,
-
-getDoc
 
 }
 
@@ -41,47 +31,130 @@ from
 
 
 
+const todaySalesElement =
 
-// CHECK ADMIN LOGIN
+document.getElementById(
 
+"todaySales"
 
-
-onAuthStateChanged(
-
-auth,
-
-async(user)=>{
-
-
-
-if(!user){
-
-
-window.location.href="../login.html";
-
-
-return;
-
-
-}
+);
 
 
 
 
+const todayOrdersElement =
+
+document.getElementById(
+
+"todayOrders"
+
+);
 
 
 
-const userDoc =
 
-await getDoc(
+const pendingOrdersElement =
 
-doc(
+document.getElementById(
+
+"pendingOrders"
+
+);
+
+
+
+
+const staffOnlineElement =
+
+document.getElementById(
+
+"staffOnline"
+
+);
+
+
+
+
+
+
+
+
+
+// LOAD DASHBOARD DATA
+
+
+
+async function loadDashboard(){
+
+
+
+try{
+
+
+
+
+
+let totalSales = 0;
+
+
+let totalOrders = 0;
+
+
+let pendingOrders = 0;
+
+
+
+
+
+
+
+const today =
+
+new Date();
+
+
+
+today.setHours(
+
+0,
+
+0,
+
+0,
+
+0
+
+);
+
+
+
+
+
+
+
+
+
+const ordersSnapshot =
+
+await getDocs(
+
+query(
+
+collection(
 
 db,
 
-"users",
+"orders"
 
-user.uid
+),
+
+orderBy(
+
+"createdAt",
+
+"desc"
+
+)
 
 )
 
@@ -94,27 +167,146 @@ user.uid
 
 
 
-if(userDoc.exists()){
 
-
-let data = userDoc.data();
-
+ordersSnapshot.forEach(orderDoc=>{
 
 
 
+const order =
+
+orderDoc.data();
 
 
-if(data.role !== "admin"){
 
 
 
-alert(
-"Access Denied"
+
+
+let orderDate =
+
+order.createdAt?.toDate();
+
+
+
+
+
+
+
+
+if(orderDate && orderDate >= today){
+
+
+
+
+
+totalOrders++;
+
+
+
+
+
+
+if(order.status === "Pending"){
+
+
+
+pendingOrders++;
+
+
+
+}
+
+
+
+
+
+
+
+
+if(order.status === "Completed"){
+
+
+
+totalSales +=
+
+Number(order.total || 0);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+// STAFF ONLINE
+
+
+
+let staffOnline = 0;
+
+
+
+
+
+
+
+const staffSnapshot =
+
+await getDocs(
+
+collection(
+
+db,
+
+"staff"
+
+)
+
 );
 
 
 
-window.location.href="../index.html";
+
+
+
+
+staffSnapshot.forEach(staff=>{
+
+
+
+const data =
+
+staff.data();
+
+
+
+
+
+
+
+if(data.status === "active"){
+
+
+
+staffOnline++;
 
 
 
@@ -122,12 +314,93 @@ window.location.href="../index.html";
 
 
 
+});
+
+
+
+
+
+
+
+
+
+
+
+// UPDATE UI
+
+
+
+if(todaySalesElement){
+
+
+
+todaySalesElement.innerText =
+
+
+"RM " +
+
+totalSales.toFixed(2);
+
+
+
 }
 
-else{
 
 
-window.location.href="../index.html";
+
+
+
+
+
+if(todayOrdersElement){
+
+
+
+todayOrdersElement.innerText =
+
+
+totalOrders;
+
+
+
+}
+
+
+
+
+
+
+
+
+if(pendingOrdersElement){
+
+
+
+pendingOrdersElement.innerText =
+
+
+pendingOrders;
+
+
+
+}
+
+
+
+
+
+
+
+
+if(staffOnlineElement){
+
+
+
+staffOnlineElement.innerText =
+
+
+staffOnline;
+
 
 
 }
@@ -137,8 +410,29 @@ window.location.href="../index.html";
 
 
 }
+
+catch(error){
+
+
+
+console.log(
+
+"Dashboard Error:",
+
+error
 
 );
+
+
+
+}
+
+
+
+}
+
+
+
 
 
 
@@ -153,8 +447,11 @@ window.location.href="../index.html";
 
 
 document.getElementById(
+
 "refreshBtn"
+
 )
+
 ?.addEventListener(
 
 "click",
@@ -162,65 +459,15 @@ document.getElementById(
 ()=>{
 
 
-location.reload();
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-
-// ADMIN PROFILE BUTTON
-
-
-
-document.getElementById(
-"adminProfileBtn"
-)
-?.addEventListener(
-
-"click",
-
-()=>{
-
-
-let logout = confirm(
-
-"Logout from Admin?"
-
-);
-
-
-
-if(logout){
-
-
-
-signOut(auth)
-.then(()=>{
-
-
-window.location.href="../login.html";
-
-
-});
-
-
-
-}
+loadDashboard();
 
 
 
 }
 
 );
+
+
 
 
 
@@ -235,8 +482,11 @@ window.location.href="../login.html";
 
 
 document.getElementById(
+
 "languageBtn"
+
 )
+
 ?.addEventListener(
 
 "click",
@@ -244,11 +494,67 @@ document.getElementById(
 ()=>{
 
 
-alert(
-"Language Menu Coming"
-);
+
+window.location.href =
+
+"../language.html";
+
 
 
 }
 
 );
+
+
+
+
+
+
+
+
+
+// PROFILE BUTTON
+
+
+
+document.getElementById(
+
+"adminProfileBtn"
+
+)
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+
+alert(
+
+"Admin Profile"
+
+);
+
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+
+
+// START
+
+
+
+loadDashboard();
