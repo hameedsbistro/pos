@@ -9,7 +9,7 @@
 
 
 <title>
-Kitchen Display System
+Kitchen Display - Hameed's Bistro
 </title>
 
 
@@ -29,15 +29,80 @@ Kitchen Display System
 <header class="admin-header">
 
 
+
 <div class="admin-title">
 
 
 <h2>
-🍳 Kitchen Display System
+Hameed's Bistro
 </h2>
 
 
+<h3>
+Kitchen Display
+</h3>
+
+
 </div>
+
+
+
+
+
+
+
+<div class="kitchen-user-panel">
+
+
+
+<span>
+Welcome:
+<b id="userName"></b>
+</span>
+
+
+
+<span>
+Role:
+<b id="userRole"></b>
+</span>
+
+
+
+
+
+<button id="checkInBtn">
+
+Check In
+
+</button>
+
+
+
+
+
+<button id="checkOutBtn">
+
+Check Out
+
+</button>
+
+
+
+
+
+<button id="logoutBtn">
+
+Logout
+
+</button>
+
+
+
+</div>
+
+
+
 
 
 
@@ -46,17 +111,23 @@ Kitchen Display System
 
 
 <button id="refreshBtn">
+
 🔄
+
 </button>
 
 
 
 <button onclick="history.back()">
+
 ←
+
 </button>
 
 
+
 </div>
+
 
 
 </header>
@@ -73,94 +144,33 @@ Kitchen Display System
 
 
 
-<h1>
-Kitchen Orders
-</h1>
 
 
+<!-- SECTION SELECT -->
 
 
-
-
-
-<!-- SECTION FILTER -->
-
-
-<div class="kitchen-filter">
+<div class="kitchen-section-select">
 
 
 <label>
 
-<input 
-type="checkbox"
-class="section-check"
-value="Main Kitchen"
-checked>
-
-
-Main Kitchen
+Select Section
 
 </label>
 
 
 
-
-<label>
-
-<input 
-type="checkbox"
-class="section-check"
-value="Tandoor">
+<select id="sectionSelect">
 
 
-Tandoor
+<option value="">
 
-</label>
+Select Section
 
-
-
-
-<label>
-
-<input 
-type="checkbox"
-class="section-check"
-value="Drinks">
+</option>
 
 
-Drinks
-
-</label>
-
-
-
-
-<label>
-
-<input 
-type="checkbox"
-class="section-check"
-value="Dessert">
-
-
-Dessert
-
-</label>
-
-
-
-
-<label>
-
-<input 
-type="checkbox"
-class="section-check"
-value="Packing">
-
-
-Packing
-
-</label>
+</select>
 
 
 
@@ -174,7 +184,7 @@ Packing
 
 
 
-<!-- ORDER COLUMNS -->
+<!-- KITCHEN STATUS BOARD -->
 
 
 <div class="kitchen-board">
@@ -184,18 +194,21 @@ Packing
 
 
 
-<!-- NEW -->
+
+<!-- NEW ORDER -->
 
 
-<div class="kitchen-column new">
+<div class="kitchen-column">
 
 
 <h2>
-🟠 New
+🟠 New Order
 </h2>
 
 
+
 <div id="newOrders">
+
 
 </div>
 
@@ -213,7 +226,7 @@ Packing
 <!-- PREPARING -->
 
 
-<div class="kitchen-column preparing">
+<div class="kitchen-column">
 
 
 <h2>
@@ -223,6 +236,7 @@ Packing
 
 
 <div id="preparingOrders">
+
 
 </div>
 
@@ -240,7 +254,7 @@ Packing
 <!-- READY -->
 
 
-<div class="kitchen-column ready">
+<div class="kitchen-column">
 
 
 <h2>
@@ -250,6 +264,35 @@ Packing
 
 
 <div id="readyOrders">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- COMPLETED -->
+
+
+<div class="kitchen-column">
+
+
+<h2>
+✅ Completed
+</h2>
+
+
+
+<div id="completedOrders">
+
 
 </div>
 
@@ -281,7 +324,27 @@ Packing
 
 
 
-<script type="module" src="../js/kitchen.js"></script>
+<script 
+type="module"
+src="../js/kitchen-auth.js">
+</script>
+
+
+
+<script 
+type="module"
+src="../js/kitchen-attendance.js">
+</script>
+
+
+
+<script 
+type="module"
+src="../js/kitchen.js">
+</script>
+
+
+
 
 
 </body>
