@@ -5,22 +5,20 @@ import { supabase } from "./supabase.js";
 const sectionSelect =
 document.getElementById("sectionSelect");
 
-
 const newOrders =
 document.getElementById("newOrders");
-
-
-const preparingOrders =
-document.getElementById("preparingOrders");
-
 
 const readyOrders =
 document.getElementById("readyOrders");
 
-
 const completedOrders =
 document.getElementById("completedOrders");
 
+const readyView =
+document.getElementById("readyView");
+
+const completedView =
+document.getElementById("completedView");
 
 
 
@@ -31,12 +29,10 @@ let selectedCategories = [];
 
 
 
-
-// LOAD KITCHEN SECTIONS
+// LOAD SECTION
 
 
 async function loadSections(){
-
 
 
 const {data,error}=
@@ -59,7 +55,6 @@ await supabase
 
 
 
-
 if(error){
 
 console.log(error);
@@ -70,38 +65,28 @@ return;
 
 
 
+sectionSelect.innerHTML=`
 
-
-sectionSelect.innerHTML =
-
-`
 <option value="">
 Select Section
 </option>
+
 `;
-
-
 
 
 
 data.forEach(section=>{
 
 
-sectionSelect.innerHTML +=
+sectionSelect.innerHTML +=`
 
-`
 <option value="${section.id}">
-
 ${section.section_name}
-
 </option>
 
 `;
 
-
-
 });
-
 
 
 }
@@ -117,16 +102,20 @@ ${section.section_name}
 // SECTION CHANGE
 
 
-sectionSelect.onchange = async()=>{
+sectionSelect
+.addEventListener(
+
+"change",
+
+async()=>{
 
 
-let sectionId =
+let id =
 sectionSelect.value;
 
 
 
-
-if(!sectionId){
+if(!id){
 
 selectedCategories=[];
 
@@ -139,8 +128,7 @@ return;
 
 
 
-
-const {data,error}=
+const {data}=
 
 await supabase
 
@@ -152,23 +140,9 @@ await supabase
 
 "section_id",
 
-sectionId
+id
 
 );
-
-
-
-
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
 
 
 
@@ -177,18 +151,18 @@ selectedCategories =
 
 data.map(
 
-item=>item.category
+x=>x.category
 
 );
-
 
 
 
 loadOrders();
 
 
+}
 
-};
+);
 
 
 
@@ -207,14 +181,9 @@ async function loadOrders(){
 
 newOrders.innerHTML="";
 
-preparingOrders.innerHTML="";
-
 readyOrders.innerHTML="";
 
 completedOrders.innerHTML="";
-
-
-
 
 
 
@@ -235,7 +204,9 @@ orders(*)
 `)
 
 .order(
+
 "created_at",
+
 {
 ascending:false
 }
@@ -262,6 +233,15 @@ data.forEach(item=>{
 
 
 
+let order=item.orders;
+
+
+
+if(!order)
+return;
+
+
+
 
 
 // CATEGORY FILTER
@@ -277,34 +257,17 @@ item.category
 
 )
 
-){
+)
 
 return;
 
-}
 
 
 
 
 
 
-
-let order =
-item.orders;
-
-
-
-
-
-if(!order)
-return;
-
-
-
-
-
-
-createCard(
+createOrderCard(
 
 item,
 
@@ -318,7 +281,6 @@ order
 
 
 
-
 }
 
 
@@ -329,60 +291,50 @@ order
 
 
 
-// CREATE CARD
-
-
-function createCard(item,order){
+function createOrderCard(item,order){
 
 
 
-let card=document.createElement("div");
+const card=document.createElement("div");
 
-card.className="kitchen-card";
-
-
+card.className="order-card";
 
 
 
-card.innerHTML=
-
-`
+card.innerHTML=`
 
 <h3>
-
-${order.order_number}
-
+Order #${order.order_number}
 </h3>
 
 
 <p>
-
 ${item.item_name}
-
 </p>
 
 
-
 <p>
-
 Qty: ${item.quantity}
-
 </p>
 
 
 <p>
-
 ${item.category}
-
 </p>
 
 
 
+<button class="prepare">
+
+Preparing
+
+</button>
 
 
-<button>
 
-${getNextStatus(order.status)}
+<button class="ready">
+
+Ready
 
 </button>
 
@@ -395,16 +347,39 @@ ${getNextStatus(order.status)}
 
 
 
-card.querySelector("button")
+card
+.querySelector(".prepare")
+.onclick=async()=>{
 
-.onclick=()=>{
 
-
-updateStatus(
+await updateStatus(
 
 order.id,
 
-getNextStatus(order.status)
+"Preparing"
+
+);
+
+
+};
+
+
+
+
+
+
+
+
+card
+.querySelector(".ready")
+.onclick=async()=>{
+
+
+await updateStatus(
+
+order.id,
+
+"Ready"
 
 );
 
@@ -424,56 +399,18 @@ newOrders.appendChild(card);
 
 
 
-else if(order.status==="Preparing")
-
-preparingOrders.appendChild(card);
-
-
-
 else if(order.status==="Ready")
 
 readyOrders.appendChild(card);
 
 
 
-else
+else if(order.status==="Completed")
 
 completedOrders.appendChild(card);
 
 
 
-}
-
-
-
-
-
-
-
-
-
-function getNextStatus(status){
-
-
-if(status==="New")
-
-return "Preparing";
-
-
-
-if(status==="Preparing")
-
-return "Ready";
-
-
-
-if(status==="Ready")
-
-return "Completed";
-
-
-
-return "Completed";
 
 
 }
@@ -484,10 +421,12 @@ return "Completed";
 
 
 
+
+
+// UPDATE STATUS
 
 
 async function updateStatus(id,status){
-
 
 
 await supabase
@@ -501,10 +440,12 @@ status:status
 })
 
 .eq(
-"id",
-id
-);
 
+"id",
+
+id
+
+);
 
 
 loadOrders();
@@ -519,18 +460,90 @@ loadOrders();
 
 
 
+
+// READY BUTTON
+
+
+document
+
+.getElementById("readyBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+readyView.style.display="block";
+
+completedView.style.display="none";
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+// COMPLETED BUTTON
+
+
+document
+
+.getElementById("completedBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+completedView.style.display="block";
+
+readyView.style.display="none";
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
 // REFRESH
 
 
 document
+
 .getElementById("refreshBtn")
+
 ?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 loadOrders();
 
+
 });
+
+
+
 
 
 
