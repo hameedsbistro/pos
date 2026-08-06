@@ -1,18 +1,17 @@
-// pos/js/checkout.js
-
-
-
 import { db } from "./firebase.js";
 
+import { changeLanguage } from "./language.js";
 
 
 import {
+
 
 collection,
 
 addDoc,
 
 serverTimestamp
+
 
 }
 
@@ -26,10 +25,7 @@ from
 
 
 
-// CART DATA
-
-
-const cart =
+let cart =
 
 JSON.parse(
 
@@ -46,27 +42,12 @@ localStorage.getItem("cart")
 
 
 
-// ORDER TYPE
 
 
-const orderType =
-
-localStorage.getItem(
-"orderType"
-)
-
-||
-
-"Dine In";
+let orderType = "Dine In";
 
 
-
-
-
-
-document.getElementById(
-"orderType"
-).innerText = orderType;
+let paymentMethod = "Cash";
 
 
 
@@ -75,21 +56,13 @@ document.getElementById(
 
 
 
-// HIDE TABLE FOR TAKE AWAY
 
-
-const tableBox =
+const checkoutItems =
 
 document.getElementById(
-"tableBox"
-);
 
+"checkoutItems"
 
-
-const tableNumber =
-
-document.getElementById(
-"tableNumber"
 );
 
 
@@ -97,31 +70,12 @@ document.getElementById(
 
 
 
-if(orderType==="Take Away"){
-
-
-tableBox.style.display="none";
-
-
-}
-
-
-
-
-
-
-
-
-
-
-// CONFIRM ORDER
-
-
-
-const confirmBtn =
+const checkoutTotal =
 
 document.getElementById(
-"confirmOrderBtn"
+
+"checkoutTotal"
+
 );
 
 
@@ -129,96 +83,18 @@ document.getElementById(
 
 
 
-confirmBtn.addEventListener(
-
-"click",
-
-async ()=>{
 
 
 
+// SHOW ORDER SUMMARY
 
 
 
-let name =
-
-document.getElementById(
-"customerName"
-).value.trim();
+function showOrderSummary(){
 
 
 
-
-
-let phone =
-
-document.getElementById(
-"customerPhone"
-).value.trim();
-
-
-
-
-
-let table =
-
-tableNumber.value;
-
-
-
-
-
-let note =
-
-document.getElementById(
-"orderNote"
-).value;
-
-
-
-
-
-
-
-
-if(name===""){
-
-
-alert(
-"Please enter customer name"
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-
-if(cart.length===0){
-
-
-alert(
-"Cart is empty"
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
+checkoutItems.innerHTML="";
 
 
 
@@ -228,16 +104,287 @@ let total = 0;
 
 
 
+
 cart.forEach(item=>{
 
 
-total +=
+
+
+
+let itemTotal =
 
 Number(item.price)
 
 *
 
 item.quantity;
+
+
+
+
+
+
+
+total += itemTotal;
+
+
+
+
+
+
+
+
+let div =
+
+document.createElement(
+
+"div"
+
+);
+
+
+
+
+
+div.className =
+
+"checkout-item";
+
+
+
+
+
+
+div.innerHTML = `
+
+
+
+<span>
+
+${item.itemName}
+
+×
+
+${item.quantity}
+
+</span>
+
+
+
+
+
+<span>
+
+RM ${itemTotal.toFixed(2)}
+
+</span>
+
+
+
+`;
+
+
+
+
+
+
+checkoutItems.appendChild(div);
+
+
+
+});
+
+
+
+
+
+
+
+
+checkoutTotal.innerText =
+
+total.toFixed(2);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ORDER TYPE BUTTONS
+
+
+
+document.getElementById(
+
+"dineInBtn"
+
+)
+
+.onclick = ()=>{
+
+
+orderType="Dine In";
+
+
+document.getElementById(
+
+"dineInBtn"
+
+)
+
+.classList.add(
+
+"active"
+
+);
+
+
+document.getElementById(
+
+"takeAwayBtn"
+
+)
+
+.classList.remove(
+
+"active"
+
+);
+
+
+
+};
+
+
+
+
+
+
+
+
+document.getElementById(
+
+"takeAwayBtn"
+
+)
+
+.onclick = ()=>{
+
+
+orderType="Take Away";
+
+
+document.getElementById(
+
+"takeAwayBtn"
+
+)
+
+.classList.add(
+
+"active"
+
+);
+
+
+document.getElementById(
+
+"dineInBtn"
+
+)
+
+.classList.remove(
+
+"active"
+
+);
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+// PAYMENT BUTTONS
+
+
+
+document.querySelectorAll(
+
+".payment-method button"
+
+)
+
+.forEach(button=>{
+
+
+
+button.onclick=()=>{
+
+
+
+paymentMethod =
+
+button.dataset.payment;
+
+
+
+
+
+
+
+document.querySelectorAll(
+
+".payment-method button"
+
+)
+
+.forEach(btn=>{
+
+
+btn.classList.remove(
+
+"active"
+
+);
+
+
+});
+
+
+
+
+
+
+
+button.classList.add(
+
+"active"
+
+);
+
+
+
+};
 
 
 
@@ -252,37 +399,136 @@ item.quantity;
 
 
 
+
+
+// PLACE ORDER
+
+
+
+document.getElementById(
+
+"placeOrderBtn"
+
+)
+
+.onclick = async ()=>{
+
+
+
+
+
+if(cart.length===0){
+
+
+
+alert(
+
+"Cart is empty"
+
+);
+
+
+
+return;
+
+
+
+}
+
+
+
+
+
+
+
+let customerName =
+
+document.getElementById(
+
+"customerName"
+
+)
+
+.value;
+
+
+
+
+
+
+
+let customerPhone =
+
+document.getElementById(
+
+"customerPhone"
+
+)
+
+.value;
+
+
+
+
+
+
+
+if(!customerName || !customerPhone){
+
+
+
+alert(
+
+"Please enter customer details"
+
+);
+
+
+
+return;
+
+
+
+}
+
+
+
+
+
+
+
+
+
 try{
 
 
 
-const order = await addDoc(
 
-collection(db,"orders"),
+
+await addDoc(
+
+collection(
+
+db,
+
+"orders"
+
+),
 
 {
 
 
-orderNumber:
 
-"HMB-"+Date.now(),
-
+customerName,
 
 
-customerName:name,
+customerPhone,
 
 
-
-customerPhone:phone,
-
+orderType,
 
 
-orderType:orderType,
-
-
-
-tableNumber:
-table,
+paymentMethod,
 
 
 
@@ -290,33 +536,25 @@ items:cart,
 
 
 
-totalAmount:
-total,
+total:Number(
+
+checkoutTotal.innerText
+
+),
 
 
 
-note:note,
-
-
-
-status:
-"New",
-
-
-
-paymentStatus:
-"Pending",
+status:"Pending",
 
 
 
 createdAt:
+
 serverTimestamp()
 
 
 
 }
-
-
 
 );
 
@@ -328,7 +566,7 @@ serverTimestamp()
 
 alert(
 
-"Order Confirmed Successfully"
+"Order Placed Successfully"
 
 );
 
@@ -337,12 +575,12 @@ alert(
 
 
 
-
-// CLEAR CART
 
 
 localStorage.removeItem(
+
 "cart"
+
 );
 
 
@@ -351,7 +589,10 @@ localStorage.removeItem(
 
 
 
-window.location.href="../index.html";
+window.location.href=
+
+"index.html";
+
 
 
 
@@ -363,14 +604,13 @@ catch(error){
 
 
 
-console.log(
-error
-);
-
+console.log(error);
 
 
 alert(
+
 "Order Failed"
+
 );
 
 
@@ -379,10 +619,9 @@ alert(
 
 
 
+};
 
-}
 
-);
 
 
 
@@ -395,31 +634,14 @@ alert(
 // HEADER BUTTONS
 
 
-document.getElementById(
-"homeBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
-
-
-window.location.href="../index.html";
-
-
-}
-
-);
-
-
-
-
-
-
 
 document.getElementById(
+
 "backBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
 
 "click",
 
@@ -439,18 +661,13 @@ history.back();
 
 
 
-document.getElementById(
-"refreshBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
 
 
-location.reload();
+// START
 
 
-}
 
-);
+showOrderSummary();
+
+
+changeLanguage();
