@@ -1,39 +1,14 @@
 // pos/js/menu.js
 
-
-import { db } from "./firebase.js";
-
-import { changeLanguage } from "./language.js";
-
-
-import {
-
-collection,
-
-getDocs
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-
-
+import { supabase } from "./supabase.js";
 
 
 const menuItemsDiv =
-
 document.getElementById("menuItems");
 
 
-
 const categoryList =
-
 document.getElementById("categoryList");
-
-
-
 
 
 
@@ -42,68 +17,34 @@ let allMenuItems = [];
 
 
 
-
-
-
-
-
-// LOAD MENU FROM FIREBASE
-
+// LOAD MENU FROM SUPABASE
 
 async function loadMenu(){
-
 
 
 try{
 
 
-
-const querySnapshot =
-
-await getDocs(
-
-collection(db,"menu")
-
-);
+const { data, error } = await supabase
+.from("menu")
+.select("*")
+.eq("status","active");
 
 
 
+if(error){
 
+throw error;
 
-allMenuItems = [];
-
-
-
-
-
-
-querySnapshot.forEach((doc)=>{
+}
 
 
 
-allMenuItems.push({
-
-
-id:doc.id,
-
-
-...doc.data()
-
-
-});
-
-
-
-});
-
-
-
-
+allMenuItems = data || [];
 
 
 
 showCategories();
-
 
 showMenu(allMenuItems);
 
@@ -115,26 +56,15 @@ catch(error){
 
 
 console.log(
-
 "Menu Load Error:",
-
 error
-
 );
 
 
-
 }
 
 
-
 }
-
-
-
-
-
-
 
 
 
@@ -142,9 +72,7 @@ error
 
 // SHOW CATEGORY
 
-
 function showCategories(){
-
 
 
 let categories = [
@@ -155,26 +83,17 @@ let categories = [
 
 
 
-
-
-
 allMenuItems.forEach(item=>{
 
 
-
 if(
-
 item.category &&
-
 !categories.includes(item.category)
-
 ){
 
 
 categories.push(
-
 item.category
-
 );
 
 
@@ -188,10 +107,7 @@ item.category
 
 
 
-
-categoryList.innerHTML = "";
-
-
+categoryList.innerHTML="";
 
 
 
@@ -200,42 +116,29 @@ categoryList.innerHTML = "";
 categories.forEach(category=>{
 
 
-
 let btn =
-
 document.createElement("button");
 
 
 
-
-
 btn.className =
-
 "category-btn";
 
 
 
-
-
-btn.innerText = category;
-
-
+btn.innerText =
+category;
 
 
 
 
-
-
-btn.onclick = ()=>{
-
+btn.onclick=()=>{
 
 
 if(category==="All"){
 
 
-
 showMenu(allMenuItems);
-
 
 
 }
@@ -243,27 +146,23 @@ showMenu(allMenuItems);
 else{
 
 
-
 showMenu(
 
 allMenuItems.filter(
 
-item =>
+item=>
 
-item.category === category
+item.category===category
 
 )
 
 );
 
 
-
 }
 
 
-
 };
-
 
 
 
@@ -273,8 +172,6 @@ categoryList.appendChild(btn);
 
 
 
-
-
 });
 
 
@@ -288,35 +185,13 @@ categoryList.appendChild(btn);
 
 
 
-
-
-
-// SHOW MENU
-
+// SHOW MENU ITEMS
 
 function showMenu(items){
 
 
 
-menuItemsDiv.innerHTML = "";
-
-
-
-
-
-
-let orderType =
-
-new URLSearchParams(
-
-window.location.search
-
-)
-
-.get("type");
-
-
-
+menuItemsDiv.innerHTML="";
 
 
 
@@ -324,22 +199,13 @@ window.location.search
 items.forEach(item=>{
 
 
-
-
-
 let card =
-
 document.createElement("div");
 
 
 
-
-
 card.className =
-
 "food-card";
-
-
 
 
 
@@ -348,61 +214,33 @@ card.className =
 card.innerHTML = `
 
 
-
-<img src="${item.image || 'images/menu/default.jpg'}">
-
-
-
-
-
-<div class="food-info">
-
+<img src="${item.image || '../images/menu/default.jpg'}">
 
 
 <h3>
-
-${item.itemName}
-
+${item.itemname || item.itemName}
 </h3>
-
-
-
-
-
 
 
 <div class="price-box">
 
 
 <p>
-
 Dine In:
-
 <br>
-
-RM ${Number(item.dineInPrice).toFixed(2)}
-
+RM ${Number(item.dineinprice || item.dineInPrice).toFixed(2)}
 </p>
-
 
 
 
 <p>
-
 Take Away:
-
 <br>
-
-RM ${Number(item.takeAwayPrice).toFixed(2)}
-
+RM ${Number(item.takeawayprice || item.takeAwayPrice).toFixed(2)}
 </p>
 
 
-
 </div>
-
-
-
 
 
 
@@ -414,40 +252,21 @@ Add To Cart
 </button>
 
 
-
-
-
-</div>
-
-
-
 `;
 
 
 
 
 
+card
+.querySelector(".add-cart-btn")
+.onclick=()=>{
 
 
-
-card.querySelector(
-
-".add-cart-btn"
-
-)
-
-.onclick = ()=>{
-
-
-
-addToCart(item,orderType);
-
+addToCart(item);
 
 
 };
-
-
-
 
 
 
@@ -471,12 +290,9 @@ menuItemsDiv.appendChild(card);
 
 
 
-
-
 // ADD TO CART
 
-
-function addToCart(item,type){
+function addToCart(item){
 
 
 
@@ -495,38 +311,15 @@ localStorage.getItem("cart")
 
 
 
-
-
-let price =
-
-type==="takeaway"
-
-?
-
-item.takeAwayPrice
-
-:
-
-item.dineInPrice;
-
-
-
-
-
-
-
 let exist =
 
 cart.find(
 
-product =>
+product=>
 
-product.id === item.id
+product.id===item.id
 
 );
-
-
-
 
 
 
@@ -535,50 +328,37 @@ product.id === item.id
 if(exist){
 
 
-
-exist.quantity += 1;
-
-
+exist.quantity++;
 
 }
 
 else{
 
 
-
 cart.push({
-
 
 
 id:item.id,
 
 
-itemName:item.itemName,
+itemName:
+item.itemname || item.itemName,
 
 
-price:Number(price),
+price:
+item.dineinprice || item.dineInPrice,
 
 
-dineInPrice:Number(item.dineInPrice),
-
-
-takeAwayPrice:Number(item.takeAwayPrice),
-
-
-image:item.image || "",
+image:item.image,
 
 
 quantity:1
 
 
-
 });
 
 
-
 }
-
-
 
 
 
@@ -596,20 +376,7 @@ JSON.stringify(cart)
 
 
 
-
-
 updateCartCount();
-
-
-
-
-
-
-alert(
-
-"Added To Cart"
-
-);
 
 
 
@@ -622,14 +389,9 @@ alert(
 
 
 
-
-
-
-// UPDATE CART COUNT
-
+// CART COUNT
 
 function updateCartCount(){
-
 
 
 let cart =
@@ -644,88 +406,28 @@ localStorage.getItem("cart")
 
 
 
+let count=0;
 
 
-
-let count =
-
-cart.reduce(
-
-(total,item)=>
+cart.forEach(item=>{
 
 
-total + item.quantity,
+count += item.quantity;
 
 
-0
-
-);
+});
 
 
 
 
-
-
-
-const cartCount =
 
 document.getElementById(
-
 "cartCount"
-
-);
-
-
-
-
-
-
-
-const floatingCount =
-
-document.getElementById(
-
-"floatingCartCount"
-
-);
-
-
-
-
-
-
-
-
-if(cartCount){
-
-
-
-cartCount.innerText = count;
+)?.innerText=count;
 
 
 
 }
-
-
-
-
-
-
-if(floatingCount){
-
-
-
-floatingCount.innerText = count;
-
-
-
-}
-
-
-
-}
-
-
 
 
 
@@ -737,109 +439,50 @@ floatingCount.innerText = count;
 
 // HEADER BUTTONS
 
-
 document.getElementById(
-
 "homeBtn"
-
-)
-
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
 
+window.location.href="../index.html";
 
-window.location.href="index.html";
-
-
-}
-
-);
-
-
-
-
-
-
+});
 
 
 document.getElementById(
-
 "backBtn"
-
-)
-
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
-
 
 history.back();
 
-
-}
-
-);
-
-
-
-
-
-
+});
 
 
 
 document.getElementById(
-
 "refreshBtn"
-
-)
-
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
-
 
 location.reload();
 
-
-}
-
-);
-
-
-
-
-
+});
 
 
 
 document.getElementById(
-
 "cartBtn"
-
-)
-
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
-
 
 window.location.href="cart.html";
 
-
-}
-
-);
-
+});
 
 
 
@@ -850,11 +493,6 @@ window.location.href="cart.html";
 
 // START
 
-
 loadMenu();
 
-
 updateCartCount();
-
-
-changeLanguage();
