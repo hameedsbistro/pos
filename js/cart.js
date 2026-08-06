@@ -1,11 +1,20 @@
 // pos/js/cart.js
 
 
-let cart = 
+import { changeLanguage } from "./language.js";
+
+
+
+let cart =
+
 JSON.parse(
+
 localStorage.getItem("cart")
+
 )
+
 ||
+
 [];
 
 
@@ -14,17 +23,30 @@ localStorage.getItem("cart")
 
 
 
+
+
 const cartItems =
+
 document.getElementById(
+
 "cartItems"
+
 );
+
+
+
 
 
 
 const cartTotal =
+
 document.getElementById(
+
 "cartTotal"
+
 );
+
+
 
 
 
@@ -38,7 +60,8 @@ document.getElementById(
 function showCart(){
 
 
-cartItems.innerHTML="";
+
+cartItems.innerHTML = "";
 
 
 
@@ -46,20 +69,36 @@ let total = 0;
 
 
 
+
+
+
+
 if(cart.length === 0){
+
 
 
 cartItems.innerHTML = `
 
-<h3>
+
+<h3 style="text-align:center">
+
 Your cart is empty
+
 </h3>
+
 
 `;
 
 
+
 cartTotal.innerText =
+
 "0.00";
+
+
+
+updateCartCount();
+
 
 
 return;
@@ -73,13 +112,20 @@ return;
 
 
 
+
+
 cart.forEach((item,index)=>{
 
 
 
+
+
 total +=
+
 Number(item.price)
+
 *
+
 item.quantity;
 
 
@@ -88,15 +134,21 @@ item.quantity;
 
 
 
+
 let div =
-document.createElement(
-"div"
-);
+
+document.createElement("div");
+
+
 
 
 
 div.className =
+
 "cart-item";
+
+
+
 
 
 
@@ -105,19 +157,31 @@ div.className =
 div.innerHTML = `
 
 
-<img src="${item.image || '../images/menu/default.jpg'}">
+
+<img src="${item.image || 'images/menu/default.jpg'}">
+
+
+
+
 
 
 <div class="cart-item-info">
 
 
+
 <h3>
+
 ${item.itemName}
+
 </h3>
 
 
+
+
 <p>
+
 RM ${Number(item.price).toFixed(2)}
+
 </p>
 
 
@@ -129,27 +193,41 @@ RM ${Number(item.price).toFixed(2)}
 
 
 
+
 <div class="quantity-box">
 
 
+
 <button class="minus">
+
 -
+
 </button>
+
+
 
 
 
 <span>
+
 ${item.quantity}
+
 </span>
 
 
 
+
+
 <button class="plus">
+
 +
+
 </button>
 
 
+
 </div>
+
 
 
 
@@ -173,18 +251,26 @@ Remove
 
 
 
-// PLUS BUTTON
+
+
+
+// PLUS
 
 
 div.querySelector(
+
 ".plus"
+
 )
-.onclick=()=>{
+
+.onclick = ()=>{
 
 
 cart[index].quantity++;
 
+
 saveCart();
+
 
 
 };
@@ -195,16 +281,22 @@ saveCart();
 
 
 
-// MINUS BUTTON
+
+
+// MINUS
 
 
 div.querySelector(
+
 ".minus"
+
 )
-.onclick=()=>{
+
+.onclick = ()=>{
 
 
-if(cart[index].quantity>1){
+
+if(cart[index].quantity > 1){
 
 
 cart[index].quantity--;
@@ -234,16 +326,23 @@ saveCart();
 
 
 
-// REMOVE BUTTON
+
+
+// REMOVE
 
 
 div.querySelector(
+
 ".remove-btn"
+
 )
-.onclick=()=>{
+
+.onclick = ()=>{
+
 
 
 cart.splice(index,1);
+
 
 
 saveCart();
@@ -271,7 +370,10 @@ cartItems.appendChild(div);
 
 
 
+
+
 cartTotal.innerText =
+
 total.toFixed(2);
 
 
@@ -290,8 +392,9 @@ updateCartCount();
 
 
 
-// SAVE CART
 
+
+// SAVE CART
 
 
 function saveCart(){
@@ -311,7 +414,11 @@ JSON.stringify(cart)
 showCart();
 
 
+
 }
+
+
+
 
 
 
@@ -331,10 +438,15 @@ let count = 0;
 
 
 
+
+
+
 cart.forEach(item=>{
 
 
+
 count += item.quantity;
+
 
 
 });
@@ -343,18 +455,59 @@ count += item.quantity;
 
 
 
+
+
+
 const cartCount =
+
 document.getElementById(
+
 "cartCount"
+
 );
+
+
+
+
+
+
+const floatingCartCount =
+
+document.getElementById(
+
+"floatingCartCount"
+
+);
+
+
+
+
+
 
 
 
 if(cartCount){
 
 
-cartCount.innerText =
-count;
+
+cartCount.innerText = count;
+
+
+
+}
+
+
+
+
+
+
+
+if(floatingCartCount){
+
+
+
+floatingCartCount.innerText = count;
+
 
 
 }
@@ -362,6 +515,7 @@ count;
 
 
 }
+
 
 
 
@@ -375,11 +529,18 @@ count;
 // CHECKOUT
 
 
-
 const checkoutBtn =
+
 document.getElementById(
+
 "checkoutBtn"
+
 );
+
+
+
+
+
 
 
 
@@ -387,18 +548,24 @@ if(checkoutBtn){
 
 
 
-checkoutBtn.onclick=()=>{
+checkoutBtn.onclick = ()=>{
 
 
-if(cart.length===0){
+
+if(cart.length === 0){
+
 
 
 alert(
+
 "Cart is empty"
+
 );
 
 
+
 return;
+
 
 
 }
@@ -406,7 +573,10 @@ return;
 
 
 
+
+
 window.location.href =
+
 "checkout.html";
 
 
@@ -414,7 +584,11 @@ window.location.href =
 };
 
 
+
 }
+
+
+
 
 
 
@@ -427,50 +601,89 @@ window.location.href =
 // HEADER BUTTONS
 
 
-
 document.getElementById(
+
 "homeBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
 
 
-window.location.href="../index.html";
+
+window.location.href =
+
+"index.html";
 
 
-});
+
+}
+
+);
+
+
+
+
 
 
 
 
 
 document.getElementById(
+
 "backBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 
 history.back();
 
 
-});
+
+}
+
+);
+
+
+
+
 
 
 
 
 
 document.getElementById(
+
 "refreshBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 
 location.reload();
 
 
-});
+
+}
+
+);
 
 
 
@@ -478,6 +691,15 @@ location.reload();
 
 
 
+
+
+
+
+
+// START
 
 
 showCart();
+
+
+changeLanguage();
