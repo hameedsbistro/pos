@@ -1,0 +1,229 @@
+/* pos/css/popular.css */
+
+
+
+.popular-container{
+
+
+    padding:20px;
+
+    width:100%;
+
+    max-width:1000px;
+
+    margin:auto;
+
+
+}
+
+
+
+
+
+.popular-container h1{
+
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+    font-size:30px;
+
+
+}
+
+
+
+
+
+
+
+#popularItems{
+
+
+    display:grid;
+
+    grid-template-columns:repeat(
+
+        auto-fit,
+
+        minmax(220px,1fr)
+
+    );
+
+    gap:20px;
+
+
+}
+
+
+
+
+
+
+
+
+.popular-card{
+
+
+    background:white;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    box-shadow:0 3px 10px rgba(
+
+        0,
+
+        0,
+
+        0,
+
+        0.15
+
+    );
+
+
+}
+
+
+
+
+
+
+
+
+.popular-card img{
+
+
+    width:100%;
+
+    height:160px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+
+}
+
+
+
+
+
+
+
+
+.popular-card h3{
+
+
+    margin:12px 0;
+
+    font-size:20px;
+
+
+}
+
+
+
+
+
+
+
+.popular-price{
+
+
+    font-size:17px;
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+
+
+
+
+
+.popular-add-btn{
+
+
+    width:100%;
+
+    height:40px;
+
+    background:#008000;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+
+
+.popular-add-btn:hover{
+
+
+    background:#006600;
+
+
+}
+
+
+
+
+
+
+
+
+@media(max-width:600px){
+
+
+
+.popular-container h1{
+
+
+    font-size:24px;
+
+
+}
+
+
+
+#popularItems{
+
+
+    grid-template-columns:1fr;
+
+
+}
+
+
+.popular-card img{
+
+
+    height:140px;
+
+
+}
+
+
+
+}
