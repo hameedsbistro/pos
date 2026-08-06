@@ -13,32 +13,50 @@ Kitchen Display System
 </title>
 
 
+<link rel="stylesheet" href="../css/admin.css">
+
 <link rel="stylesheet" href="../css/kitchen.css">
 
 
 </head>
 
 
+
 <body>
 
 
 
+<header class="admin-header">
+
+
+<div class="admin-title">
+
+
+<h2>
+🍳 Kitchen Display System
+</h2>
+
+
+</div>
 
 
 
-<header class="kitchen-header">
 
-
-<h1>
-Kitchen Display System
-</h1>
-
+<div class="admin-actions">
 
 
 <button id="refreshBtn">
 🔄
 </button>
 
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+</div>
 
 
 </header>
@@ -55,13 +73,126 @@ Kitchen Display System
 
 
 
-<div class="kitchen-column">
+<h1>
+Kitchen Orders
+</h1>
+
+
+
+
+
+
+
+<!-- SECTION FILTER -->
+
+
+<div class="kitchen-filter">
+
+
+<label>
+
+<input 
+type="checkbox"
+class="section-check"
+value="Main Kitchen"
+checked>
+
+
+Main Kitchen
+
+</label>
+
+
+
+
+<label>
+
+<input 
+type="checkbox"
+class="section-check"
+value="Tandoor">
+
+
+Tandoor
+
+</label>
+
+
+
+
+<label>
+
+<input 
+type="checkbox"
+class="section-check"
+value="Drinks">
+
+
+Drinks
+
+</label>
+
+
+
+
+<label>
+
+<input 
+type="checkbox"
+class="section-check"
+value="Dessert">
+
+
+Dessert
+
+</label>
+
+
+
+
+<label>
+
+<input 
+type="checkbox"
+class="section-check"
+value="Packing">
+
+
+Packing
+
+</label>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ORDER COLUMNS -->
+
+
+<div class="kitchen-board">
+
+
+
+
+
+
+<!-- NEW -->
+
+
+<div class="kitchen-column new">
 
 
 <h2>
-New Orders
+🟠 New
 </h2>
-
 
 
 <div id="newOrders">
@@ -78,11 +209,15 @@ New Orders
 
 
 
-<div class="kitchen-column">
+
+<!-- PREPARING -->
+
+
+<div class="kitchen-column preparing">
 
 
 <h2>
-Preparing
+🟣 Preparing
 </h2>
 
 
@@ -101,11 +236,15 @@ Preparing
 
 
 
-<div class="kitchen-column">
+
+<!-- READY -->
+
+
+<div class="kitchen-column ready">
 
 
 <h2>
-Ready
+🟢 Ready
 </h2>
 
 
@@ -116,6 +255,16 @@ Ready
 
 
 </div>
+
+
+
+
+
+
+
+</div>
+
+
 
 
 
