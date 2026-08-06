@@ -1,63 +1,194 @@
-// pos/js/kitchen.js
-
-
-import { db } from "./firebase.js";
+import { supabase } from "./supabase.js";
 
 
 
-import {
-
-collection,
-
-getDocs,
-
-doc,
-
-updateDoc,
-
-query,
-
-orderBy
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-
-
-
-
+const sectionSelect =
+document.getElementById("sectionSelect");
 
 
 const newOrders =
-
-document.getElementById(
-
-"newOrders"
-
-);
-
+document.getElementById("newOrders");
 
 
 const preparingOrders =
-
-document.getElementById(
-
-"preparingOrders"
-
-);
-
+document.getElementById("preparingOrders");
 
 
 const readyOrders =
+document.getElementById("readyOrders");
 
-document.getElementById(
 
-"readyOrders"
+const completedOrders =
+document.getElementById("completedOrders");
+
+
+
+
+let selectedCategories = [];
+
+
+
+
+
+
+
+// LOAD KITCHEN SECTIONS
+
+
+async function loadSections(){
+
+
+
+const {data,error}=
+
+await supabase
+
+.from("kitchen_sections")
+
+.select("*")
+
+.eq(
+"status",
+"active"
+)
+
+.order(
+"section_name"
+);
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+sectionSelect.innerHTML =
+
+`
+<option value="">
+Select Section
+</option>
+`;
+
+
+
+
+
+data.forEach(section=>{
+
+
+sectionSelect.innerHTML +=
+
+`
+<option value="${section.id}">
+
+${section.section_name}
+
+</option>
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// SECTION CHANGE
+
+
+sectionSelect.onchange = async()=>{
+
+
+let sectionId =
+sectionSelect.value;
+
+
+
+
+if(!sectionId){
+
+selectedCategories=[];
+
+loadOrders();
+
+return;
+
+}
+
+
+
+
+
+const {data,error}=
+
+await supabase
+
+.from("kitchen_section_categories")
+
+.select("category")
+
+.eq(
+
+"section_id",
+
+sectionId
 
 );
+
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+selectedCategories =
+
+data.map(
+
+item=>item.category
+
+);
+
+
+
+
+loadOrders();
+
+
+
+};
 
 
 
@@ -70,115 +201,85 @@ document.getElementById(
 // LOAD ORDERS
 
 
-async function loadKitchen(){
+async function loadOrders(){
 
 
 
-try{
+newOrders.innerHTML="";
 
+preparingOrders.innerHTML="";
 
+readyOrders.innerHTML="";
 
-newOrders.innerHTML = "";
-
-preparingOrders.innerHTML = "";
-
-readyOrders.innerHTML = "";
-
-
+completedOrders.innerHTML="";
 
 
 
 
 
-const q = query(
 
 
-collection(db,"orders"),
+
+const {data,error}=
+
+await supabase
+
+.from("order_items")
+
+.select(`
+
+*,
+
+orders(*)
+
+`)
+
+.order(
+"created_at",
+{
+ascending:false
+}
+
+);
 
 
-orderBy(
 
-"createdAt",
 
-"desc"
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+data.forEach(item=>{
+
+
+
+
+
+// CATEGORY FILTER
+
+
+if(
+
+selectedCategories.length &&
+
+!selectedCategories.includes(
+
+item.category
 
 )
 
-
-);
-
-
-
-
-
-
-
-const snapshot =
-
-await getDocs(q);
-
-
-
-
-
-
-
-
-snapshot.forEach(orderDoc=>{
-
-
-
-
-
-const order = {
-
-
-id:orderDoc.id,
-
-
-...orderDoc.data()
-
-
-
-};
-
-
-
-
-
-
-
-
-// PENDING ORDERS
-
-
-
-if(
-
-order.status === "Pending"
-
 ){
 
-
-
-createOrderCard(
-
-
-order,
-
-
-newOrders,
-
-
-"Accept Order",
-
-
-"Preparing"
-
-
-);
-
-
+return;
 
 }
 
@@ -188,81 +289,28 @@ newOrders,
 
 
 
-
-
-// PREPARING ORDERS
-
-
-
-if(
-
-order.status === "Preparing"
-
-){
+let order =
+item.orders;
 
 
 
-createOrderCard(
 
 
-order,
+if(!order)
+return;
 
 
-preparingOrders,
 
 
-"Mark Ready",
 
 
-"Ready"
+createCard(
 
+item,
+
+order
 
 );
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// READY ORDERS
-
-
-
-if(
-
-order.status === "Ready"
-
-){
-
-
-
-createOrderCard(
-
-
-order,
-
-
-readyOrders,
-
-
-"Complete",
-
-
-"Completed"
-
-
-);
-
-
-
-}
 
 
 
@@ -271,28 +319,6 @@ readyOrders,
 
 
 
-
-
-}
-
-catch(error){
-
-
-
-console.log(
-
-"Kitchen Load Error:",
-
-error
-
-);
-
-
-
-}
-
-
-
 }
 
 
@@ -303,120 +329,50 @@ error
 
 
 
+// CREATE CARD
 
 
-// CREATE ORDER CARD
+function createCard(item,order){
 
 
-function createOrderCard(
 
+let card=document.createElement("div");
 
-order,
+card.className="kitchen-card";
 
 
-container,
 
 
-buttonText,
 
+card.innerHTML=
 
-nextStatus
-
-
-){
-
-
-
-
-
-
-const card =
-
-document.createElement(
-
-"div"
-
-);
-
-
-
-
-
-card.className =
-
-"kitchen-card";
-
-
-
-
-
-
-
-
-
-let itemsHTML = "";
-
-
-
-
-
-
-
-
-order.items?.forEach(item=>{
-
-
-
-itemsHTML += `
-
-
-<p>
-
-${item.itemName}
-
-×
-
-${item.quantity}
-
-</p>
-
-
-`;
-
-
-
-});
-
-
-
-
-
-
-
-
-
-card.innerHTML = `
-
-
+`
 
 <h3>
 
-Order #
-
-${order.id.slice(0,6)}
+${order.order_number}
 
 </h3>
 
 
+<p>
 
+${item.item_name}
+
+</p>
 
 
 
 <p>
 
-Customer:
+Qty: ${item.quantity}
 
-${order.customerName || "Walk In"}
+</p>
+
+
+<p>
+
+${item.category}
 
 </p>
 
@@ -424,72 +380,11 @@ ${order.customerName || "Walk In"}
 
 
 
+<button>
 
-
-<p>
-
-Phone:
-
-${order.customerPhone || "-"}
-
-</p>
-
-
-
-
-
-
-
-<p>
-
-Type:
-
-${order.orderType || "-"}
-
-</p>
-
-
-
-
-
-
-
-<p>
-
-Payment:
-
-${order.paymentMethod || "-"}
-
-</p>
-
-
-
-
-
-
-
-<div class="kitchen-items">
-
-
-${itemsHTML}
-
-
-</div>
-
-
-
-
-
-
-
-<button class="kitchen-status-btn">
-
-
-${buttonText}
-
+${getNextStatus(order.status)}
 
 </button>
-
 
 
 `;
@@ -500,86 +395,18 @@ ${buttonText}
 
 
 
+card.querySelector("button")
+
+.onclick=()=>{
 
 
-card.querySelector(
+updateStatus(
 
-".kitchen-status-btn"
+order.id,
 
-)
-
-.onclick = async()=>{
-
-
-
-
-
-try{
-
-
-
-await updateDoc(
-
-
-
-doc(
-
-db,
-
-
-"orders",
-
-
-order.id
-
-
-),
-
-
-
-{
-
-
-status:nextStatus
-
-
-
-}
-
-
+getNextStatus(order.status)
 
 );
-
-
-
-
-
-
-loadKitchen();
-
-
-
-
-
-
-}
-
-catch(error){
-
-
-
-console.log(
-
-"Status Update Error:",
-
-error
-
-);
-
-
-
-}
-
 
 
 };
@@ -591,7 +418,27 @@ error
 
 
 
-container.appendChild(card);
+if(order.status==="New")
+
+newOrders.appendChild(card);
+
+
+
+else if(order.status==="Preparing")
+
+preparingOrders.appendChild(card);
+
+
+
+else if(order.status==="Ready")
+
+readyOrders.appendChild(card);
+
+
+
+else
+
+completedOrders.appendChild(card);
 
 
 
@@ -605,36 +452,65 @@ container.appendChild(card);
 
 
 
+function getNextStatus(status){
+
+
+if(status==="New")
+
+return "Preparing";
 
 
 
-// REFRESH BUTTON
+if(status==="Preparing")
 
-
-document.getElementById(
-
-"refreshBtn"
-
-)
-
-?.addEventListener(
-
-"click",
-
-()=>{
+return "Ready";
 
 
 
-loadKitchen();
+if(status==="Ready")
 
+return "Completed";
+
+
+
+return "Completed";
 
 
 }
 
+
+
+
+
+
+
+
+
+async function updateStatus(id,status){
+
+
+
+await supabase
+
+.from("orders")
+
+.update({
+
+status:status
+
+})
+
+.eq(
+"id",
+id
 );
 
 
 
+loadOrders();
+
+
+}
 
 
 
@@ -643,33 +519,34 @@ loadKitchen();
 
 
 
-// START
+// REFRESH
 
 
-loadKitchen();
+document
+.getElementById("refreshBtn")
+?.addEventListener(
+"click",
+()=>{
+
+loadOrders();
+
+});
 
 
 
 
-
-
-
-
-// AUTO REFRESH
 
 
 setInterval(
 
-()=>{
-
-
-
-loadKitchen();
-
-
-
-},
+loadOrders,
 
 5000
 
 );
+
+
+
+loadSections();
+
+loadOrders();
