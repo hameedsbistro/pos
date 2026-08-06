@@ -26,6 +26,7 @@ Settings - Hameed's Bistro
 
 
 
+
 <header class="admin-header">
 
 
@@ -194,9 +195,7 @@ readonly>
 
 
 <p>
-
 Restaurant Name cannot be changed
-
 </p>
 
 
@@ -212,7 +211,7 @@ Restaurant Name cannot be changed
 
 
 
-<!-- KITCHEN MAPPING -->
+<!-- KITCHEN SETTINGS -->
 
 
 <div class="settings-card">
@@ -220,26 +219,134 @@ Restaurant Name cannot be changed
 
 
 <h3>
-Kitchen Section Mapping
+Kitchen Settings
 </h3>
 
 
 
 <p>
-Category অনুযায়ী Kitchen Section নির্বাচন করুন
+Manage Kitchen Display Sections and Categories
 </p>
 
 
 
-<div id="kitchenMappingList">
 
-Loading...
+
+
+
+
+
+<div class="setting-group">
+
+
+<label>
+Select Section
+</label>
+
+
+<select id="sectionSelect">
+
+
+<option value="">
+Select Section
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="setting-group">
+
+
+<label>
+Select Category
+</label>
+
+
+
+<div id="categoryList">
+
+
+Loading categories...
+
 
 </div>
 
 
 
 </div>
+
+
+
+
+
+
+
+
+
+<button id="saveKitchenMappingBtn">
+
+Save Kitchen Mapping
+
+</button>
+
+
+
+
+
+
+<hr>
+
+
+
+
+
+
+
+
+<h3>
+Add New Section
+</h3>
+
+
+
+
+<input
+
+type="text"
+
+id="newSectionName"
+
+placeholder="New Section Name">
+
+
+
+
+
+<button id="addSectionBtn">
+
+Add New Section
+
+</button>
+
+
+
+
+
+
+
+</div>
+
 
 
 
@@ -258,13 +365,23 @@ Loading...
 
 
 
-<script type="module" src="../js/settings.js"></script>
+<script 
+type="module"
+src="../js/settings.js">
+</script>
 
 
-<script type="module" src="../js/kitchen-mapping.js"></script>
+
+<script 
+type="module"
+src="../js/kitchen-settings.js">
+</script>
+
+
 
 
 
 </body>
+
 
 </html>
