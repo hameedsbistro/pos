@@ -1,69 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
 
-
 <meta charset="UTF-8">
-
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-
 <title>
-Hameed's Bistro
+Login - Hameed's Bistro
 </title>
 
 
-
-<link rel="stylesheet" href="css/style.css">
-
-
+<link rel="stylesheet" href="css/login.css">
 
 </head>
-
-
-
 
 
 <body>
 
 
+<div class="login-container">
+
+
+<img 
+src="images/logo.png"
+class="login-logo">
+
+
+<h2>
+Hameed's Bistro
+</h2>
+
+
+<p>
+Staff Login
+</p>
 
 
 
-<header class="top-header">
+
+<input 
+type="email"
+id="email"
+placeholder="Email">
 
 
 
-
-
-<div class="top-actions">
-
-
-
-<button id="refreshBtn">
-🔄
-</button>
-
-
-
-
-
-<button id="languageBtn">
-🌐
-</button>
+<input 
+type="password"
+id="password"
+placeholder="Password">
 
 
 
 
 
 <button id="loginBtn">
-👤
+
+Login
+
 </button>
 
+
+
+
+<p id="message"></p>
 
 
 </div>
@@ -71,271 +74,9 @@ Hameed's Bistro
 
 
 
-
-</header>
-
-
-
-
-
-
-
-
-
-<main class="welcome-page">
-
-
-
-
-
-<div class="logo-area">
-
-
-
-
-
-<img 
-
-src="images/logo.png"
-
-class="restaurant-logo"
-
-alt="Logo"
-
->
-
-
-
-
-
-
-
-
-<h1>
-
-Hameed's Bistro
-
-</h1>
-
-
-
-
-
-
-
-<h2 data-i18n="menuOrderSystem">
-
-Menu & Ordering System
-
-</h2>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div class="main-buttons">
-
-
-
-
-
-<button class="main-btn"
-
-onclick="location.href='menu.html'">
-
-
-🍽️
-
-<span data-i18n="menu">
-
-Menu
-
-</span>
-
-
-</button>
-
-
-
-
-
-
-
-
-<button class="main-btn"
-
-onclick="location.href='menu.html?type=dinein'">
-
-
-🪑
-
-<span data-i18n="dineIn">
-
-Dine In
-
-</span>
-
-
-</button>
-
-
-
-
-
-
-
-
-<button class="main-btn"
-
-onclick="location.href='menu.html?type=takeaway'">
-
-
-🥡
-
-<span data-i18n="takeAway">
-
-Take Away
-
-</span>
-
-
-</button>
-
-
-
-
-
-
-
-
-<button class="main-btn"
-
-onclick="location.href='cart.html'">
-
-
-🛒
-
-<span data-i18n="cart">
-
-Cart
-
-</span>
-
-
-</button>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-</main>
-
-
-
-
-
-
-
-
-
-<script type="module">
-
-
-
-import {
-
-applyLanguage
-
-}
-
-from "./js/translation.js";
-
-
-
-
-applyLanguage();
-
-
-
-
-
-document.getElementById(
-"refreshBtn"
-)
-
-.onclick=()=>{
-
-
-location.reload();
-
-
-};
-
-
-
-
-
-
-document.getElementById(
-"languageBtn"
-)
-
-.onclick=()=>{
-
-
-location.href="language.html";
-
-
-};
-
-
-
-
-
-
-document.getElementById(
-"loginBtn"
-)
-
-.onclick=()=>{
-
-
-location.href="login.html";
-
-
-};
-
-
-
-</script>
-
-
-
-
-
+<script type="module" src="js/login.js"></script>
 
 
 </body>
-
 
 </html>
