@@ -1,0 +1,274 @@
+/* pos/css/admin-menu.css */
+
+
+
+.menu-upload-box,
+.add-menu-box,
+.menu-table-box{
+
+
+    background:white;
+
+    padding:20px;
+
+    margin-bottom:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 3px 10px rgba(
+
+        0,
+
+        0,
+
+        0,
+
+        0.15
+
+    );
+
+
+}
+
+
+
+
+
+
+
+.menu-upload-box h3,
+.add-menu-box h3,
+.menu-table-box h3{
+
+
+    margin-bottom:15px;
+
+    color:#0066cc;
+
+
+}
+
+
+
+
+
+
+
+
+.add-menu-box input{
+
+
+    width:100%;
+
+    height:45px;
+
+    margin-bottom:12px;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+
+}
+
+
+
+
+
+
+
+.add-menu-box label{
+
+
+    display:block;
+
+    margin:15px 0;
+
+
+}
+
+
+
+
+
+
+
+
+#saveMenuBtn,
+#uploadCsvBtn{
+
+
+    background:#008000;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+
+
+
+#saveMenuBtn:hover,
+#uploadCsvBtn:hover{
+
+
+    background:#006600;
+
+
+}
+
+
+
+
+
+
+
+
+.menu-table-box{
+
+
+    overflow-x:auto;
+
+
+}
+
+
+
+
+
+
+
+.menu-table-box table{
+
+
+    width:100%;
+
+    border-collapse:collapse;
+
+
+}
+
+
+
+
+
+
+
+.menu-table-box th{
+
+
+    background:#003366;
+
+    color:white;
+
+    padding:12px;
+
+
+}
+
+
+
+
+
+
+
+.menu-table-box td{
+
+
+    padding:10px;
+
+    border-bottom:1px solid #ddd;
+
+    text-align:center;
+
+
+}
+
+
+
+
+
+
+
+
+.delete-btn{
+
+
+    background:red;
+
+    color:white;
+
+    border:none;
+
+    padding:7px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+
+.edit-btn{
+
+
+    background:#0066cc;
+
+    color:white;
+
+    border:none;
+
+    padding:7px 12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+
+
+@media(max-width:700px){
+
+
+
+.menu-table-box table{
+
+
+    font-size:12px;
+
+
+}
+
+
+
+
+}
