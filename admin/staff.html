@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Staff Management
+</title>
+
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<link rel="stylesheet" href="../css/staff.css">
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+<header class="admin-header">
+
+
+
+<div class="admin-title">
+
+
+<h2>
+Staff Management
+</h2>
+
+
+</div>
+
+
+
+
+
+
+<div class="admin-actions">
+
+
+<button id="refreshBtn">
+🔄
+</button>
+
+
+
+<button onclick="history.back()">
+←
+</button>
+
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+<main class="admin-container">
+
+
+
+
+
+<h1>
+Staff Management
+</h1>
+
+
+
+
+
+
+
+
+
+<!-- ADD STAFF -->
+
+
+<div class="staff-form">
+
+
+
+<h3>
+Add New Staff
+</h3>
+
+
+
+
+
+
+<input 
+type="text"
+id="staffName"
+placeholder="Staff Name">
+
+
+
+
+
+
+<input 
+type="email"
+id="staffEmail"
+placeholder="Email">
+
+
+
+
+
+
+<input 
+type="password"
+id="staffPassword"
+placeholder="Password">
+
+
+
+
+
+
+
+<select id="staffRole">
+
+
+<option value="manager">
+Manager
+</option>
+
+
+
+<option value="cashier">
+Cashier
+</option>
+
+
+
+<option value="waiter">
+Waiter
+</option>
+
+
+
+<option value="cook">
+Cook
+</option>
+
+
+
+</select>
+
+
+
+
+
+
+
+
+<button id="addStaffBtn">
+
+Add Staff
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- STAFF TABLE -->
+
+
+
+<div class="staff-table-box">
+
+
+
+<table>
+
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Name
+</th>
+
+
+<th>
+Email
+</th>
+
+
+<th>
+Role
+</th>
+
+
+<th>
+Status
+</th>
+
+
+<th>
+Action
+</th>
+
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="staffTable">
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script type="module" src="../js/staff.js"></script>
+
+
+</body>
+
+</html>
