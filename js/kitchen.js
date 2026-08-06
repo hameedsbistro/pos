@@ -1,7 +1,6 @@
 // pos/js/kitchen.js
 
 
-
 import { db } from "./firebase.js";
 
 
@@ -32,12 +31,12 @@ from
 
 
 
-
-
 const newOrders =
 
 document.getElementById(
+
 "newOrders"
+
 );
 
 
@@ -45,7 +44,9 @@ document.getElementById(
 const preparingOrders =
 
 document.getElementById(
+
 "preparingOrders"
+
 );
 
 
@@ -53,7 +54,9 @@ document.getElementById(
 const readyOrders =
 
 document.getElementById(
+
 "readyOrders"
+
 );
 
 
@@ -63,19 +66,23 @@ document.getElementById(
 
 
 
-// LOAD KITCHEN ORDERS
 
+// LOAD ORDERS
 
 
 async function loadKitchen(){
 
 
 
-newOrders.innerHTML="";
+try{
 
-preparingOrders.innerHTML="";
 
-readyOrders.innerHTML="";
+
+newOrders.innerHTML = "";
+
+preparingOrders.innerHTML = "";
+
+readyOrders.innerHTML = "";
 
 
 
@@ -85,14 +92,21 @@ readyOrders.innerHTML="";
 
 const q = query(
 
+
 collection(db,"orders"),
 
+
 orderBy(
+
 "createdAt",
+
 "desc"
+
 )
 
+
 );
+
 
 
 
@@ -109,18 +123,21 @@ await getDocs(q);
 
 
 
-snapshot.forEach(
 
-orderDoc=>{
-
+snapshot.forEach(orderDoc=>{
 
 
-let order = {
+
+
+
+const order = {
 
 
 id:orderDoc.id,
 
+
 ...orderDoc.data()
+
 
 
 };
@@ -131,20 +148,34 @@ id:orderDoc.id,
 
 
 
-if(order.status==="New"){
+
+// PENDING ORDERS
+
+
+
+if(
+
+order.status === "Pending"
+
+){
 
 
 
 createOrderCard(
 
+
 order,
+
 
 newOrders,
 
+
 "Accept Order",
+
 
 "Preparing"
 
+
 );
 
 
@@ -156,19 +187,35 @@ newOrders,
 
 
 
-if(order.status==="Preparing"){
+
+
+
+// PREPARING ORDERS
+
+
+
+if(
+
+order.status === "Preparing"
+
+){
 
 
 
 createOrderCard(
 
+
 order,
+
 
 preparingOrders,
 
+
 "Mark Ready",
 
+
 "Ready"
+
 
 );
 
@@ -182,28 +229,40 @@ preparingOrders,
 
 
 
-if(order.status==="Ready"){
+
+
+// READY ORDERS
+
+
+
+if(
+
+order.status === "Ready"
+
+){
 
 
 
 createOrderCard(
 
+
 order,
+
 
 readyOrders,
 
+
 "Complete",
 
+
 "Completed"
+
 
 );
 
 
 
 }
-
-
-
 
 
 
@@ -213,7 +272,30 @@ readyOrders,
 
 
 
+
 }
+
+catch(error){
+
+
+
+console.log(
+
+"Kitchen Load Error:",
+
+error
+
+);
+
+
+
+}
+
+
+
+}
+
+
 
 
 
@@ -226,16 +308,20 @@ readyOrders,
 // CREATE ORDER CARD
 
 
-
 function createOrderCard(
+
 
 order,
 
+
 container,
+
 
 buttonText,
 
+
 nextStatus
+
 
 ){
 
@@ -243,15 +329,21 @@ nextStatus
 
 
 
-let card =
+
+const card =
 
 document.createElement(
+
 "div"
+
 );
 
 
 
+
+
 card.className =
+
 "kitchen-card";
 
 
@@ -259,7 +351,10 @@ card.className =
 
 
 
-let items="";
+
+
+
+let itemsHTML = "";
 
 
 
@@ -267,19 +362,21 @@ let items="";
 
 
 
-order.items?.forEach(
 
-item=>{
-
+order.items?.forEach(item=>{
 
 
-items += `
+
+itemsHTML += `
+
 
 <p>
 
 ${item.itemName}
 
- x ${item.quantity}
+×
+
+${item.quantity}
 
 </p>
 
@@ -304,9 +401,13 @@ card.innerHTML = `
 
 <h3>
 
-${order.orderNumber}
+Order #
+
+${order.id.slice(0,6)}
 
 </h3>
+
+
 
 
 
@@ -315,9 +416,25 @@ ${order.orderNumber}
 
 Customer:
 
-${order.customerName}
+${order.customerName || "Walk In"}
 
 </p>
+
+
+
+
+
+
+
+<p>
+
+Phone:
+
+${order.customerPhone || "-"}
+
+</p>
+
+
 
 
 
@@ -327,7 +444,7 @@ ${order.customerName}
 
 Type:
 
-${order.orderType}
+${order.orderType || "-"}
 
 </p>
 
@@ -335,9 +452,27 @@ ${order.orderType}
 
 
 
+
+
+<p>
+
+Payment:
+
+${order.paymentMethod || "-"}
+
+</p>
+
+
+
+
+
+
+
 <div class="kitchen-items">
 
-${items}
+
+${itemsHTML}
+
 
 </div>
 
@@ -345,11 +480,16 @@ ${items}
 
 
 
+
+
 <button class="kitchen-status-btn">
+
 
 ${buttonText}
 
+
 </button>
+
 
 
 `;
@@ -374,24 +514,33 @@ card.querySelector(
 
 
 
+try{
+
+
+
 await updateDoc(
+
+
 
 doc(
 
 db,
 
+
 "orders",
+
 
 order.id
 
+
 ),
+
+
 
 {
 
 
-status:
-
-nextStatus
+status:nextStatus
 
 
 
@@ -406,10 +555,30 @@ nextStatus
 
 
 
-
 loadKitchen();
 
 
+
+
+
+
+}
+
+catch(error){
+
+
+
+console.log(
+
+"Status Update Error:",
+
+error
+
+);
+
+
+
+}
 
 
 
@@ -436,13 +605,18 @@ container.appendChild(card);
 
 
 
+
+
+
 // REFRESH BUTTON
 
 
-
 document.getElementById(
+
 "refreshBtn"
+
 )
+
 ?.addEventListener(
 
 "click",
@@ -450,7 +624,9 @@ document.getElementById(
 ()=>{
 
 
+
 loadKitchen();
+
 
 
 }
@@ -463,7 +639,11 @@ loadKitchen();
 
 
 
-// AUTO LOAD
+
+
+
+
+// START
 
 
 loadKitchen();
@@ -471,7 +651,11 @@ loadKitchen();
 
 
 
-// AUTO REFRESH EVERY 5 SECOND
+
+
+
+
+// AUTO REFRESH
 
 
 setInterval(
@@ -479,7 +663,9 @@ setInterval(
 ()=>{
 
 
+
 loadKitchen();
+
 
 
 },
