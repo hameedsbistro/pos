@@ -1,9 +1,7 @@
 // pos/js/orders.js
 
 
-
 import { db } from "./firebase.js";
-
 
 
 import {
@@ -32,12 +30,14 @@ from
 
 
 
-
 const ordersTable =
 
 document.getElementById(
+
 "ordersTable"
+
 );
+
 
 
 
@@ -53,11 +53,15 @@ let allOrders = [];
 
 
 
+
 // LOAD ORDERS
 
 
-
 async function loadOrders(){
+
+
+
+try{
 
 
 
@@ -71,12 +75,21 @@ ordersTable.innerHTML="";
 
 const q = query(
 
+
+
 collection(db,"orders"),
 
+
+
 orderBy(
+
 "createdAt",
+
 "desc"
+
 )
+
+
 
 );
 
@@ -96,6 +109,7 @@ await getDocs(q);
 
 
 
+
 allOrders=[];
 
 
@@ -104,9 +118,8 @@ allOrders=[];
 
 
 
-snapshot.forEach(
+snapshot.forEach(orderDoc=>{
 
-orderDoc=>{
 
 
 allOrders.push({
@@ -114,14 +127,17 @@ allOrders.push({
 
 id:orderDoc.id,
 
+
 ...orderDoc.data()
 
 
-});
-
-
 
 });
+
+
+
+});
+
 
 
 
@@ -135,6 +151,30 @@ displayOrders(allOrders);
 
 }
 
+catch(error){
+
+
+
+console.log(
+
+"Orders Load Error:",
+
+error
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -144,7 +184,6 @@ displayOrders(allOrders);
 
 
 // DISPLAY ORDERS
-
 
 
 function displayOrders(orders){
@@ -163,11 +202,17 @@ orders.forEach(order=>{
 
 
 
+
+
 let row =
 
 document.createElement(
+
 "tr"
+
 );
+
+
 
 
 
@@ -180,9 +225,10 @@ row.innerHTML = `
 
 <td>
 
-${order.orderNumber || ""}
+#${order.id.slice(0,6)}
 
 </td>
+
 
 
 
@@ -190,9 +236,10 @@ ${order.orderNumber || ""}
 
 <td>
 
-${order.customerName || ""}
+${order.customerName || "-"}
 
 </td>
+
 
 
 
@@ -200,9 +247,10 @@ ${order.customerName || ""}
 
 <td>
 
-${order.orderType || ""}
+${order.orderType || "-"}
 
 </td>
+
 
 
 
@@ -218,9 +266,10 @@ ${order.tableNumber || "-"}
 
 
 
+
 <td>
 
-RM ${Number(order.totalAmount).toFixed(2)}
+RM ${Number(order.total || 0).toFixed(2)}
 
 </td>
 
@@ -228,48 +277,82 @@ RM ${Number(order.totalAmount).toFixed(2)}
 
 
 
+
+
 <td>
+
 
 
 <select class="status-select">
 
 
-<option ${order.status==="New"?"selected":""}>
-New
+
+<option value="Pending"
+
+${order.status==="Pending"?"selected":""}>
+
+Pending
+
 </option>
 
 
 
-<option ${order.status==="Accepted"?"selected":""}>
-Accepted
-</option>
 
 
 
-<option ${order.status==="Preparing"?"selected":""}>
+<option value="Preparing"
+
+${order.status==="Preparing"?"selected":""}>
+
 Preparing
+
 </option>
 
 
 
-<option ${order.status==="Ready"?"selected":""}>
+
+
+
+<option value="Ready"
+
+${order.status==="Ready"?"selected":""}>
+
 Ready
+
 </option>
 
 
 
-<option ${order.status==="Completed"?"selected":""}>
+
+
+
+<option value="Completed"
+
+${order.status==="Completed"?"selected":""}>
+
 Completed
+
 </option>
 
 
 
-<option ${order.status==="Cancelled"?"selected":""}>
+
+
+
+<option value="Cancelled"
+
+${order.status==="Cancelled"?"selected":""}>
+
 Cancelled
+
 </option>
+
+
+
 
 
 </select>
+
 
 
 </td>
@@ -278,7 +361,11 @@ Cancelled
 
 
 
+
+
+
 <td>
+
 
 
 <button class="update-btn">
@@ -286,6 +373,7 @@ Cancelled
 Update
 
 </button>
+
 
 
 </td>
@@ -305,8 +393,11 @@ Update
 const select =
 
 row.querySelector(
+
 ".status-select"
+
 );
+
 
 
 
@@ -315,8 +406,11 @@ row.querySelector(
 const updateBtn =
 
 row.querySelector(
+
 ".update-btn"
+
 );
+
 
 
 
@@ -329,20 +423,32 @@ updateBtn.onclick = async()=>{
 
 
 
+try{
+
+
+
+
+
 await updateDoc(
 
+
+
 doc(
+
 db,
+
 "orders",
+
 order.id
+
 ),
+
+
 
 {
 
 
-status:
-
-select.value
+status:select.value
 
 
 
@@ -359,7 +465,9 @@ select.value
 
 
 alert(
+
 "Order Updated"
+
 );
 
 
@@ -370,6 +478,27 @@ alert(
 loadOrders();
 
 
+
+
+
+
+}
+
+catch(error){
+
+
+
+console.log(
+
+"Update Error:",
+
+error
+
+);
+
+
+
+}
 
 
 
@@ -402,8 +531,10 @@ ordersTable.appendChild(row);
 
 
 
-// FILTER SYSTEM
 
+
+
+// FILTER SYSTEM
 
 
 document.querySelectorAll(
@@ -424,9 +555,7 @@ button.addEventListener(
 
 
 
-
-
-let status =
+const status =
 
 button.dataset.status;
 
@@ -452,14 +581,18 @@ else{
 
 displayOrders(
 
+
+
 allOrders.filter(
 
-order=>
+order =>
 
-order.status===status
+order.status === status
 
 )
 
+
+
 );
 
 
@@ -468,9 +601,7 @@ order.status===status
 
 
 
-}
-
-);
+});
 
 
 
@@ -484,13 +615,18 @@ order.status===status
 
 
 
+
+
+
 // REFRESH
 
 
-
 document.getElementById(
+
 "refreshBtn"
+
 )
+
 ?.addEventListener(
 
 "click",
@@ -498,7 +634,8 @@ document.getElementById(
 ()=>{
 
 
-location.reload();
+loadOrders();
+
 
 
 }
@@ -510,6 +647,13 @@ location.reload();
 
 
 
+
+
+
+
+
+
+// START
 
 
 loadOrders();
