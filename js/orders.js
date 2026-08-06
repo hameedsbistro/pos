@@ -1,46 +1,12 @@
 // pos/js/orders.js
 
 
-import { db } from "./firebase.js";
-
-
-import {
-
-collection,
-
-getDocs,
-
-doc,
-
-updateDoc,
-
-orderBy,
-
-query
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-
-
-
+import { supabase } from "./supabase.js";
 
 
 
 const ordersTable =
-
-document.getElementById(
-
-"ordersTable"
-
-);
-
-
-
-
+document.getElementById("ordersTable");
 
 
 
@@ -52,96 +18,44 @@ let allOrders = [];
 
 
 
-
-
 // LOAD ORDERS
 
-
 async function loadOrders(){
-
-
-
-try{
-
 
 
 ordersTable.innerHTML="";
 
 
 
+const {data,error}=
 
+await supabase
 
+.from("orders")
 
+.select("*")
 
-const q = query(
-
-
-
-collection(db,"orders"),
-
-
-
-orderBy(
-
-"createdAt",
-
-"desc"
-
-)
-
-
-
+.order(
+"created_at",
+{
+ascending:false
+}
 );
 
 
 
 
+if(error){
+
+console.log(error);
+
+return;
+
+}
 
 
 
-
-const snapshot =
-
-await getDocs(q);
-
-
-
-
-
-
-
-allOrders=[];
-
-
-
-
-
-
-
-snapshot.forEach(orderDoc=>{
-
-
-
-allOrders.push({
-
-
-id:orderDoc.id,
-
-
-...orderDoc.data()
-
-
-
-});
-
-
-
-});
-
-
-
-
-
+allOrders = data || [];
 
 
 
@@ -150,30 +64,6 @@ displayOrders(allOrders);
 
 
 }
-
-catch(error){
-
-
-
-console.log(
-
-"Orders Load Error:",
-
-error
-
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
 
 
 
@@ -195,27 +85,11 @@ ordersTable.innerHTML="";
 
 
 
-
-
-
 orders.forEach(order=>{
 
 
-
-
-
 let row =
-
-document.createElement(
-
-"tr"
-
-);
-
-
-
-
-
+document.createElement("tr");
 
 
 
@@ -224,157 +98,90 @@ row.innerHTML = `
 
 
 <td>
+${order.order_number || order.orderNumber || ""}
+</td>
 
-#${order.id.slice(0,6)}
 
+
+<td>
+${order.customer_name || order.customerName || ""}
+</td>
+
+
+
+<td>
+${order.order_type || order.orderType || ""}
+</td>
+
+
+
+<td>
+${order.table_number || order.tableNumber || "-"}
+</td>
+
+
+
+<td>
+RM ${Number(order.total_amount || order.totalAmount || 0).toFixed(2)}
 </td>
 
 
 
 
-
-
 <td>
-
-${order.customerName || "-"}
-
-</td>
-
-
-
-
-
-
-<td>
-
-${order.orderType || "-"}
-
-</td>
-
-
-
-
-
-
-<td>
-
-${order.tableNumber || "-"}
-
-</td>
-
-
-
-
-
-
-<td>
-
-RM ${Number(order.total || 0).toFixed(2)}
-
-</td>
-
-
-
-
-
-
-
-<td>
-
 
 
 <select class="status-select">
 
 
+<option ${order.status==="New"?"selected":""}>
+New
+</option>
 
-<option value="Pending"
 
-${order.status==="Pending"?"selected":""}>
-
-Pending
-
+<option ${order.status==="Accepted"?"selected":""}>
+Accepted
 </option>
 
 
 
-
-
-
-<option value="Preparing"
-
-${order.status==="Preparing"?"selected":""}>
-
+<option ${order.status==="Preparing"?"selected":""}>
 Preparing
-
 </option>
 
 
 
-
-
-
-<option value="Ready"
-
-${order.status==="Ready"?"selected":""}>
-
+<option ${order.status==="Ready"?"selected":""}>
 Ready
-
 </option>
 
 
 
-
-
-
-<option value="Completed"
-
-${order.status==="Completed"?"selected":""}>
-
+<option ${order.status==="Completed"?"selected":""}>
 Completed
-
 </option>
 
 
 
-
-
-
-<option value="Cancelled"
-
-${order.status==="Cancelled"?"selected":""}>
-
+<option ${order.status==="Cancelled"?"selected":""}>
 Cancelled
-
 </option>
-
-
 
 
 
 </select>
 
 
-
 </td>
-
-
-
-
 
 
 
 
 <td>
 
-
-
 <button class="update-btn">
-
 Update
-
 </button>
-
-
 
 </td>
 
@@ -387,118 +194,47 @@ Update
 
 
 
-
-
-
 const select =
 
 row.querySelector(
-
 ".status-select"
-
 );
 
 
-
-
-
-
-const updateBtn =
 
 row.querySelector(
-
 ".update-btn"
+)
 
-);
-
-
-
+.onclick = async()=>{
 
 
 
+await supabase
 
-updateBtn.onclick = async()=>{
+.from("orders")
 
+.update({
 
+status:
+select.value
 
+})
 
-
-try{
-
-
-
-
-
-await updateDoc(
-
-
-
-doc(
-
-db,
-
-"orders",
-
+.eq(
+"id",
 order.id
-
-),
-
-
-
-{
-
-
-status:select.value
-
-
-
-}
-
-
-
 );
-
-
-
-
 
 
 
 alert(
-
 "Order Updated"
-
 );
-
-
-
 
 
 
 loadOrders();
-
-
-
-
-
-
-}
-
-catch(error){
-
-
-
-console.log(
-
-"Update Error:",
-
-error
-
-);
-
-
-
-}
 
 
 
@@ -508,12 +244,7 @@ error
 
 
 
-
-
-
-
 ordersTable.appendChild(row);
-
 
 
 
@@ -531,46 +262,28 @@ ordersTable.appendChild(row);
 
 
 
-
-
-
-// FILTER SYSTEM
+// FILTER
 
 
 document.querySelectorAll(
-
 ".order-filter button"
-
 )
 
-.forEach(button=>{
+.forEach(btn=>{
 
 
-
-button.addEventListener(
-
-"click",
-
-()=>{
+btn.onclick=()=>{
 
 
-
-const status =
-
-button.dataset.status;
-
-
-
-
+let status =
+btn.dataset.status;
 
 
 
 if(status==="All"){
 
 
-
 displayOrders(allOrders);
-
 
 
 }
@@ -578,37 +291,27 @@ displayOrders(allOrders);
 else{
 
 
-
 displayOrders(
-
-
 
 allOrders.filter(
 
-order =>
+order=>
 
-order.status === status
+order.status===status
 
 )
 
-
-
 );
-
 
 
 }
 
 
+};
+
+
 
 });
-
-
-
-});
-
-
-
 
 
 
@@ -620,40 +323,21 @@ order.status === status
 
 // REFRESH
 
-
 document.getElementById(
-
 "refreshBtn"
-
-)
-
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
-
 
 loadOrders();
 
-
-
-}
-
-);
+});
 
 
 
 
 
 
-
-
-
-
-
-
-// START
 
 
 loadOrders();
