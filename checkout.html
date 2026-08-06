@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+
+
+<meta charset="UTF-8">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Checkout - Hameed's Bistro
+</title>
+
+
+
+
+<link rel="stylesheet" href="css/checkout.css">
+
+
+</head>
+
+
+
+
+
+<body>
+
+
+
+
+
+<header class="checkout-header">
+
+
+<button id="backBtn">
+
+←
+
+</button>
+
+
+
+<h2 data-i18n="checkout">
+
+Checkout
+
+</h2>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<main class="checkout-container">
+
+
+
+
+
+
+<h1>
+
+Customer Details
+
+</h1>
+
+
+
+
+
+
+
+<div class="checkout-box">
+
+
+
+<input
+
+type="text"
+
+id="customerName"
+
+placeholder="Name"
+
+>
+
+
+
+
+
+<input
+
+type="tel"
+
+id="customerPhone"
+
+placeholder="Phone Number"
+
+>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<h2>
+
+Order Type
+
+</h2>
+
+
+
+
+
+<div class="order-type">
+
+
+
+<button id="dineInBtn">
+
+🪑 Dine In
+
+</button>
+
+
+
+
+<button id="takeAwayBtn">
+
+🥡 Take Away
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<h2>
+
+Payment Method
+
+</h2>
+
+
+
+
+
+
+
+<div class="payment-method">
+
+
+
+<button data-payment="Cash">
+
+Cash
+
+</button>
+
+
+
+
+<button data-payment="DuitNow">
+
+DuitNow QR
+
+</button>
+
+
+
+
+<button data-payment="Card">
+
+Card
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<h2>
+
+Order Summary
+
+</h2>
+
+
+
+
+
+<div id="checkoutItems">
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="checkout-total">
+
+
+Total:
+
+RM <span id="checkoutTotal">
+
+0.00
+
+</span>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<button id="placeOrderBtn">
+
+
+Place Order
+
+
+</button>
+
+
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+<script type="module" src="js/checkout.js"></script>
+
+
+</body>
+
+</html>
