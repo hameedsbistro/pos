@@ -1,217 +1,33 @@
 // pos/js/admin.js
 
 
-import { db } from "./firebase.js";
+import { supabase } from "./supabase.js";
 
 
-import {
 
 
-collection,
 
-getDocs,
+async function checkAdmin(){
 
-query,
 
-where,
 
-orderBy
+const {
 
+data:{user}
 
-}
+}= await supabase.auth.getUser();
 
-from
 
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 
 
+if(!user){
 
 
+window.location.href="../login.html";
 
 
-
-const todaySalesElement =
-
-document.getElementById(
-
-"todaySales"
-
-);
-
-
-
-
-const todayOrdersElement =
-
-document.getElementById(
-
-"todayOrders"
-
-);
-
-
-
-
-const pendingOrdersElement =
-
-document.getElementById(
-
-"pendingOrders"
-
-);
-
-
-
-
-const staffOnlineElement =
-
-document.getElementById(
-
-"staffOnline"
-
-);
-
-
-
-
-
-
-
-
-
-// LOAD DASHBOARD DATA
-
-
-
-async function loadDashboard(){
-
-
-
-try{
-
-
-
-
-
-let totalSales = 0;
-
-
-let totalOrders = 0;
-
-
-let pendingOrders = 0;
-
-
-
-
-
-
-
-const today =
-
-new Date();
-
-
-
-today.setHours(
-
-0,
-
-0,
-
-0,
-
-0
-
-);
-
-
-
-
-
-
-
-
-
-const ordersSnapshot =
-
-await getDocs(
-
-query(
-
-collection(
-
-db,
-
-"orders"
-
-),
-
-orderBy(
-
-"createdAt",
-
-"desc"
-
-)
-
-)
-
-);
-
-
-
-
-
-
-
-
-
-ordersSnapshot.forEach(orderDoc=>{
-
-
-
-const order =
-
-orderDoc.data();
-
-
-
-
-
-
-
-let orderDate =
-
-order.createdAt?.toDate();
-
-
-
-
-
-
-
-
-if(orderDate && orderDate >= today){
-
-
-
-
-
-totalOrders++;
-
-
-
-
-
-
-if(order.status === "Pending"){
-
-
-
-pendingOrders++;
-
+return;
 
 
 }
@@ -221,126 +37,30 @@ pendingOrders++;
 
 
 
+const {data:userData,error}=
 
+await supabase
 
-if(order.status === "Completed"){
+.from("users")
 
+.select("*")
 
+.eq("email",user.email)
 
-totalSales +=
+.single();
 
-Number(order.total || 0);
 
 
 
-}
 
 
+if(error || !userData){
 
-}
 
+window.location.href="../login.html";
 
 
-
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
-// STAFF ONLINE
-
-
-
-let staffOnline = 0;
-
-
-
-
-
-
-
-const staffSnapshot =
-
-await getDocs(
-
-collection(
-
-db,
-
-"staff"
-
-)
-
-);
-
-
-
-
-
-
-
-staffSnapshot.forEach(staff=>{
-
-
-
-const data =
-
-staff.data();
-
-
-
-
-
-
-
-if(data.status === "active"){
-
-
-
-staffOnline++;
-
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-
-
-
-
-// UPDATE UI
-
-
-
-if(todaySalesElement){
-
-
-
-todaySalesElement.innerText =
-
-
-"RM " +
-
-totalSales.toFixed(2);
-
+return;
 
 
 }
@@ -350,84 +70,38 @@ totalSales.toFixed(2);
 
 
 
+if(
+
+userData.role !== "admin" &&
+
+userData.role !== "manager"
+
+){
 
 
-if(todayOrdersElement){
+alert("Access Denied");
 
 
-
-todayOrdersElement.innerText =
-
-
-totalOrders;
+window.location.href="../login.html";
 
 
-
-}
-
-
-
-
-
-
-
-
-if(pendingOrdersElement){
-
-
-
-pendingOrdersElement.innerText =
-
-
-pendingOrders;
-
+return;
 
 
 }
 
 
 
-
-
-
-
-
-if(staffOnlineElement){
-
-
-
-staffOnlineElement.innerText =
-
-
-staffOnline;
-
-
-
-}
-
-
-
-
-
-}
-
-catch(error){
 
 
 
 console.log(
-
-"Dashboard Error:",
-
-error
-
+"Admin Login:",
+userData.name
 );
 
 
 
-}
-
-
 
 }
 
@@ -435,117 +109,22 @@ error
 
 
 
-
-
-
-
-
-
-
-// REFRESH BUTTON
-
-
+// LOGOUT BUTTON
 
 document.getElementById(
-
-"refreshBtn"
-
-)
-
-?.addEventListener(
-
+"logoutBtn"
+)?.addEventListener(
 "click",
+async()=>{
 
-()=>{
 
+await supabase.auth.signOut();
 
-loadDashboard();
 
+window.location.href="../login.html";
 
 
-}
-
-);
-
-
-
-
-
-
-
-
-
-
-
-// LANGUAGE BUTTON
-
-
-
-document.getElementById(
-
-"languageBtn"
-
-)
-
-?.addEventListener(
-
-"click",
-
-()=>{
-
-
-
-window.location.href =
-
-"../language.html";
-
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-
-// PROFILE BUTTON
-
-
-
-document.getElementById(
-
-"adminProfileBtn"
-
-)
-
-?.addEventListener(
-
-"click",
-
-()=>{
-
-
-
-alert(
-
-"Admin Profile"
-
-);
-
-
-
-}
-
-);
-
-
-
-
+});
 
 
 
@@ -555,6 +134,4 @@ alert(
 
 // START
 
-
-
-loadDashboard();
+checkAdmin();
