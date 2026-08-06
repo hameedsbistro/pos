@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Checkout - Hameed's Bistro
+</title>
+
+
+<link rel="stylesheet" href="../css/customer.css">
+
+<link rel="stylesheet" href="../css/checkout.css">
+
+
+</head>
+
+
+<body>
+
+
+
+<!-- HEADER -->
+
+
+<header class="customer-header">
+
+
+<button class="header-btn" id="menuBtn">
+☰
+</button>
+
+
+
+<div class="header-actions">
+
+
+<button class="header-btn" id="backBtn">
+←
+</button>
+
+
+
+<button class="header-btn" id="homeBtn">
+🏠
+</button>
+
+
+
+<button class="header-btn" id="languageBtn">
+🌐 EN
+</button>
+
+
+
+<button class="header-btn" id="cartBtn">
+🛒
+</button>
+
+
+
+<button class="header-btn" id="loginBtn">
+👤
+</button>
+
+
+
+<button class="header-btn" id="refreshBtn">
+🔄
+</button>
+
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+
+
+
+<main class="checkout-container">
+
+
+
+<h1>
+Checkout
+</h1>
+
+
+
+
+
+
+
+<div class="order-type-box">
+
+
+<h3>
+Order Type
+</h3>
+
+
+<p id="orderType">
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="customer-form">
+
+
+
+<label>
+Customer Name
+</label>
+
+
+<input 
+type="text"
+id="customerName"
+placeholder="Enter Name">
+
+
+
+
+
+<label>
+Phone Number
+</label>
+
+
+<input 
+type="tel"
+id="customerPhone"
+placeholder="Enter Phone">
+
+
+
+
+
+
+<div id="tableBox">
+
+
+<label>
+Table Number
+</label>
+
+
+<select id="tableNumber">
+
+
+<option value="">
+Select Table
+</option>
+
+
+<option>
+Indoor A1
+</option>
+
+
+<option>
+Indoor A2
+</option>
+
+
+<option>
+Outdoor B1
+</option>
+
+
+<option>
+First Floor C1
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<label>
+Order Note
+</label>
+
+
+<textarea 
+id="orderNote"
+placeholder="Special Request">
+</textarea>
+
+
+
+
+
+
+<button id="confirmOrderBtn">
+
+Confirm Order
+
+</button>
+
+
+
+
+</div>
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+
+<script type="module" src="../js/checkout.js"></script>
+
+
+</body>
+
+</html>
