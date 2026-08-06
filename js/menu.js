@@ -1,255 +1,99 @@
-// pos/js/menu.js
+// pos/js/admin-menu.js
 
 import { supabase } from "./supabase.js";
 
 
-const menuItemsDiv =
-document.getElementById("menuItems");
+
+const csvFile =
+document.getElementById("csvFile");
 
 
-const categoryList =
-document.getElementById("categoryList");
+const uploadBtn =
+document.getElementById("uploadCsvBtn");
+
+
+const saveBtn =
+document.getElementById("saveMenuBtn");
+
+
+const menuTable =
+document.getElementById("menuTable");
 
 
 
-let allMenuItems = [];
 
 
+// LOAD MENU
 
-
-// LOAD MENU FROM SUPABASE
 
 async function loadMenu(){
 
 
-try{
+menuTable.innerHTML="";
 
 
 const { data, error } = await supabase
 .from("menu")
 .select("*")
-.eq("status","active");
+.order("created_at", { ascending:false });
 
 
 
 if(error){
 
-throw error;
-
-}
-
-
-
-allMenuItems = data || [];
-
-
-
-showCategories();
-
-showMenu(allMenuItems);
-
-
-
-}
-
-catch(error){
-
-
-console.log(
-"Menu Load Error:",
-error
-);
-
-
-}
-
+console.log(error);
+return;
 
 }
 
 
 
 
+data.forEach(item=>{
 
-// SHOW CATEGORY
 
-function showCategories(){
+let row =
+document.createElement("tr");
 
 
-let categories = [
 
-"All"
+row.innerHTML = `
 
-];
 
+<td>
+${item.category || ""}
+</td>
 
 
-allMenuItems.forEach(item=>{
+<td>
+${item.itemname || item.itemName || ""}
+</td>
 
 
-if(
-item.category &&
-!categories.includes(item.category)
-){
-
-
-categories.push(
-item.category
-);
-
-
-}
-
-
-
-});
-
-
-
-
-
-categoryList.innerHTML="";
-
-
-
-
-
-categories.forEach(category=>{
-
-
-let btn =
-document.createElement("button");
-
-
-
-btn.className =
-"category-btn";
-
-
-
-btn.innerText =
-category;
-
-
-
-
-btn.onclick=()=>{
-
-
-if(category==="All"){
-
-
-showMenu(allMenuItems);
-
-
-}
-
-else{
-
-
-showMenu(
-
-allMenuItems.filter(
-
-item=>
-
-item.category===category
-
-)
-
-);
-
-
-}
-
-
-};
-
-
-
-
-
-categoryList.appendChild(btn);
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-// SHOW MENU ITEMS
-
-function showMenu(items){
-
-
-
-menuItemsDiv.innerHTML="";
-
-
-
-
-items.forEach(item=>{
-
-
-let card =
-document.createElement("div");
-
-
-
-card.className =
-"food-card";
-
-
-
-
-
-card.innerHTML = `
-
-
-<img src="${item.image || '../images/menu/default.jpg'}">
-
-
-<h3>
-${item.itemname || item.itemName}
-</h3>
-
-
-<div class="price-box">
-
-
-<p>
-Dine In:
-<br>
+<td>
 RM ${Number(item.dineinprice || item.dineInPrice).toFixed(2)}
-</p>
+</td>
 
 
-
-<p>
-Take Away:
-<br>
+<td>
 RM ${Number(item.takeawayprice || item.takeAwayPrice).toFixed(2)}
-</p>
+</td>
 
 
-</div>
+<td>
+${item.popular ? "YES" : "NO"}
+</td>
 
 
 
+<td>
 
-<button class="add-cart-btn">
-
-Add To Cart
-
+<button class="delete-btn"
+data-id="${item.id}">
+Delete
 </button>
+
+</td>
 
 
 `;
@@ -257,13 +101,113 @@ Add To Cart
 
 
 
-
-card
-.querySelector(".add-cart-btn")
-.onclick=()=>{
+row.querySelector(".delete-btn")
+.onclick = async()=>{
 
 
-addToCart(item);
+await supabase
+.from("menu")
+.delete()
+.eq("id",item.id);
+
+
+
+loadMenu();
+
+
+};
+
+
+
+
+menuTable.appendChild(row);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+// SAVE SINGLE ITEM
+
+
+saveBtn.onclick = async()=>{
+
+
+
+let item = {
+
+
+category:
+document.getElementById("category").value,
+
+
+itemName:
+document.getElementById("itemName").value,
+
+
+dineInPrice:
+Number(
+document.getElementById("dineInPrice").value
+),
+
+
+takeAwayPrice:
+Number(
+document.getElementById("takeAwayPrice").value
+),
+
+
+image:
+document.getElementById("image").value,
+
+
+popular:
+document.getElementById("popular").checked,
+
+
+status:
+"active"
+
+
+};
+
+
+
+
+const {error}= await supabase
+.from("menu")
+.insert([item]);
+
+
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+
+
+alert("Menu Added");
+
+
+
+loadMenu();
 
 
 };
@@ -272,90 +216,115 @@ addToCart(item);
 
 
 
-menuItemsDiv.appendChild(card);
 
+
+
+
+// CSV UPLOAD
+
+
+uploadBtn.onclick = async()=>{
+
+
+
+const file =
+csvFile.files[0];
+
+
+
+if(!file){
+
+alert("Select CSV File");
+
+return;
+
+}
+
+
+
+
+const text =
+await file.text();
+
+
+
+let rows =
+text.trim().split("\n");
+
+
+
+
+
+let headers =
+rows[0]
+.split(",")
+.map(h=>h.trim());
+
+
+
+
+
+let items=[];
+
+
+
+for(let i=1;i<rows.length;i++){
+
+
+let values =
+rows[i]
+.split(",");
+
+
+
+let obj={};
+
+
+
+headers.forEach((header,index)=>{
+
+
+obj[header]=values[index];
 
 
 });
 
 
 
-}
 
 
+items.push({
 
-
-
-
-
-
-
-// ADD TO CART
-
-function addToCart(item){
-
-
-
-let cart =
-
-JSON.parse(
-
-localStorage.getItem("cart")
-
-)
-
-|| [];
-
-
-
-
-
-
-let exist =
-
-cart.find(
-
-product=>
-
-product.id===item.id
-
-);
-
-
-
-
-
-if(exist){
-
-
-exist.quantity++;
-
-}
-
-else{
-
-
-cart.push({
-
-
-id:item.id,
+category:
+obj.category,
 
 
 itemName:
-item.itemname || item.itemName,
+obj.itemName,
 
 
-price:
-item.dineinprice || item.dineInPrice,
+dineInPrice:
+Number(obj.dineInPrice),
 
 
-image:item.image,
+takeAwayPrice:
+Number(obj.takeAwayPrice),
 
 
-quantity:1
+image:
+obj.image || "",
+
+
+popular:
+obj.popular==="true",
+
+
+status:
+"active"
 
 
 });
+
 
 
 }
@@ -364,70 +333,35 @@ quantity:1
 
 
 
+const {error}=await supabase
+.from("menu")
+.insert(items);
 
-localStorage.setItem(
 
-"cart",
 
-JSON.stringify(cart)
 
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+
+alert(
+"CSV Uploaded Successfully"
 );
 
 
 
-
-updateCartCount();
-
-
-
-}
+loadMenu();
 
 
 
-
-
-
-
-
-// CART COUNT
-
-function updateCartCount(){
-
-
-let cart =
-
-JSON.parse(
-
-localStorage.getItem("cart")
-
-)
-
-|| [];
-
-
-
-let count=0;
-
-
-cart.forEach(item=>{
-
-
-count += item.quantity;
-
-
-});
-
-
-
-
-
-document.getElementById(
-"cartCount"
-)?.innerText=count;
-
-
-
-}
+};
 
 
 
@@ -437,30 +371,7 @@ document.getElementById(
 
 
 
-// HEADER BUTTONS
-
-document.getElementById(
-"homeBtn"
-)?.addEventListener(
-"click",
-()=>{
-
-window.location.href="../index.html";
-
-});
-
-
-document.getElementById(
-"backBtn"
-)?.addEventListener(
-"click",
-()=>{
-
-history.back();
-
-});
-
-
+// REFRESH
 
 document.getElementById(
 "refreshBtn"
@@ -474,25 +385,9 @@ location.reload();
 
 
 
-document.getElementById(
-"cartBtn"
-)?.addEventListener(
-"click",
-()=>{
-
-window.location.href="cart.html";
-
-});
 
 
 
 
-
-
-
-
-// START
 
 loadMenu();
-
-updateCartCount();
