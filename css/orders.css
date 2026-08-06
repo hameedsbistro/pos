@@ -1,9 +1,9 @@
 /* pos/css/orders.css */
 
 
+/* FILTER BUTTONS */
 
 .order-filter{
-
 
     display:flex;
 
@@ -13,12 +13,7 @@
 
     margin-bottom:20px;
 
-
 }
-
-
-
-
 
 
 
@@ -37,12 +32,10 @@
 
     cursor:pointer;
 
+    font-size:15px;
+
 
 }
-
-
-
-
 
 
 
@@ -60,6 +53,11 @@
 
 
 
+
+
+/* ORDERS TABLE BOX */
+
+
 .orders-table-box{
 
 
@@ -70,15 +68,10 @@
     border-radius:12px;
 
     box-shadow:0 3px 10px rgba(
-
         0,
-
         0,
-
         0,
-
         0.15
-
     );
 
     overflow-x:auto;
@@ -92,6 +85,10 @@
 
 
 
+
+/* TABLE */
+
+
 .orders-table-box table{
 
 
@@ -99,9 +96,10 @@
 
     border-collapse:collapse;
 
+    min-width:750px;
+
 
 }
-
 
 
 
@@ -119,10 +117,10 @@
 
     text-align:center;
 
+    font-size:16px;
+
 
 }
-
-
 
 
 
@@ -138,6 +136,22 @@
 
     text-align:center;
 
+    color:#333;
+
+
+}
+
+
+
+
+
+
+
+.orders-table-box tr:hover{
+
+
+    background:#f5f5f5;
+
 
 }
 
@@ -148,14 +162,51 @@
 
 
 
-.status-badge{
+
+/* STATUS SELECT */
 
 
-    padding:6px 12px;
+.status-select{
 
-    border-radius:20px;
+
+    padding:8px 12px;
+
+    border-radius:6px;
+
+    border:1px solid #ccc;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* UPDATE BUTTON */
+
+
+.update-btn{
+
+
+    background:#008000;
 
     color:white;
+
+    border:none;
+
+    padding:8px 14px;
+
+    border-radius:6px;
+
+    cursor:pointer;
 
     font-size:14px;
 
@@ -165,24 +216,58 @@
 
 
 
+.update-btn:hover{
 
 
-
-
-.status-new{
-
-
-    background:#ff9800;
+    background:#006600;
 
 
 }
 
 
 
-.status-accepted{
 
 
-    background:#0066cc;
+
+
+
+
+/* STATUS BADGE */
+
+
+.status-badge{
+
+
+    display:inline-block;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* STATUS COLORS */
+
+
+.status-pending{
+
+
+    background:#ff9800;
 
 
 }
@@ -222,7 +307,7 @@
 .status-cancelled{
 
 
-    background:red;
+    background:#d00000;
 
 
 }
@@ -234,38 +319,20 @@
 
 
 
-.status-select{
+
+/* EMPTY ORDERS */
 
 
-    padding:8px;
-
-    border-radius:6px;
-
-    border:1px solid #ccc;
+.empty-orders{
 
 
-}
+    text-align:center;
 
+    padding:30px;
 
+    font-size:18px;
 
-
-
-
-
-.update-btn{
-
-
-    background:#008000;
-
-    color:white;
-
-    border:none;
-
-    padding:8px 12px;
-
-    border-radius:6px;
-
-    cursor:pointer;
+    color:#666;
 
 
 }
@@ -275,16 +342,20 @@
 
 
 
+
+
+
+/* MOBILE */
 
 
 @media(max-width:700px){
 
 
 
-.orders-table-box{
+.order-filter{
 
 
-    font-size:12px;
+    justify-content:center;
 
 
 }
@@ -294,9 +365,29 @@
 .order-filter button{
 
 
-    font-size:12px;
+    font-size:13px;
 
-    padding:8px;
+    padding:8px 12px;
+
+
+}
+
+
+
+.orders-table-box{
+
+
+    padding:10px;
+
+
+}
+
+
+
+.orders-table-box table{
+
+
+    min-width:700px;
 
 
 }
