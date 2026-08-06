@@ -3,6 +3,8 @@
 
 import { db } from "./firebase.js";
 
+import { changeLanguage } from "./language.js";
+
 
 import {
 
@@ -20,12 +22,14 @@ from
 
 
 
+const menuItemsDiv =
 
-const menuItemsDiv = 
 document.getElementById("menuItems");
 
 
+
 const categoryList =
+
 document.getElementById("categoryList");
 
 
@@ -33,8 +37,9 @@ document.getElementById("categoryList");
 
 
 
-
 let allMenuItems = [];
+
+
 
 
 
@@ -52,31 +57,46 @@ async function loadMenu(){
 try{
 
 
+
 const querySnapshot =
+
 await getDocs(
+
 collection(db,"menu")
+
 );
 
 
 
 
-allMenuItems=[];
+
+allMenuItems = [];
+
+
+
 
 
 
 querySnapshot.forEach((doc)=>{
 
 
+
 allMenuItems.push({
+
 
 id:doc.id,
 
+
 ...doc.data()
 
+
 });
 
 
+
 });
+
+
 
 
 
@@ -89,23 +109,28 @@ showMenu(allMenuItems);
 
 
 
-
 }
 
 catch(error){
 
 
 console.log(
+
 "Menu Load Error:",
+
 error
+
 );
 
 
+
+}
+
+
+
 }
 
 
-
-}
 
 
 
@@ -121,6 +146,7 @@ error
 function showCategories(){
 
 
+
 let categories = [
 
 "All"
@@ -129,20 +155,31 @@ let categories = [
 
 
 
+
+
+
 allMenuItems.forEach(item=>{
 
 
+
 if(
+
 item.category &&
+
 !categories.includes(item.category)
+
 ){
 
+
 categories.push(
+
 item.category
+
 );
 
 
 }
+
 
 
 });
@@ -151,7 +188,10 @@ item.category
 
 
 
-categoryList.innerHTML="";
+
+categoryList.innerHTML = "";
+
+
 
 
 
@@ -162,27 +202,40 @@ categories.forEach(category=>{
 
 
 let btn =
+
 document.createElement("button");
 
 
 
+
+
 btn.className =
+
 "category-btn";
 
 
 
-btn.innerText =
-category;
+
+
+btn.innerText = category;
 
 
 
-btn.onclick=()=>{
+
+
+
+
+
+btn.onclick = ()=>{
+
 
 
 if(category==="All"){
 
 
+
 showMenu(allMenuItems);
+
 
 
 }
@@ -190,14 +243,19 @@ showMenu(allMenuItems);
 else{
 
 
+
 showMenu(
 
 allMenuItems.filter(
-item=>
-item.category===category
+
+item =>
+
+item.category === category
+
 )
 
 );
+
 
 
 }
@@ -210,7 +268,10 @@ item.category===category
 
 
 
+
 categoryList.appendChild(btn);
+
+
 
 
 
@@ -227,15 +288,35 @@ categoryList.appendChild(btn);
 
 
 
-// SHOW MENU ITEMS
 
+
+
+// SHOW MENU
 
 
 function showMenu(items){
 
 
 
-menuItemsDiv.innerHTML="";
+menuItemsDiv.innerHTML = "";
+
+
+
+
+
+
+let orderType =
+
+new URLSearchParams(
+
+window.location.search
+
+)
+
+.get("type");
+
+
+
 
 
 
@@ -244,48 +325,85 @@ items.forEach(item=>{
 
 
 
+
+
 let card =
+
 document.createElement("div");
 
 
 
+
+
 card.className =
+
 "food-card";
 
 
 
 
 
-card.innerHTML=`
 
-<img src="${item.image || '../images/menu/default.jpg'}">
+
+card.innerHTML = `
+
+
+
+<img src="${item.image || 'images/menu/default.jpg'}">
+
+
+
+
+
+<div class="food-info">
+
 
 
 <h3>
+
 ${item.itemName}
+
 </h3>
+
+
+
+
+
 
 
 <div class="price-box">
 
 
 <p>
+
 Dine In:
+
 <br>
+
 RM ${Number(item.dineInPrice).toFixed(2)}
+
 </p>
 
 
 
+
 <p>
+
 Take Away:
+
 <br>
+
 RM ${Number(item.takeAwayPrice).toFixed(2)}
+
 </p>
 
 
 
 </div>
+
+
+
+
 
 
 
@@ -296,6 +414,13 @@ Add To Cart
 </button>
 
 
+
+
+
+</div>
+
+
+
 `;
 
 
@@ -304,22 +429,25 @@ Add To Cart
 
 
 
-let addButton =
+
 card.querySelector(
+
 ".add-cart-btn"
-);
+
+)
+
+.onclick = ()=>{
 
 
 
+addToCart(item,orderType);
 
-
-addButton.onclick=()=>{
-
-
-addToCart(item);
 
 
 };
+
+
+
 
 
 
@@ -333,8 +461,9 @@ menuItemsDiv.appendChild(card);
 
 
 
-
 }
+
+
 
 
 
@@ -347,8 +476,7 @@ menuItemsDiv.appendChild(card);
 // ADD TO CART
 
 
-
-function addToCart(item){
+function addToCart(item,type){
 
 
 
@@ -366,15 +494,38 @@ localStorage.getItem("cart")
 
 
 
+
+
+
+let price =
+
+type==="takeaway"
+
+?
+
+item.takeAwayPrice
+
+:
+
+item.dineInPrice;
+
+
+
+
+
+
+
 let exist =
 
 cart.find(
 
-product=>
+product =>
 
-product.id===item.id
+product.id === item.id
 
 );
+
+
 
 
 
@@ -384,7 +535,9 @@ product.id===item.id
 if(exist){
 
 
-exist.quantity +=1;
+
+exist.quantity += 1;
+
 
 
 }
@@ -392,23 +545,40 @@ exist.quantity +=1;
 else{
 
 
+
 cart.push({
+
+
 
 id:item.id,
 
+
 itemName:item.itemName,
 
-price:item.dineInPrice,
 
-image:item.image,
+price:Number(price),
+
+
+dineInPrice:Number(item.dineInPrice),
+
+
+takeAwayPrice:Number(item.takeAwayPrice),
+
+
+image:item.image || "",
+
 
 quantity:1
+
 
 
 });
 
 
+
 }
+
+
 
 
 
@@ -433,6 +603,16 @@ updateCartCount();
 
 
 
+
+
+alert(
+
+"Added To Cart"
+
+);
+
+
+
 }
 
 
@@ -443,8 +623,9 @@ updateCartCount();
 
 
 
-// UPDATE CART COUNT
 
+
+// UPDATE CART COUNT
 
 
 function updateCartCount(){
@@ -465,23 +646,28 @@ localStorage.getItem("cart")
 
 
 
-let count=0;
+
+let count =
+
+cart.reduce(
+
+(total,item)=>
+
+
+total + item.quantity,
+
+
+0
+
+);
 
 
 
-cart.forEach(item=>{
-
-
-count += item.quantity;
-
-
-});
 
 
 
 
-
-let cartCount =
+const cartCount =
 
 document.getElementById(
 
@@ -493,7 +679,9 @@ document.getElementById(
 
 
 
-let floatingCount =
+
+
+const floatingCount =
 
 document.getElementById(
 
@@ -505,21 +693,39 @@ document.getElementById(
 
 
 
-if(cartCount)
-
-cartCount.innerText=count;
 
 
 
+if(cartCount){
 
 
-if(floatingCount)
 
-floatingCount.innerText=count;
+cartCount.innerText = count;
 
 
 
 }
+
+
+
+
+
+
+if(floatingCount){
+
+
+
+floatingCount.innerText = count;
+
+
+
+}
+
+
+
+}
+
+
 
 
 
@@ -532,26 +738,43 @@ floatingCount.innerText=count;
 // HEADER BUTTONS
 
 
-
 document.getElementById(
+
 "homeBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
 
-window.location.href="../index.html";
+
+window.location.href="index.html";
+
 
 }
+
 );
 
 
 
 
 
+
+
+
 document.getElementById(
+
 "backBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
 
 
@@ -559,16 +782,27 @@ history.back();
 
 
 }
+
 );
 
 
 
 
 
+
+
+
+
 document.getElementById(
+
 "refreshBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
 
 
@@ -576,16 +810,26 @@ location.reload();
 
 
 }
+
 );
 
 
 
 
 
+
+
+
 document.getElementById(
+
 "cartBtn"
-)?.addEventListener(
+
+)
+
+?.addEventListener(
+
 "click",
+
 ()=>{
 
 
@@ -593,7 +837,9 @@ window.location.href="cart.html";
 
 
 }
+
 );
+
 
 
 
@@ -609,3 +855,6 @@ loadMenu();
 
 
 updateCartCount();
+
+
+changeLanguage();
