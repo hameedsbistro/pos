@@ -1,36 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
 
+
 <meta charset="UTF-8">
+
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+
 <title>
-Login - Hameed's Bistro
+Hameed's Bistro
 </title>
 
 
-<link rel="stylesheet" href="css/customer.css">
 
-<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/style.css">
+
 
 
 </head>
+
+
+
 
 
 <body>
 
 
 
-<header class="customer-header">
 
 
-<button class="header-btn" onclick="history.back()">
-←
+<header class="top-header">
+
+
+
+
+
+<div class="top-actions">
+
+
+
+<button id="refreshBtn">
+🔄
 </button>
+
+
+
+
+
+<button id="languageBtn">
+🌐
+</button>
+
+
+
+
+
+<button id="loginBtn">
+👤
+</button>
+
+
+
+</div>
+
+
+
 
 
 </header>
@@ -40,47 +79,89 @@ Login - Hameed's Bistro
 
 
 
-<main class="auth-container">
+
+
+
+<main class="welcome-page">
+
+
+
+
+
+<div class="logo-area">
+
+
 
 
 
 <img 
+
 src="images/logo.png"
-class="auth-logo">
+
+class="restaurant-logo"
+
+alt="Logo"
+
+>
+
+
+
+
+
 
 
 
 <h1>
-Customer Login
+
+Hameed's Bistro
+
 </h1>
 
 
 
 
 
-<input 
-type="email"
-id="email"
-placeholder="Email Address">
+
+
+<h2 data-i18n="menuOrderSystem">
+
+Menu & Ordering System
+
+</h2>
+
+
+
+
+
+</div>
 
 
 
 
 
 
-<input 
-type="password"
-id="password"
-placeholder="Password">
+
+
+
+<div class="main-buttons">
 
 
 
 
 
+<button class="main-btn"
 
-<button id="loginSubmit">
+onclick="location.href='menu.html'">
 
-Login
+
+🍽️
+
+<span data-i18n="menu">
+
+Menu
+
+</span>
+
 
 </button>
 
@@ -90,16 +171,79 @@ Login
 
 
 
-<p>
 
-Don't have an account?
+<button class="main-btn"
 
-<a href="register.html">
-Register
-</a>
+onclick="location.href='menu.html?type=dinein'">
 
 
-</p>
+🪑
+
+<span data-i18n="dineIn">
+
+Dine In
+
+</span>
+
+
+</button>
+
+
+
+
+
+
+
+
+<button class="main-btn"
+
+onclick="location.href='menu.html?type=takeaway'">
+
+
+🥡
+
+<span data-i18n="takeAway">
+
+Take Away
+
+</span>
+
+
+</button>
+
+
+
+
+
+
+
+
+<button class="main-btn"
+
+onclick="location.href='cart.html'">
+
+
+🛒
+
+<span data-i18n="cart">
+
+Cart
+
+</span>
+
+
+</button>
+
+
+
+
+
+</div>
+
+
+
+
+
 
 
 
@@ -113,9 +257,85 @@ Register
 
 
 
-<script type="module" src="js/auth.js"></script>
+
+<script type="module">
+
+
+
+import {
+
+applyLanguage
+
+}
+
+from "./js/translation.js";
+
+
+
+
+applyLanguage();
+
+
+
+
+
+document.getElementById(
+"refreshBtn"
+)
+
+.onclick=()=>{
+
+
+location.reload();
+
+
+};
+
+
+
+
+
+
+document.getElementById(
+"languageBtn"
+)
+
+.onclick=()=>{
+
+
+location.href="language.html";
+
+
+};
+
+
+
+
+
+
+document.getElementById(
+"loginBtn"
+)
+
+.onclick=()=>{
+
+
+location.href="login.html";
+
+
+};
+
+
+
+</script>
+
+
+
+
+
 
 
 </body>
+
 
 </html>
