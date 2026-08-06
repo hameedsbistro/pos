@@ -1,41 +1,23 @@
 // pos/js/admin-menu.js
 
-
-import { db } from "./firebase.js";
-
-
-
-import {
-
-collection,
-
-addDoc,
-
-getDocs,
-
-deleteDoc,
-
-doc
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { supabase } from "./supabase.js";
 
 
 
+const csvFile =
+document.getElementById("csvFile");
 
 
+const uploadBtn =
+document.getElementById("uploadCsvBtn");
+
+
+const saveBtn =
+document.getElementById("saveMenuBtn");
 
 
 const menuTable =
-
-document.getElementById(
-"menuTable"
-);
-
-
+document.getElementById("menuTable");
 
 
 
@@ -47,49 +29,31 @@ document.getElementById(
 async function loadMenu(){
 
 
-
 menuTable.innerHTML="";
 
 
+const { data, error } = await supabase
+.from("menu")
+.select("*")
+.order("created_at", { ascending:false });
 
 
 
-const snapshot =
+if(error){
 
-await getDocs(
+console.log(error);
+return;
 
-collection(
-db,
-"menu"
-)
-
-);
-
-
+}
 
 
 
 
-snapshot.forEach(
-
-(itemDoc)=>{
-
-
-
-let item = itemDoc.data();
-
-
+data.forEach(item=>{
 
 
 let row =
-
-document.createElement(
-"tr"
-);
-
-
-
-
+document.createElement("tr");
 
 
 
@@ -97,64 +61,39 @@ row.innerHTML = `
 
 
 <td>
-
 ${item.category || ""}
+</td>
 
+
+<td>
+${item.itemname || item.itemName || ""}
+</td>
+
+
+<td>
+RM ${Number(item.dineinprice || item.dineInPrice).toFixed(2)}
+</td>
+
+
+<td>
+RM ${Number(item.takeawayprice || item.takeAwayPrice).toFixed(2)}
+</td>
+
+
+<td>
+${item.popular ? "YES" : "NO"}
 </td>
 
 
 
 <td>
 
-${item.itemName || ""}
-
-</td>
-
-
-
-
-<td>
-
-RM ${Number(item.dineInPrice).toFixed(2)}
-
-</td>
-
-
-
-
-
-<td>
-
-RM ${Number(item.takeAwayPrice).toFixed(2)}
-
-</td>
-
-
-
-
-
-<td>
-
-${item.popular ? "Yes":"No"}
-
-</td>
-
-
-
-
-
-<td>
-
-
-<button class="delete-btn">
-
+<button class="delete-btn"
+data-id="${item.id}">
 Delete
-
 </button>
 
-
 </td>
-
 
 
 `;
@@ -162,48 +101,21 @@ Delete
 
 
 
+row.querySelector(".delete-btn")
+.onclick = async()=>{
 
 
-
-row.querySelector(
-".delete-btn"
-)
-.onclick=async()=>{
-
-
-
-if(confirm("Delete Item?")){
-
-
-
-await deleteDoc(
-
-doc(
-
-db,
-
-"menu",
-
-itemDoc.id
-
-)
-
-);
+await supabase
+.from("menu")
+.delete()
+.eq("id",item.id);
 
 
 
 loadMenu();
 
 
-
-}
-
-
-
 };
-
-
-
 
 
 
@@ -212,9 +124,7 @@ menuTable.appendChild(row);
 
 
 
-
 });
-
 
 
 
@@ -227,95 +137,77 @@ menuTable.appendChild(row);
 
 
 
-
-// SAVE NEW ITEM
-
+// SAVE SINGLE ITEM
 
 
-document.getElementById(
-"saveMenuBtn"
-)
-.addEventListener(
-
-"click",
-
-async()=>{
+saveBtn.onclick = async()=>{
 
 
 
-
-
-let data = {
+let item = {
 
 
 category:
-
-document.getElementById(
-"category"
-).value,
-
+document.getElementById("category").value,
 
 
 itemName:
-
-document.getElementById(
-"itemName"
-).value,
-
-
+document.getElementById("itemName").value,
 
 
 dineInPrice:
-
 Number(
-
-document.getElementById(
-"dineInPrice"
-).value
-
+document.getElementById("dineInPrice").value
 ),
-
-
-
 
 
 takeAwayPrice:
-
 Number(
-
-document.getElementById(
-"takeAwayPrice"
-).value
-
+document.getElementById("takeAwayPrice").value
 ),
 
 
-
-
 image:
-
-document.getElementById(
-"image"
-).value,
-
-
-
+document.getElementById("image").value,
 
 
 popular:
-
-document.getElementById(
-"popular"
-).checked,
+document.getElementById("popular").checked,
 
 
+status:
+"active"
+
+
+};
 
 
 
-createdAt:
 
-new Date()
+const {error}= await supabase
+.from("menu")
+.insert([item]);
 
+
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+
+
+alert("Menu Added");
+
+
+
+loadMenu();
 
 
 };
@@ -327,28 +219,141 @@ new Date()
 
 
 
-await addDoc(
 
-collection(
-db,
-"menu"
-),
+// CSV UPLOAD
 
-data
 
-);
+uploadBtn.onclick = async()=>{
 
 
 
+const file =
+csvFile.files[0];
+
+
+
+if(!file){
+
+alert("Select CSV File");
+
+return;
+
+}
+
+
+
+
+const text =
+await file.text();
+
+
+
+let rows =
+text.trim().split("\n");
+
+
+
+
+
+let headers =
+rows[0]
+.split(",")
+.map(h=>h.trim());
+
+
+
+
+
+let items=[];
+
+
+
+for(let i=1;i<rows.length;i++){
+
+
+let values =
+rows[i]
+.split(",");
+
+
+
+let obj={};
+
+
+
+headers.forEach((header,index)=>{
+
+
+obj[header]=values[index];
+
+
+});
+
+
+
+
+
+items.push({
+
+category:
+obj.category,
+
+
+itemName:
+obj.itemName,
+
+
+dineInPrice:
+Number(obj.dineInPrice),
+
+
+takeAwayPrice:
+Number(obj.takeAwayPrice),
+
+
+image:
+obj.image || "",
+
+
+popular:
+obj.popular==="true",
+
+
+status:
+"active"
+
+
+});
+
+
+
+}
+
+
+
+
+
+const {error}=await supabase
+.from("menu")
+.insert(items);
+
+
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
 
 
 
 alert(
-"Menu Saved"
+"CSV Uploaded Successfully"
 );
-
-
-
 
 
 
@@ -356,9 +361,7 @@ loadMenu();
 
 
 
-
-
-});
+};
 
 
 
@@ -370,23 +373,15 @@ loadMenu();
 
 // REFRESH
 
-
 document.getElementById(
 "refreshBtn"
-)
-?.addEventListener(
-
+)?.addEventListener(
 "click",
-
 ()=>{
-
 
 location.reload();
 
-
-}
-
-);
+});
 
 
 
