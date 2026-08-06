@@ -13,7 +13,7 @@ Kitchen Display - Hameed's Bistro
 </title>
 
 
-<link rel="stylesheet" href="kitchen.css">
+<link rel="stylesheet" href="../css/kitchen.css">
 
 
 </head>
@@ -26,7 +26,9 @@ Kitchen Display - Hameed's Bistro
 <header class="kitchen-header">
 
 
-<div>
+
+<div class="kitchen-brand">
+
 
 <h1>
 Hameed's Bistro
@@ -44,13 +46,23 @@ Kitchen Display
 
 
 
-<div class="kitchen-user">
+
+
+<div class="kitchen-user-panel">
 
 
 <span>
 Welcome:
 <b id="userName"></b>
 </span>
+
+
+<span>
+Role:
+<b id="userRole"></b>
+</span>
+
+
 
 
 
@@ -60,14 +72,32 @@ Check In
 
 
 
+
 <button id="checkOutBtn">
 Check Out
 </button>
 
 
 
+
 <button id="logoutBtn">
 Logout
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+<div class="kitchen-actions">
+
+
+<button id="refreshBtn">
+🔄
 </button>
 
 
@@ -85,30 +115,33 @@ Logout
 
 
 
-<main>
+<main class="kitchen-main">
 
 
 
-<!-- SECTION -->
+
+
+<!-- SECTION SELECT -->
 
 
 <div class="section-bar">
 
 
+<label>
+Select Section
+</label>
+
+
+
 <select id="sectionSelect">
 
 
-<option>
+<option value="">
 Select Section
 </option>
 
 
 </select>
-
-
-<button id="refreshBtn">
-🔄 Refresh
-</button>
 
 
 
@@ -122,11 +155,10 @@ Select Section
 
 
 
+<!-- NEW ORDERS -->
 
-<!-- ORDER DISPLAY -->
 
-
-<section class="orders-area">
+<section class="new-order-section">
 
 
 <h2>
@@ -135,12 +167,10 @@ New Orders
 
 
 
-<div id="newOrders"
-class="order-grid">
+<div id="newOrders" class="order-grid">
 
 
 </div>
-
 
 
 </section>
@@ -153,10 +183,10 @@ class="order-grid">
 
 
 
-<!-- READY / COMPLETED BUTTON -->
+<!-- READY COMPLETED BUTTON -->
 
 
-<div class="status-buttons">
+<div class="status-menu">
 
 
 <button id="readyBtn">
@@ -164,6 +194,7 @@ class="order-grid">
 Ready Orders
 
 </button>
+
 
 
 
@@ -183,6 +214,60 @@ Completed Orders
 
 
 
+
+<!-- READY VIEW -->
+
+
+<section id="readyView" class="hidden-view">
+
+
+<h2>
+Ready Orders
+</h2>
+
+
+<div id="readyOrders" class="order-grid">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- COMPLETED VIEW -->
+
+
+<section id="completedView" class="hidden-view">
+
+
+<h2>
+Completed Orders
+</h2>
+
+
+<div id="completedOrders" class="order-grid">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
 </main>
 
 
@@ -193,11 +278,14 @@ Completed Orders
 
 
 
-<script type="module" src="js/kitchen-auth.js"></script>
+<script type="module" src="../js/kitchen-auth.js"></script>
 
-<script type="module" src="js/kitchen-attendance.js"></script>
 
-<script type="module" src="js/kitchen.js"></script>
+<script type="module" src="../js/kitchen-attendance.js"></script>
+
+
+<script type="module" src="../js/kitchen.js"></script>
+
 
 
 
