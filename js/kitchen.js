@@ -1,26 +1,15 @@
 import { supabase } from "./supabase.js";
 
-
-// =====================
-// VARIABLES
-// =====================
-
 let currentStatus = "New";
-let currentSection = "";
 
 
-// =====================
-// ELEMENTS
-// =====================
+// Elements
 
 const orderContainer =
 document.getElementById("orderContainer");
 
 const orderTitle =
 document.getElementById("orderTitle");
-
-const sectionSelect =
-document.getElementById("sectionSelect");
 
 const readyBtn =
 document.getElementById("readyBtn");
@@ -31,15 +20,16 @@ document.getElementById("completedBtn");
 const refreshBtn =
 document.getElementById("refreshBtn");
 
+const sectionSelect =
+document.getElementById("sectionSelect");
+
 const backBtn =
 document.getElementById("backBtn");
 
 
 
 
-// =====================
-// BACK BUTTON
-// =====================
+// Back Button
 
 backBtn?.addEventListener("click",()=>{
 
@@ -50,68 +40,52 @@ backBtn?.addEventListener("click",()=>{
 
 
 
-
-// =====================
-// LOAD SECTIONS
-// =====================
+// Load Kitchen Sections
 
 async function loadSections(){
 
-
-const {data,error}=
-
-await supabase
-
-.from("kitchen_sections")
-
-.select("*")
-
-.eq(
-"status",
-"active"
-);
+    const {data,error}=await supabase
+    .from("kitchen_sections")
+    .select("*")
+    .eq("status","active");
 
 
+    if(error){
 
-if(error){
+        console.log(error);
+        return;
 
-console.log(error);
-
-return;
-
-}
+    }
 
 
+    sectionSelect.innerHTML=`
 
-sectionSelect.innerHTML = `
+    <option value="">
+    All Stations
+    </option>
 
-<option value="">
-All Stations
-</option>
-
-`;
-
+    `;
 
 
-data.forEach(section=>{
+    data.forEach(section=>{
 
 
-let option =
-document.createElement("option");
+        const option =
+        document.createElement("option");
 
 
-option.value =
-section.section_name;
+        option.value =
+        section.section_name;
 
 
-option.textContent =
-section.section_name;
+        option.textContent =
+        section.section_name;
 
 
-sectionSelect.appendChild(option);
+        sectionSelect.appendChild(option);
 
 
-});
+    });
 
 
 }
@@ -121,23 +95,31 @@ sectionSelect.appendChild(option);
 
 
 
-// =====================
-// LOAD ORDERS
-// =====================
+// Load Orders
 
 async function loadOrders(){
 
 
-
-let {data,error}=
-
-await supabase
+const {data,error}=await supabase
 
 .from("orders")
 
 .select(`
 
-*,
+id,
+
+orderNumber,
+
+tableNumber,
+
+ordered_by_type,
+
+ordered_by_name,
+
+created_at,
+
+status,
+
 
 order_items(
 
@@ -161,9 +143,7 @@ currentStatus
 {
 ascending:false
 }
-
 );
-
 
 
 
@@ -175,7 +155,6 @@ console.log(error);
 return;
 
 }
-
 
 
 
@@ -192,12 +171,9 @@ displayOrders(data);
 
 
 
-// =====================
-// DISPLAY ORDERS
-// =====================
+// Display Orders
 
 function displayOrders(orders){
-
 
 
 orderContainer.innerHTML="";
@@ -219,10 +195,11 @@ No Orders
 
 `;
 
+
 return;
 
-}
 
+}
 
 
 
@@ -230,16 +207,14 @@ return;
 orders.forEach(order=>{
 
 
-
-let itemsHTML="";
-
+let items="";
 
 
-order.order_items?.forEach(item=>{
+
+order.order_items.forEach(item=>{
 
 
-itemsHTML += `
-
+items += `
 
 <div class="item-row">
 
@@ -247,24 +222,23 @@ itemsHTML += `
 ${item.quantity} × ${item.itemName}
 
 
-${
 
+${
 item.item_note
 
 ?
 
 `
-
 <div class="item-note">
 
-Note:
-${item.item_note}
+Note: ${item.item_note}
 
 </div>
-
 `
 
-:""
+:
+
+""
 
 }
 
@@ -275,30 +249,26 @@ ${item.item_note}
 `;
 
 
+
 });
 
 
 
 
 
-
-
-let card =
+const card =
 document.createElement("div");
 
 
-card.className =
-"order-card";
+card.className="order-card";
 
 
 
-card.innerHTML = `
-
+card.innerHTML=`
 
 <h3>
 
-Order No:
-${order.orderNumber}
+Order No: ${order.orderNumber}
 
 </h3>
 
@@ -313,22 +283,17 @@ ${order.tableNumber || "-"}
 
 
 
+
 <div class="order-info">
 
 Ordered By:
 
 ${
-
 order.ordered_by_name
-
 ?
-
 order.ordered_by_name
-
 :
-
 order.ordered_by_type
-
 }
 
 </div>
@@ -338,7 +303,7 @@ order.ordered_by_type
 <hr>
 
 
-${itemsHTML}
+${items}
 
 
 
@@ -348,13 +313,8 @@ ${itemsHTML}
 
 <div class="order-time">
 
-${
-
-new Date(order.created_at)
-
-.toLocaleString()
-
-}
+${new Date(order.created_at)
+.toLocaleString()}
 
 </div>
 
@@ -379,15 +339,10 @@ orderContainer.appendChild(card);
 
 
 
-
-// =====================
-// BUTTONS
-// =====================
+// Buttons
 
 
-readyBtn?.addEventListener(
-"click",
-()=>{
+readyBtn?.addEventListener("click",()=>{
 
 
 currentStatus="Ready";
@@ -403,9 +358,7 @@ loadOrders();
 
 
 
-completedBtn?.addEventListener(
-"click",
-()=>{
+completedBtn?.addEventListener("click",()=>{
 
 
 currentStatus="Completed";
@@ -421,9 +374,7 @@ loadOrders();
 
 
 
-refreshBtn?.addEventListener(
-"click",
-()=>{
+refreshBtn?.addEventListener("click",()=>{
 
 
 currentStatus="New";
@@ -440,22 +391,11 @@ loadOrders();
 
 
 
+// Station Change
 
-sectionSelect?.addEventListener(
-"change",
-(e)=>{
-
-
-currentSection =
-e.target.value;
-
-
-// এখন section filtering বন্ধ রাখা হয়েছে
-// কারণ menu category mapping final join পরে করবো
-
+sectionSelect?.addEventListener("change",()=>{
 
 loadOrders();
-
 
 });
 
@@ -464,15 +404,11 @@ loadOrders();
 
 
 
-
-// =====================
-// REALTIME
-// =====================
-
+// Realtime
 
 supabase
 
-.channel("kitchen-orders")
+.channel("kitchen-orders-live")
 
 .on(
 
@@ -503,8 +439,8 @@ loadOrders();
 
 
 
-// START
 
+// Start
 
 loadSections();
 
