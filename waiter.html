@@ -4,19 +4,25 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 
 <title>
 Waiter Panel - Hameed's Bistro
 </title>
 
+
 <link rel="stylesheet" href="css/waiter.css">
+
 
 </head>
 
 
 <body>
 
+
+<!-- HEADER -->
 
 <header class="waiter-header">
 
@@ -27,6 +33,7 @@ Waiter Panel - Hameed's Bistro
 Hameed's Bistro
 </h1>
 
+
 <h3>
 Waiter Panel
 </h3>
@@ -35,19 +42,33 @@ Waiter Panel
 
 
 
+
+
 <div class="user-info">
+
 
 <p>
 Welcome:
-<span id="userName">---</span>
+<span id="userName">
+---
+</span>
 </p>
+
+
 
 <p>
 Role:
-<span id="userRole">---</span>
+<span id="userRole">
+---
+</span>
 </p>
 
+
+
 </div>
+
+
+
 
 
 
@@ -59,6 +80,7 @@ Role:
 </button>
 
 
+
 <button id="logoutBtn">
 Logout
 </button>
@@ -67,87 +89,161 @@ Logout
 </div>
 
 
+
 </header>
 
 
 
 
 
-<main class="waiter-container">
 
+
+
+
+<!-- TABLE AREA -->
+
+
+<section class="table-section">
 
 
 <h2>
-Table Status
+Tables
 </h2>
-
 
 
 
 <div id="tableGrid" class="table-grid">
 
+
 <!-- Tables Load Here -->
+
+
 
 </div>
 
 
 
-</main>
+</section>
 
 
 
 
 
-<!-- ORDER PANEL -->
+
+
+
+
+<!-- ORDER MODAL -->
 
 
 <div id="orderPanel" class="order-panel">
 
 
+
+<div class="order-header">
+
+
 <h2>
-Create Order
+Table Order
 </h2>
 
 
-<h3 id="selectedTable">
-Table:
-</h3>
 
+<button id="closeOrderBtn">
+✕
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="order-content">
+
+
+
+
+
+<!-- MENU -->
+
+<div class="menu-side">
+
+
+<h3>
+Menu
+</h3>
 
 
 <div id="menuItems">
 
+
+</div>
+
+
 </div>
 
 
 
-<div id="cartItems">
+
+
+
+
+<!-- CART -->
+
+<div class="cart-side">
+
+
+<h3>
+Current Order
+</h3>
+
+
+
+<div id="orderItems">
+
 
 </div>
+
+
 
 
 
 <textarea 
 id="itemNote"
-placeholder="Order Note">
+placeholder="Item Note">
+
 </textarea>
 
 
 
 
+
+
 <button id="sendOrderBtn">
+
 Send Order
-</button>
 
-
-
-<button id="closeOrderBtn">
-Close
 </button>
 
 
 
 </div>
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+
 
 
 
