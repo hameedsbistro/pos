@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Payment - Hameed's Bistro
+</title>
+
+
+<link rel="stylesheet" href="css/payment.css">
+
+</head>
+
+
+<body>
+
+
+<header class="payment-header">
+
+
+<h1>
+Hameed's Bistro
+</h1>
+
+
+<h3>
+Payment Counter
+</h3>
+
+
+</header>
+
+
+
+
+
+
+
+<main class="payment-container">
+
+
+
+<h2>
+Order Payment
+</h2>
+
+
+
+
+
+
+
+<div class="order-summary">
+
+
+<h3>
+Order Details
+</h3>
+
+
+<p>
+Order No:
+<span id="orderNo">
+---
+</span>
+</p>
+
+
+<p>
+Table:
+<span id="tableNo">
+---
+</span>
+</p>
+
+
+
+<div id="paymentItems">
+
+</div>
+
+
+
+
+
+<h2>
+
+Total:
+
+RM
+
+<span id="totalAmount">
+0.00
+</span>
+
+
+</h2>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="payment-method">
+
+
+<h3>
+Payment Method
+</h3>
+
+
+
+<button class="method-btn"
+data-method="Cash">
+
+💵 Cash
+
+</button>
+
+
+
+<button class="method-btn"
+data-method="Card">
+
+💳 Card
+
+</button>
+
+
+
+
+<button class="method-btn"
+data-method="DuitNow QR">
+
+📱 DuitNow QR
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div id="cashBox"
+class="cash-box">
+
+
+
+<label>
+
+Enter Amount
+
+</label>
+
+
+<input
+
+type="number"
+
+id="cashAmount"
+
+placeholder="RM 0.00">
+
+
+
+
+
+<p>
+
+Change:
+
+RM
+
+<span id="changeAmount">
+0.00
+</span>
+
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<button id="payBtn"
+class="pay-btn">
+
+PAY
+
+</button>
+
+
+
+
+
+
+
+<div id="message">
+
+</div>
+
+
+
+</main>
+
+
+
+
+
+
+
+<script type="module" src="js/payment.js"></script>
+
+
+</body>
+
+</html>
