@@ -1,145 +1,91 @@
-// pos/js/checkout.js
+// js/checkout.js
 
 
 import { supabase } from "./supabase.js";
 
 
 
-
-// ELEMENTS
-
-const checkoutBtn =
-document.getElementById("checkoutBtn");
-
-
-
-const customerNameInput =
-document.getElementById("customerName");
-
-
-
-const paymentMethodInput =
-document.getElementById("paymentMethod");
-
-
-
-
-
-
-// GET CART
-
-
-function getCart(){
-
-
-return JSON.parse(
+let cart = JSON.parse(
 
 localStorage.getItem("cart")
 
 ) || [];
 
 
-}
+
+let orderType =
+
+localStorage.getItem("orderType") || "Dine In";
 
 
 
 
 
+// CHECK LOGIN
+
+
+async function checkCustomer(){
 
 
 
-// GET KITCHEN SECTION
+const user = JSON.parse(
 
-
-async function getKitchenSection(category){
-
-
-
-const {data,error}=
-
-await supabase
-
-.from("kitchen_mapping")
-
-.select("section")
-
-.eq(
-"category",
-category
-)
-
-.single();
-
-
-
-
-
-if(error || !data){
-
-
-return "Main Kitchen";
-
-
-}
-
-
-
-return data.section;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// CREATE ORDER NUMBER
-
-
-function generateOrderNumber(){
-
-
-let date =
-new Date();
-
-
-
-return (
-
-"HB" +
-
-date.getFullYear() +
-
-(date.getMonth()+1)
-
-.toString()
-
-.padStart(2,"0")
-
-+
-
-date.getDate()
-
-.toString()
-
-.padStart(2,"0")
-
-+
-
-Date.now()
-
-.toString()
-
-.slice(-5)
+localStorage.getItem("customer")
 
 );
 
 
+
+
+if(!user){
+
+
+
+let confirmLogin = confirm(
+
+"Please Login or Create Account to place order"
+
+);
+
+
+
+if(confirmLogin){
+
+window.location.href="login.html";
+
+}
+
+else{
+
+window.location.href="register.html";
+
+}
+
+
+return false;
+
+
+}
+
+
+
+
+document.getElementById(
+"customerName"
+).value = user.name || "";
+
+
+
+document.getElementById(
+"customerPhone"
+).value = user.phone || "";
+
+
+
+return true;
+
+
+
 }
 
 
@@ -150,15 +96,104 @@ Date.now()
 
 
 
-// CHECKOUT
+// SHOW ORDER TYPE
 
 
-checkoutBtn.onclick = async()=>{
+document.getElementById(
+"orderType"
+).innerText = orderType;
 
 
 
-const cart =
-getCart();
+
+
+
+// TABLE CONTROL
+
+
+if(orderType==="Take Away"){
+
+
+
+document.getElementById(
+"tableBox"
+).style.display="none";
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// PLACE ORDER
+
+
+document.getElementById(
+"confirmOrderBtn"
+)
+.onclick=async()=>{
+
+
+
+let logged = await checkCustomer();
+
+
+
+if(!logged)
+return;
+
+
+
+
+
+let user = JSON.parse(
+
+localStorage.getItem("customer")
+
+);
+
+
+
+
+
+let table = null;
+
+
+
+if(orderType==="Dine In"){
+
+
+
+table = document.getElementById(
+"tableNumber"
+).value;
+
+
+
+if(!table){
+
+
+alert(
+"Please Select Table"
+);
+
+
+return;
+
+
+}
+
+
+
+}
+
+
 
 
 
@@ -167,8 +202,137 @@ getCart();
 if(cart.length===0){
 
 
+
 alert(
-"Cart is empty"
+"Cart Empty"
+);
+
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+
+// CREATE ORDER
+
+
+const {data:order,error}=await supabase
+
+.from("orders")
+
+.insert({
+
+customer_id:user.id,
+
+
+customer_name:user.name,
+
+
+phone:user.phone,
+
+
+order_type:orderType,
+
+
+table_number:table,
+
+
+status:"New"
+
+
+})
+
+.select()
+
+.single();
+
+
+
+
+
+
+
+if(error){
+
+
+console.log(error);
+
+alert(
+"Order Failed"
+);
+
+return;
+
+
+}
+
+
+
+
+
+
+
+
+
+// ORDER ITEMS
+
+
+let items = cart.map(item=>({
+
+
+
+order_id:order.id,
+
+
+
+item_name:item.itemName,
+
+
+
+quantity:item.quantity,
+
+
+
+item_note:item.note || ""
+
+
+
+}));
+
+
+
+
+
+
+
+const {error:itemError}=await supabase
+
+.from("order_items")
+
+.insert(items);
+
+
+
+
+
+
+
+if(itemError){
+
+
+console.log(itemError);
+
+
+alert(
+"Item Error"
 );
 
 
@@ -182,248 +346,14 @@ return;
 
 
 
-let customerName =
-
-customerNameInput?.value ||
-
-"Walk In Customer";
 
 
 
+alert(
 
-
-let paymentMethod =
-
-paymentMethodInput?.value ||
-
-"Cash";
-
-
-
-
-
-
-
-let totalAmount =
-
-cart.reduce(
-
-(sum,item)=>
-
-
-sum +
-
-(Number(item.price) *
-
-Number(item.quantity)),
-
-
-0
+"Order Sent Successfully"
 
 );
-
-
-
-
-
-
-
-try{
-
-
-
-
-
-// CREATE ORDER
-
-
-
-const orderNumber =
-
-generateOrderNumber();
-
-
-
-
-
-
-const {data:order,error:orderError}=
-
-await supabase
-
-.from("orders")
-
-.insert({
-
-
-
-order_number:
-orderNumber,
-
-
-customer_name:
-customerName,
-
-
-order_type:
-localStorage.getItem("orderType")
-
-|| "Dine In",
-
-
-
-table_number:
-localStorage.getItem("tableNumber")
-
-|| null,
-
-
-
-total_amount:
-totalAmount,
-
-
-
-payment_method:
-paymentMethod,
-
-
-
-status:
-"New"
-
-
-
-})
-
-
-
-.select()
-
-.single();
-
-
-
-
-
-
-
-if(orderError){
-
-throw orderError;
-
-}
-
-
-
-
-
-
-
-// CREATE ORDER ITEMS
-
-
-
-let orderItems=[];
-
-
-
-
-
-
-for(let item of cart){
-
-
-
-
-
-let section =
-
-await getKitchenSection(
-
-item.category
-
-);
-
-
-
-
-
-
-orderItems.push({
-
-
-
-order_id:
-
-order.id,
-
-
-
-item_name:
-
-item.itemName,
-
-
-
-category:
-
-item.category,
-
-
-
-quantity:
-
-Number(item.quantity),
-
-
-
-price:
-
-Number(item.price),
-
-
-
-section:
-
-section
-
-
-
-});
-
-
-
-
-
-}
-
-
-
-
-
-
-
-const {error:itemError}=
-
-await supabase
-
-.from("order_items")
-
-.insert(orderItems);
-
-
-
-
-
-
-if(itemError){
-
-throw itemError;
-
-}
-
-
 
 
 
@@ -434,68 +364,30 @@ throw itemError;
 // CLEAR CART
 
 
-
 localStorage.removeItem(
 "cart"
 );
 
 
 
-
-
-
-
-alert(
-
-"Order placed successfully\nOrder No: "
-
-+
-
-orderNumber
-
-);
-
-
-
-
-
-
-
-window.location.href=
-
-"success.html";
-
-
-
-
-
-
-
-
-}
-
-catch(error){
-
-
-
-console.log(error);
-
-
-
-alert(
-
-"Order Failed: "
-
-+
-
-error.message
-
-);
-
-
-
-}
+window.location.href="index.html";
 
 
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+// START
+
+
+checkCustomer();
