@@ -1,25 +1,18 @@
 import { supabase } from "./supabase.js";
 
 
-
-const loginBtn = 
-document.getElementById("loginBtn");
+const loginBtn = document.getElementById("loginBtn");
 
 
-
-loginBtn.addEventListener(
-"click",
-async()=>{
+loginBtn?.addEventListener("click", async()=>{
 
 
 const email =
 document.getElementById("email").value.trim();
 
 
-
 const password =
 document.getElementById("password").value;
-
 
 
 
@@ -28,48 +21,28 @@ document.getElementById("message");
 
 
 
-
 if(!email || !password){
 
-message.innerText =
-"Please enter email and password";
-
+message.innerText="Enter email and password";
 return;
 
 }
 
 
 
-
-
-
-// LOGIN
-
-const {
-
-data,
-
-error
-
-}= await supabase.auth.signInWithPassword({
+const {data,error} =
+await supabase.auth.signInWithPassword({
 
 email,
-
 password
 
 });
 
 
 
-
-
-
-
 if(error){
 
-message.innerText =
-error.message;
-
+message.innerText=error.message;
 return;
 
 }
@@ -78,30 +51,15 @@ return;
 
 
 
+const {data:user,error:userError}=
 
-
-// GET USER DATA
-
-
-const {
-
-data:userData,
-
-error:userError
-
-}= await supabase
+await supabase
 
 .from("users")
 
 .select("*")
 
-.eq(
-
-"email",
-
-email
-
-)
+.eq("email",email)
 
 .single();
 
@@ -110,86 +68,49 @@ email
 
 
 
-
-
-if(userError || !userData){
-
+if(userError || !user){
 
 await supabase.auth.signOut();
 
-
-message.innerText =
-"User not found";
-
+message.innerText="User not found";
 
 return;
-
 
 }
 
 
 
-
-
-
-
-
-
-// KITCHEN PERMISSION
 
 
 if(
 
-userData.role !== "admin" &&
+user.role !== "admin" &&
 
-userData.role !== "cook"
+user.role !== "cook"
 
 ){
 
-
 await supabase.auth.signOut();
 
-
-message.innerText =
-"Only Cook/Admin can access Kitchen";
-
+message.innerText="Kitchen access denied";
 
 return;
-
 
 }
 
 
 
 
-
-
-
-
-
-// SAVE SESSION
-
-
 localStorage.setItem(
-
 "kitchenUser",
-
-JSON.stringify(userData)
-
+JSON.stringify(user)
 );
 
 
 
 
 
-
-
-
-// FINAL REDIRECT
-
-
-window.location.href =
-"/kitchen/index.html";
+window.location.href="/kitchen/index.html";
 
 
 
