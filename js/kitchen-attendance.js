@@ -1,378 +1,162 @@
 import { supabase } from "./supabase.js";
 
+const checkInBtn = document.getElementById("checkInBtn");
+const checkOutBtn = document.getElementById("checkOutBtn");
 
+async function getKitchenUser() {
 
-let attendanceId = null;
+    const localUser =
+        JSON.parse(localStorage.getItem("kitchenUser"));
 
+    if (localUser) return localUser;
 
+    const {
+        data: { user }
+    } = await supabase.auth.getUser();
 
+    if (!user) return null;
 
+    const { data } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", user.email)
+        .single();
 
-async function getCurrentUser(){
-
-
-
-const userData =
-
-JSON.parse(
-
-localStorage.getItem("kitchenUser")
-
-);
-
-
-
-return userData;
-
+    return data;
 
 }
 
 
 
-
-
-
-
-
-async function loadTodayAttendance(){
-
-
-
-const user = await getCurrentUser();
-
-
-
-if(!user)
-return;
-
-
-
-
-
-const today =
-
-new Date()
-
-.toISOString()
-
-.split("T")[0];
-
-
-
-
-
-
-
-const {data,error}=
-
-await supabase
-
-.from("attendance")
-
-.select("*")
-
-.eq(
-
-"user_id",
-
-user.id
-
-)
-
-.eq(
-
-"date",
-
-today
-
-)
-
-.maybeSingle();
-
-
-
-
-
-
-
-if(data){
-
-
-attendanceId=data.id;
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
+// ======================
 // CHECK IN
+// ======================
 
+checkInBtn?.addEventListener("click", async () => {
 
-document
+    const user = await getKitchenUser();
 
-.getElementById("checkInBtn")
+    if (!user) {
+        alert("User not found");
+        return;
+    }
 
-?.addEventListener(
+    const today =
+        new Date().toISOString().split("T")[0];
 
-"click",
 
-async()=>{
 
+    const { data: existing } = await supabase
+        .from("attendance")
+        .select("*")
+        .eq("staff_id", user.id)
+        .eq("attendance_date", today)
+        .maybeSingle();
 
 
 
+    if (existing) {
+        alert("Already Checked In");
+        return;
+    }
 
-const user =
 
-await getCurrentUser();
 
+    const now =
+        new Date().toLocaleTimeString();
 
 
 
+    const { error } = await supabase
+        .from("attendance")
+        .insert({
 
-if(!user){
+            staff_id: user.id,
 
-alert(
-"Login required"
-);
+            staff_name: user.name,
 
-return;
+            role: user.role,
 
-}
+            attendance_date: today,
 
+            check_in: now,
 
+            status: "Present"
 
+        });
 
 
-if(attendanceId){
 
+    if (error) {
 
-alert(
-"Already Checked In"
-);
+        alert(error.message);
 
+        return;
 
-return;
+    }
 
 
-}
 
+    alert("Check In Successful");
 
+});
 
 
 
-
-
-const now =
-
-new Date();
-
-
-
-
-
-
-
-const {data,error}=
-
-await supabase
-
-.from("attendance")
-
-.insert({
-
-user_id:user.id,
-
-name:user.name,
-
-role:user.role,
-
-date:
-
-now.toISOString()
-
-.split("T")[0],
-
-
-check_in:
-
-now.toISOString(),
-
-
-status:
-
-"working"
-
-
-})
-
-.select()
-
-.single();
-
-
-
-
-
-
-
-
-if(error){
-
-
-alert(error.message);
-
-
-return;
-
-
-}
-
-
-
-
-
-attendanceId=data.id;
-
-
-
-alert(
-"Check In Successful"
-);
-
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-
-
-
+// ======================
 // CHECK OUT
+// ======================
 
+checkOutBtn?.addEventListener("click", async () => {
 
-document
+    const user = await getKitchenUser();
 
-.getElementById("checkOutBtn")
+    if (!user) {
 
-?.addEventListener(
+        alert("User not found");
 
-"click",
+        return;
 
-async()=>{
+    }
 
 
 
+    const today =
+        new Date().toISOString().split("T")[0];
 
 
-if(!attendanceId){
 
+    const now =
+        new Date().toLocaleTimeString();
 
-alert(
-"Please Check In First"
-);
 
 
-return;
+    const { error } = await supabase
 
+        .from("attendance")
 
-}
+        .update({
 
+            check_out: now
 
+        })
 
+        .eq("staff_id", user.id)
 
+        .eq("attendance_date", today);
 
 
-const {error}=
 
-await supabase
+    if (error) {
 
-.from("attendance")
+        alert(error.message);
 
-.update({
+        return;
 
-check_out:
+    }
 
-new Date()
 
-.toISOString(),
 
+    alert("Check Out Successful");
 
-status:
-
-"completed"
-
-
-})
-
-.eq(
-
-"id",
-
-attendanceId
-
-);
-
-
-
-
-
-
-
-if(error){
-
-
-alert(error.message);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-attendanceId=null;
-
-
-
-alert(
-"Check Out Successful"
-);
-
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-
-loadTodayAttendance();
+});
