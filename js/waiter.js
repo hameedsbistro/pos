@@ -1,39 +1,17 @@
+// js/waiter.js
+
+
 import { supabase } from "./supabase.js";
 
-
-// ==========================
-// USER CHECK
-// ==========================
-
-const user = JSON.parse(
-    localStorage.getItem("user")
-);
-
-
-if(!user){
-
-    window.location.href="login.html";
-
-}
-
-
-
-
-document.getElementById("userName").innerText =
-user.name || "---";
-
-
-document.getElementById("userRole").innerText =
-user.role || "waiter";
+import { requireRole, logout } from "./auth.js";
 
 
 
 
 
-// ==========================
-// VARIABLES
-// ==========================
 
+
+let user = null;
 
 let menu = [];
 
@@ -47,35 +25,65 @@ let selectedTable = "";
 
 
 
-// ==========================
-// TABLE SELECT
-// ==========================
 
 
-document
-.getElementById("tableSelect")
-?.addEventListener(
-"change",
-(e)=>{
-
-selectedTable =
-e.target.value;
-
-});
+// ===============================
+// START
+// ===============================
 
 
+async function start(){
 
 
-
+user = await requireRole(
+[
+"waiter",
+"manager",
+"admin"
+]
+);
 
 
 
-// ==========================
-// LOAD MENU
-// ==========================
+if(!user){
+
+return;
+
+}
 
 
-async function loadMenu(){
+
+
+document.getElementById(
+"userName"
+)?.innerText =
+user.name;
+
+
+
+loadTables();
+
+loadMenu();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// LOAD TABLES
+// ===============================
+
+
+async function loadTables(){
+
 
 
 const {
@@ -86,20 +94,24 @@ error
 
 }=await supabase
 
-.from("menu")
+.from("tables")
 
-.select(`
-id,
-item_name,
-dine_in_price,
-section_name,
-status
-`)
+.select("*")
 
 .eq(
+
 "status",
+
 "active"
+
+)
+
+.order(
+"table_number"
 );
+
+
+
 
 
 
@@ -115,11 +127,22 @@ return;
 
 
 
-menu = data;
 
 
-displayMenu();
+const box =
 
+document.getElementById(
+"tableSelect"
+);
+
+
+
+
+
+
+if(!box){
+
+return;
 
 }
 
@@ -127,70 +150,32 @@ displayMenu();
 
 
 
+box.innerHTML =
+
+`
+<option value="">
+Select Table
+</option>
+`;
 
 
 
-// ==========================
-// DISPLAY MENU
-// ==========================
-
-
-function displayMenu(){
-
-
-const box =
-document.getElementById(
-"menuContainer"
-);
 
 
 
-box.innerHTML="";
+data.forEach(table=>{
 
 
-
-menu.forEach(item=>{
-
-
-box.innerHTML +=`
+box.innerHTML += `
 
 
-<div class="menu-item">
+<option value="${table.table_number}">
 
+${table.table_number}
 
-<h3>
+(${table.area})
 
-${item.item_name}
-
-</h3>
-
-
-<p>
-
-RM ${Number(item.dine_in_price).toFixed(2)}
-
-</p>
-
-
-
-<small>
-
-${item.section_name || "Main Kitchen"}
-
-</small>
-
-
-
-<button class="add-btn"
-data-id="${item.id}">
-
-Add
-
-</button>
-
-
-
-</div>
+</option>
 
 
 `;
@@ -203,23 +188,16 @@ Add
 
 
 
-document
-.querySelectorAll(".add-btn")
-.forEach(btn=>{
 
 
-btn.onclick=()=>{
+box.onchange=(e)=>{
 
 
-addToCart(
-btn.dataset.id
-);
+selectedTable =
+e.target.value;
 
 
 };
-
-
-});
 
 
 
@@ -233,25 +211,210 @@ btn.dataset.id
 
 
 
-// ==========================
-// ADD CART
-// ==========================
+// ===============================
+// LOAD MENU
+// ===============================
 
 
-function addToCart(id){
+async function loadMenu(){
 
 
-let item =
+
+const {
+
+data,
+
+error
+
+}=await supabase
+
+.from("menu")
+
+.select(`
+
+id,
+
+item_name,
+
+category,
+
+dine_in_price,
+
+section_id
+
+`)
+
+.eq(
+
+"status",
+
+"active"
+
+);
+
+
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+
+menu=data;
+
+
+
+showMenu(menu);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// SHOW MENU
+// ===============================
+
+
+function showMenu(items){
+
+
+
+const box =
+
+document.getElementById(
+"menuContainer"
+);
+
+
+
+
+
+if(!box){
+
+return;
+
+}
+
+
+
+
+
+box.innerHTML="";
+
+
+
+
+
+
+items.forEach(item=>{
+
+
+box.innerHTML += `
+
+
+
+<div class="menu-item">
+
+
+<h3>
+
+${item.item_name}
+
+</h3>
+
+
+
+<p>
+
+RM ${Number(item.dine_in_price).toFixed(2)}
+
+</p>
+
+
+
+<button
+
+onclick="addItem('${item.id}')">
+
+Add
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+
+});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// ADD ITEM
+// ===============================
+
+
+window.addItem=function(id){
+
+
+
+const item =
+
 menu.find(
 x=>x.id===id
 );
 
 
 
+
+
+
+
 let exist =
+
 cart.find(
 x=>x.id===id
 );
+
+
+
 
 
 
@@ -271,25 +434,29 @@ cart.push({
 
 id:item.id,
 
-item_name:item.item_name,
+
+itemName:item.item_name,
+
 
 price:Number(
 item.dine_in_price
 ),
 
+
 quantity:1,
 
 
-// KITCHEN ROUTE
-
-section:
-item.section_name || "Main Kitchen"
+section_id:
+item.section_id
 
 
 });
 
 
+
 }
+
+
 
 
 
@@ -306,36 +473,36 @@ showCart();
 
 
 
-// ==========================
+// ===============================
 // SHOW CART
-// ==========================
+// ===============================
 
 
 function showCart(){
 
 
+
 const box =
+
 document.getElementById(
-"cartContainer"
+"cartItems"
 );
 
 
 
-box.innerHTML="";
 
 
-
-
-if(cart.length===0){
-
-
-box.innerHTML=
-"<p>No Item Selected</p>";
+if(!box){
 
 return;
 
-
 }
+
+
+
+
+
+box.innerHTML="";
 
 
 
@@ -345,54 +512,26 @@ cart.forEach(
 (item,index)=>{
 
 
-box.innerHTML +=`
+box.innerHTML += `
 
 
-<div class="cart-item">
+<div>
 
 
-<span>
-
-${item.item_name}
-
-</span>
+${item.itemName}
 
 
-<span>
-
-RM ${(item.price * item.quantity).toFixed(2)}
-
-</span>
-
-
-
-<button onclick="minusItem(${index})">
-
--
-
-</button>
-
-
+×
 
 ${item.quantity}
 
 
 
-<button onclick="plusItem(${index})">
-
-+
-
-</button>
-
-
-
-
 <button onclick="removeItem(${index})">
 
-✕
+X
 
 </button>
-
 
 
 </div>
@@ -405,53 +544,11 @@ ${item.quantity}
 });
 
 
-}
-
-
-
-
-
-
-
-
-
-// ==========================
-// CART BUTTONS
-// ==========================
-
-
-window.plusItem=function(index){
-
-cart[index].quantity++;
-
-showCart();
 
 }
 
 
 
-
-
-window.minusItem=function(index){
-
-
-if(cart[index].quantity>1){
-
-cart[index].quantity--;
-
-}
-
-else{
-
-cart.splice(index,1);
-
-}
-
-
-showCart();
-
-
-}
 
 
 
@@ -477,17 +574,25 @@ showCart();
 
 
 
-// ==========================
+// ===============================
 // SEND ORDER
-// ==========================
+// ===============================
 
 
 document
-.getElementById("sendOrderBtn")
+
+.getElementById(
+"sendOrderBtn"
+)
+
 ?.addEventListener(
+
 "click",
 
 async()=>{
+
+
+
 
 
 
@@ -495,13 +600,16 @@ if(!selectedTable){
 
 
 alert(
-"Please Select Table"
+"Select Table"
 );
 
 
 return;
 
+
 }
+
+
 
 
 
@@ -516,6 +624,7 @@ alert(
 
 return;
 
+
 }
 
 
@@ -523,7 +632,10 @@ return;
 
 
 
-let total = 0;
+
+
+let total=0;
+
 
 
 cart.forEach(item=>{
@@ -544,8 +656,22 @@ item.quantity;
 
 
 
+const orderNumber =
+
+"HMB-" +
+
+Date.now();
+
+
+
+
+
+
+
 
 const {
+
+data:order,
 
 error
 
@@ -555,9 +681,8 @@ error
 
 .insert({
 
-
-customer_name:
-"Walk In",
+order_number:
+orderNumber,
 
 
 table_number:
@@ -568,12 +693,12 @@ order_type:
 "Dine In",
 
 
-order_items:
-cart,
+ordered_by_type:
+"waiter",
 
 
-total:
-total,
+ordered_by_name:
+user.name,
 
 
 status:
@@ -584,11 +709,16 @@ payment_status:
 "Pending",
 
 
-created_by:
-user.id
+total_amount:
+total
 
 
-});
+
+})
+
+.select()
+
+.single();
 
 
 
@@ -602,12 +732,8 @@ if(error){
 console.log(error);
 
 
-alert(
-"Order Failed"
-);
-
-
 return;
+
 
 }
 
@@ -615,9 +741,60 @@ return;
 
 
 
+
+
+
+const items =
+
+cart.map(item=>({
+
+
+order_id:
+order.id,
+
+
+item_name:
+item.itemName,
+
+
+quantity:
+item.quantity,
+
+
+price:
+item.price,
+
+
+section_id:
+item.section_id
+
+
+
+}));
+
+
+
+
+
+
+
+
+await supabase
+
+.from("order_items")
+
+.insert(items);
+
+
+
+
+
+
+
 alert(
-"Order Sent To Cashier"
+"Order Sent"
 );
+
 
 
 
@@ -640,47 +817,48 @@ showCart();
 
 
 
-// ==========================
-// REFRESH
-// ==========================
+// ===============================
+// BUTTONS
+// ===============================
 
 
 document
-.getElementById("refreshBtn")
+
+.getElementById(
+"refreshBtn"
+)
+
 ?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 location.reload();
 
+
 });
 
 
 
 
-
-
-
-
-// ==========================
-// LOGOUT
-// ==========================
 
 
 document
-.getElementById("logoutBtn")
+
+.getElementById(
+"logoutBtn"
+)
+
 ?.addEventListener(
+
 "click",
+
 ()=>{
 
 
-localStorage.removeItem(
-"user"
-);
-
-
-window.location.href=
-"login.html";
+logout();
 
 
 });
@@ -693,9 +871,4 @@ window.location.href=
 
 
 
-// START
-
-
-loadMenu();
-
-showCart();
+start();
