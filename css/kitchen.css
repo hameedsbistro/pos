@@ -1,80 +1,59 @@
 *{
     box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
 }
 
 
 body{
 
-    margin:0;
-
-    padding:0;
-
-    font-family:Arial, sans-serif;
-
-    background:#eef2f5;
-
+    background:#f4f7fb;
     color:#222;
-
-    overflow:hidden;
+    min-height:100vh;
 
 }
 
 
-/* ================= HEADER ================= */
 
+/* HEADER */
 
 .kitchen-header{
 
-    height:110px;
-
     width:100%;
-
-    background:white;
-
+    background:#ffffff;
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
-    padding:10px 20px;
-
+    padding:12px 20px;
     border-bottom:2px solid #ddd;
+    gap:15px;
 
 }
 
 
 
 
+.brand-section{
 
-/* BRAND */
-
-
-.brand-area{
-
-    width:30%;
+    min-width:220px;
 
 }
 
 
-.brand-area h1{
+.brand-section h1{
 
-    margin:0;
-
-    font-size:34px;
-
-    font-weight:800;
+    font-size:28px;
+    color:#0b4f8a;
 
 }
 
 
-.brand-area h2{
+.brand-section h3{
 
-    margin:5px 0 0;
-
-    font-size:20px;
-
+    font-size:18px;
     color:#555;
+    margin-top:4px;
 
 }
 
@@ -82,34 +61,122 @@ body{
 
 
 
+.user-section{
 
-/* USER */
+    font-size:16px;
+    line-height:28px;
+    min-width:160px;
+
+}
 
 
-.user-area{
+
+.user-section span{
+
+    font-weight:bold;
+    color:#0b4f8a;
+
+}
+
+
+
+
+
+.attendance-section,
+.control-section{
 
     display:flex;
+    flex-direction:column;
+    gap:6px;
 
-    align-items:center;
+}
 
+
+
+
+button{
+
+    border:none;
+    padding:8px 18px;
+    border-radius:6px;
+    font-size:15px;
+    cursor:pointer;
+    font-weight:bold;
+
+}
+
+
+
+
+#checkInBtn{
+
+    background:#16a34a;
+    color:white;
+
+}
+
+
+
+#checkOutBtn{
+
+    background:#dc2626;
+    color:white;
+
+}
+
+
+
+#refreshBtn{
+
+    background:#2563eb;
+    color:white;
+
+}
+
+
+
+#logoutBtn{
+
+    background:#f59e0b;
+    color:white;
+
+}
+
+
+
+#backBtn{
+
+    background:#6b7280;
+    color:white;
+
+}
+
+
+
+
+
+
+
+/* READY COMPLETED BUTTON */
+
+
+.status-buttons{
+
+    display:flex;
+    justify-content:center;
     gap:25px;
+    margin:15px 0;
 
 }
 
 
 
-.welcome-area{
+#readyBtn,
+#completedBtn{
 
-    font-size:17px;
-
-    line-height:1.8;
-
-}
-
-
-
-.welcome-area strong{
-
+    width:150px;
+    background:#0b4f8a;
+    color:white;
     font-size:18px;
 
 }
@@ -119,115 +186,157 @@ body{
 
 
 
-/* CHECK IN OUT */
+
+/* SELECT STATION */
 
 
-.attendance-area{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:6px;
-
-}
-
-
-.attendance-area button{
-
-    width:95px;
-
-    height:30px;
-
-    border:none;
-
-    border-radius:5px;
-
-    background:#1976d2;
-
-    color:white;
-
-    font-size:13px;
-
-}
-
-
-
-
-
-
-/* RIGHT CONTROL */
-
-
-.control-area{
+.station-box{
 
     display:flex;
-
-    flex-direction:column;
-
-    gap:6px;
-
-}
-
-
-.control-area button{
-
-    width:90px;
-
-    height:30px;
-
-    border:none;
-
-    border-radius:5px;
-
-    background:#37474f;
-
-    color:white;
-
-    font-size:13px;
-
-}
-
-
-#logoutBtn{
-
-    background:#d32f2f;
-
-}
-
-
-
-
-
-
-
-
-/* ================= READY COMPLETED ================= */
-
-
-.status-area{
-
-    width:100%;
-
-    display:flex;
-
     justify-content:center;
-
-    gap:25px;
-
-    margin:15px 0;
+    margin:10px;
 
 }
 
 
-.status-area button{
 
-    width:150px;
+#sectionSelect{
 
-    height:45px;
+    width:260px;
+    padding:10px;
+    font-size:16px;
+    border-radius:6px;
+    border:1px solid #aaa;
 
-    border:none;
+}
 
-    border-radius:8px;
 
-    background
+
+
+
+
+
+/* TITLE */
+
+
+#orderTitle{
+
+    text-align:center;
+    margin:15px;
+    font-size:26px;
+    color:#0b4f8a;
+
+}
+
+
+
+
+
+
+
+/* ORDER GRID */
+
+
+.order-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fill,minmax(320px,1fr));
+
+    gap:15px;
+
+    padding:20px;
+
+}
+
+
+
+
+
+
+
+/* ORDER CARD */
+
+
+.order-card{
+
+    background:white;
+
+    border-radius:10px;
+
+    padding:18px;
+
+    box-shadow:
+    0 3px 10px rgba(0,0,0,0.15);
+
+}
+
+
+
+.order-card h3{
+
+    color:#0b4f8a;
+    margin-bottom:10px;
+
+}
+
+
+
+.order-info{
+
+    font-size:18px;
+
+    margin-bottom:8px;
+
+}
+
+
+
+.item-row{
+
+    background:#f1f5f9;
+
+    padding:10px;
+
+    margin-top:8px;
+
+    border-radius:6px;
+
+    font-size:20px;
+
+}
+
+
+
+.item-note{
+
+    font-size:16px;
+
+    color:#dc2626;
+
+    margin-top:4px;
+
+}
+
+
+
+.order-time{
+
+    margin-top:15px;
+
+    color:#555;
+
+    font-size:15px;
+
+}
+
+
+
+
+
+.hidden{
+
+    display:none;
+
+}
