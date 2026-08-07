@@ -7,7 +7,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <title>
 Waiter Panel - Hameed's Bistro
 </title>
@@ -15,14 +14,11 @@ Waiter Panel - Hameed's Bistro
 
 <link rel="stylesheet" href="css/waiter.css">
 
-
 </head>
 
 
 <body>
 
-
-<!-- HEADER -->
 
 <header class="waiter-header">
 
@@ -33,7 +29,6 @@ Waiter Panel - Hameed's Bistro
 Hameed's Bistro
 </h1>
 
-
 <h3>
 Waiter Panel
 </h3>
@@ -43,27 +38,18 @@ Waiter Panel
 
 
 
-
-<div class="user-info">
-
+<div class="user-box">
 
 <p>
 Welcome:
-<span id="userName">
----
-</span>
+<span id="userName">---</span>
 </p>
-
 
 
 <p>
 Role:
-<span id="userRole">
----
-</span>
+<span id="userRole">---</span>
 </p>
-
-
 
 </div>
 
@@ -71,14 +57,12 @@ Role:
 
 
 
-
-<div class="controls">
+<div class="header-btns">
 
 
 <button id="refreshBtn">
 🔄 Refresh
 </button>
-
 
 
 <button id="logoutBtn">
@@ -89,7 +73,6 @@ Logout
 </div>
 
 
-
 </header>
 
 
@@ -98,12 +81,7 @@ Logout
 
 
 
-
-
-<!-- TABLE AREA -->
-
-
-<section class="table-section">
+<main>
 
 
 <h2>
@@ -111,19 +89,67 @@ Tables
 </h2>
 
 
-
-<div id="tableGrid" class="table-grid">
-
-
-<!-- Tables Load Here -->
+<section class="table-section">
 
 
+<h3>
+Indoor
+</h3>
 
+
+<div id="indoorTables"
+class="table-grid">
 </div>
 
 
+</section>
+
+
+
+
+
+
+
+<section class="table-section">
+
+
+<h3>
+Outdoor
+</h3>
+
+
+<div id="outdoorTables"
+class="table-grid">
+</div>
+
 
 </section>
+
+
+
+
+
+
+
+<section class="table-section">
+
+
+<h3>
+First Floor
+</h3>
+
+
+<div id="floorTables"
+class="table-grid">
+</div>
+
+
+</section>
+
+
+
+
+</main>
 
 
 
@@ -136,42 +162,32 @@ Tables
 <!-- ORDER MODAL -->
 
 
-<div id="orderPanel" class="order-panel">
+<div id="orderModal"
+class="modal">
 
 
-
-<div class="order-header">
-
-
-<h2>
-Table Order
-</h2>
+<div class="modal-box">
 
 
-
-<button id="closeOrderBtn">
+<button id="closeBtn"
+class="close">
 ✕
 </button>
 
 
-</div>
+<h2>
+Table:
+<span id="selectedTable">
+---
+</span>
+
+</h2>
 
 
 
 
 
-
-
-<div class="order-content">
-
-
-
-
-
-<!-- MENU -->
-
-<div class="menu-side">
-
+<div class="menu-area">
 
 <h3>
 Menu
@@ -180,7 +196,6 @@ Menu
 
 <div id="menuItems">
 
-
 </div>
 
 
@@ -192,19 +207,18 @@ Menu
 
 
 
-<!-- CART -->
-
-<div class="cart-side">
+<div class="cart-area">
 
 
 <h3>
-Current Order
+Order Items
 </h3>
-
 
 
 <div id="orderItems">
 
+</div>
+
 
 </div>
 
@@ -212,12 +226,15 @@ Current Order
 
 
 
-<textarea 
-id="itemNote"
+
+
+<textarea
+
+id="orderNote"
+
 placeholder="Item Note">
 
 </textarea>
-
 
 
 
@@ -234,16 +251,7 @@ Send Order
 </div>
 
 
-
-
-
 </div>
-
-
-</div>
-
-
-
 
 
 
