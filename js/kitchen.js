@@ -2,10 +2,6 @@ import { supabase } from "./supabase.js";
 
 
 
-const sectionSelect =
-document.getElementById("sectionSelect");
-
-
 const newOrders =
 document.getElementById("newOrders");
 
@@ -19,68 +15,34 @@ document.getElementById("completedOrders");
 
 
 
-const readyView =
-document.getElementById("readyView");
-
-
-const completedView =
-document.getElementById("completedView");
+const sectionSelect =
+document.getElementById("sectionSelect");
 
 
 
-let selectedCategories=[];
+let categories=[];
 
 
-
-
-
-// LOAD SECTION
 
 
 async function loadSections(){
 
 
+const {data}=
 
-const {
-
-data,
-
-error
-
-}= await supabase
+await supabase
 
 .from("kitchen_sections")
 
 .select("*")
 
-.eq(
-
-"status",
-
-"active"
-
-);
-
-
-
-
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
+.eq("status","active");
 
 
 
 
 
 sectionSelect.innerHTML=
-
 `
 <option value="">
 Select Section
@@ -89,20 +51,16 @@ Select Section
 
 
 
-
-
-
-data.forEach(section=>{
+data?.forEach(item=>{
 
 
 sectionSelect.innerHTML +=
 
 `
-<option value="${section.id}">
-${section.section_name}
+<option value="${item.id}">
+${item.section_name}
 </option>
 `;
-
 
 });
 
@@ -116,85 +74,35 @@ ${section.section_name}
 
 
 
-
-// SECTION CHANGE
-
-
-sectionSelect.addEventListener(
-
+sectionSelect?.addEventListener(
 "change",
-
 async()=>{
 
 
-const id =
+const id=
 sectionSelect.value;
 
 
 
-if(!id){
+const {data}=
 
-selectedCategories=[];
-
-loadOrders();
-
-return;
-
-}
-
-
-
-
-
-
-const {
-
-data,
-
-error
-
-}= await supabase
+await supabase
 
 .from("kitchen_section_categories")
 
 .select("category")
 
-.eq(
-
-"section_id",
-
-id
-
-);
+.eq("section_id",id);
 
 
 
 
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
-
-
-
-
-
-selectedCategories =
-
-data.map(
-x=>x.category
-);
+categories =
+data?.map(x=>x.category) || [];
 
 
 
 loadOrders();
-
 
 
 });
@@ -207,11 +115,7 @@ loadOrders();
 
 
 
-// LOAD ORDERS
-
-
 async function loadOrders(){
-
 
 
 newOrders.innerHTML="";
@@ -222,56 +126,28 @@ completedOrders.innerHTML="";
 
 
 
+const {data,error}=
 
-
-
-
-const {
-
-data,
-
-error
-
-}= await supabase
+await supabase
 
 .from("order_items")
 
 .select(`
-
 *,
-
 orders(*)
-
 `)
 
 .order(
-
 "created_at",
-
 {
 ascending:false
 }
-
 );
 
 
 
 
-
-
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
-
-
-
+if(error)return;
 
 
 
@@ -279,41 +155,17 @@ return;
 data.forEach(item=>{
 
 
-
 if(
 
-selectedCategories.length &&
+categories.length &&
 
-!selectedCategories.includes(
+!categories.includes(item.category)
 
-item.category
-
-)
-
-){
-
-return;
-
-}
+)return;
 
 
 
-
-const order=item.orders;
-
-
-
-
-if(!order)
-
-return;
-
-
-
-
-
-createCard(item,order);
-
+showOrder(item,item.orders);
 
 
 });
@@ -330,48 +182,42 @@ createCard(item,order);
 
 
 
-// CREATE CARD
-
-
-function createCard(item,order){
+function showOrder(item,order){
 
 
 
-const card=
+if(!order)return;
 
-document.createElement("div");
 
+
+const card=document.createElement("div");
 
 card.className="order-card";
-
-
 
 
 
 card.innerHTML=
 
 `
-
 <h3>
 Order #${order.order_number}
 </h3>
-
 
 <p>
 ${item.item_name}
 </p>
 
-
 <p>
 Qty: ${item.quantity}
 </p>
 
+<button class="prepare-btn">
+Preparing
+</button>
 
-<p>
-${item.category}
-</p>
-
-
+<button class="ready-btn">
+Ready
+</button>
 
 `;
 
@@ -379,99 +225,32 @@ ${item.category}
 
 
 
+card.querySelector(".prepare-btn")
 
-
-if(order.status==="New"){
-
-
-
-let btn=document.createElement("button");
-
-btn.innerText="Preparing";
-
-btn.onclick=()=>{
-
-updateStatus(
-
-order.id,
-
-"Preparing"
-
-);
-
-};
+.onclick=()=>updateStatus(order.id,"Preparing");
 
 
 
-card.appendChild(btn);
+
+card.querySelector(".ready-btn")
+
+.onclick=()=>updateStatus(order.id,"Ready");
 
 
+
+
+
+if(order.status==="New")
 
 newOrders.appendChild(card);
 
 
-
-}
-
-
-
-
-
-else if(order.status==="Preparing"){
-
-
-
-let btn=document.createElement("button");
-
-btn.innerText="Ready";
-
-btn.onclick=()=>{
-
-
-updateStatus(
-
-order.id,
-
-"Ready"
-
-);
-
-
-};
-
-
-
-card.appendChild(btn);
-
-
-
-newOrders.appendChild(card);
-
-
-
-}
-
-
-
-
-
-else if(order.status==="Ready"){
-
-
+else if(order.status==="Ready")
 
 readyOrders.appendChild(card);
 
 
-
-}
-
-
-
-
-
-else if(order.status==="Completed"){
-
-
+else if(order.status==="Completed")
 
 completedOrders.appendChild(card);
 
@@ -482,21 +261,12 @@ completedOrders.appendChild(card);
 
 
 
-}
 
 
 
-
-
-
-
-
-
-// UPDATE STATUS
 
 
 async function updateStatus(id,status){
-
 
 
 await supabase
@@ -505,23 +275,18 @@ await supabase
 
 .update({
 
-status:status
+status
 
 })
 
 .eq(
-
 "id",
-
 id
-
 );
 
 
 
-
 loadOrders();
-
 
 }
 
@@ -532,8 +297,21 @@ loadOrders();
 
 
 
+document
 
-// READY BUTTON
+.getElementById("refreshBtn")
+
+?.addEventListener(
+
+"click",
+
+loadOrders
+
+);
+
+
+
+
 
 
 document
@@ -546,12 +324,8 @@ document
 
 ()=>{
 
-
-readyView.style.display="block";
-
-
-completedView.style.display="none";
-
+document.getElementById("readyView")
+.style.display="block";
 
 });
 
@@ -559,11 +333,6 @@ completedView.style.display="none";
 
 
 
-
-
-
-
-// COMPLETED BUTTON
 
 
 document
@@ -576,59 +345,12 @@ document
 
 ()=>{
 
-
-completedView.style.display="block";
-
-
-readyView.style.display="none";
-
+document.getElementById("completedView")
+.style.display="block";
 
 });
 
 
-
-
-
-
-
-
-
-// REFRESH
-
-
-document
-
-.getElementById("refreshBtn")
-
-?.addEventListener(
-
-"click",
-
-()=>{
-
-
-loadOrders();
-
-
-});
-
-
-
-
-
-
-
-
-// AUTO REFRESH
-
-
-setInterval(
-
-loadOrders,
-
-5000
-
-);
 
 
 
@@ -637,3 +359,6 @@ loadOrders,
 loadSections();
 
 loadOrders();
+
+
+setInterval(loadOrders,5000);
