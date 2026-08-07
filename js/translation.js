@@ -1,49 +1,68 @@
-// pos/js/translation.js
+// js/translation.js
 
 
+export const translations = {
 
-const translations = {
 
 
 en:{
 
 
-home:"Home",
-
-back:"Back",
-
-refresh:"Refresh",
-
-login:"Login",
+welcome:"Welcome To Hameed's Bistro",
 
 menu:"Menu",
-
-order:"Order Now",
 
 cart:"Cart",
 
 checkout:"Checkout",
 
+login:"Login",
+
+logout:"Logout",
+
+refresh:"Refresh",
+
+home:"Home",
+
+popular:"Popular Items",
+
+profile:"Company Profile",
+
+orderType:"Order Type",
+
 dineIn:"Dine In",
 
 takeAway:"Take Away",
 
-language:"Language",
+table:"Table",
 
-welcome:"Welcome",
+sendOrder:"Send Order",
 
-menuOrderSystem:"Menu & Ordering System",
+confirmOrder:"Confirm Order",
 
-addToCart:"Add To Cart",
+customerName:"Customer Name",
 
-total:"Total",
+phone:"Phone Number",
 
-placeOrder:"Place Order",
+orderNote:"Order Note",
 
-cancel:"Cancel",
+emptyCart:"Your cart is empty",
 
-confirm:"Confirm"
+payment:"Payment",
 
+invoice:"Invoice",
+
+cashier:"Cashier",
+
+waiter:"Waiter",
+
+kitchen:"Kitchen",
+
+ready:"Ready",
+
+preparing:"Preparing",
+
+completed:"Completed"
 
 
 
@@ -54,45 +73,65 @@ confirm:"Confirm"
 
 
 
+
 ms:{
 
 
-home:"Laman Utama",
-
-back:"Kembali",
-
-refresh:"Muat Semula",
-
-login:"Log Masuk",
+welcome:"Selamat Datang Ke Hameed's Bistro",
 
 menu:"Menu",
 
-order:"Pesan Sekarang",
-
 cart:"Troli",
 
-checkout:"Bayar",
+checkout:"Pembayaran",
+
+login:"Log Masuk",
+
+logout:"Log Keluar",
+
+refresh:"Muat Semula",
+
+home:"Laman Utama",
+
+popular:"Item Popular",
+
+profile:"Profil Syarikat",
+
+orderType:"Jenis Pesanan",
 
 dineIn:"Makan Di Sini",
 
 takeAway:"Bawa Pulang",
 
-language:"Bahasa",
+table:"Meja",
 
-welcome:"Selamat Datang",
+sendOrder:"Hantar Pesanan",
 
-menuOrderSystem:"Menu & Sistem Pesanan",
+confirmOrder:"Sahkan Pesanan",
 
-addToCart:"Tambah Ke Troli",
+customerName:"Nama Pelanggan",
 
-total:"Jumlah",
+phone:"Nombor Telefon",
 
-placeOrder:"Buat Pesanan",
+orderNote:"Nota Pesanan",
 
-cancel:"Batal",
+emptyCart:"Troli kosong",
 
-confirm:"Sahkan"
+payment:"Bayaran",
 
+invoice:"Invois",
+
+cashier:"Juruwang",
+
+waiter:"Pelayan",
+
+kitchen:"Dapur",
+
+ready:"Siap",
+
+preparing:"Sedang Disediakan",
+
+completed:"Selesai"
 
 
 
@@ -107,42 +146,61 @@ confirm:"Sahkan"
 bn:{
 
 
-home:"হোম",
-
-back:"পিছনে",
-
-refresh:"রিফ্রেশ",
-
-login:"লগইন",
+welcome:"হামিদের বিস্ট্রোতে স্বাগতম",
 
 menu:"মেনু",
 
-order:"অর্ডার করুন",
-
 cart:"কার্ট",
 
-checkout:"চেকআউট",
+checkout:"অর্ডার নিশ্চিত করুন",
 
-dineIn:"এখানে খাব",
+login:"লগইন",
 
-takeAway:"নিয়ে যাব",
+logout:"লগআউট",
 
-language:"ভাষা",
+refresh:"রিফ্রেশ",
 
-welcome:"স্বাগতম",
+home:"হোম",
 
-menuOrderSystem:"মেনু ও অর্ডারিং সিস্টেম",
+popular:"জনপ্রিয় আইটেম",
 
-addToCart:"কার্টে যোগ করুন",
+profile:"কোম্পানি প্রোফাইল",
 
-total:"মোট",
+orderType:"অর্ডারের ধরন",
 
-placeOrder:"অর্ডার দিন",
+dineIn:"রেস্টুরেন্টে খাবেন",
 
-cancel:"বাতিল",
+takeAway:"প্যাকেট",
 
-confirm:"নিশ্চিত"
+table:"টেবিল",
 
+sendOrder:"অর্ডার পাঠান",
+
+confirmOrder:"অর্ডার নিশ্চিত করুন",
+
+customerName:"গ্রাহকের নাম",
+
+phone:"ফোন নম্বর",
+
+orderNote:"অর্ডার নোট",
+
+emptyCart:"কার্ট খালি",
+
+payment:"পেমেন্ট",
+
+invoice:"ইনভয়েস",
+
+cashier:"ক্যাশিয়ার",
+
+waiter:"ওয়েটার",
+
+kitchen:"কিচেন",
+
+ready:"প্রস্তুত",
+
+preparing:"তৈরি হচ্ছে",
+
+completed:"সম্পন্ন"
 
 
 
@@ -157,42 +215,61 @@ confirm:"নিশ্চিত"
 hi:{
 
 
-home:"होम",
-
-back:"वापस",
-
-refresh:"रिफ्रेश",
-
-login:"लॉगिन",
+welcome:"हमीद बिस्ट्रो में आपका स्वागत है",
 
 menu:"मेनू",
-
-order:"ऑर्डर करें",
 
 cart:"कार्ट",
 
 checkout:"चेकआउट",
 
+login:"लॉगिन",
+
+logout:"लॉगआउट",
+
+refresh:"रिफ्रेश",
+
+home:"होम",
+
+popular:"लोकप्रिय आइटम",
+
+profile:"कंपनी प्रोफाइल",
+
+orderType:"ऑर्डर प्रकार",
+
 dineIn:"यहीं खाएं",
 
 takeAway:"ले जाएं",
 
-language:"भाषा",
+table:"टेबल",
 
-welcome:"स्वागत है",
+sendOrder:"ऑर्डर भेजें",
 
-menuOrderSystem:"मेनू और ऑर्डरिंग सिस्टम",
+confirmOrder:"ऑर्डर पुष्टि करें",
 
-addToCart:"कार्ट में जोड़ें",
+customerName:"ग्राहक का नाम",
 
-total:"कुल",
+phone:"फोन नंबर",
 
-placeOrder:"ऑर्डर करें",
+orderNote:"ऑर्डर नोट",
 
-cancel:"रद्द करें",
+emptyCart:"कार्ट खाली है",
 
-confirm:"पुष्टि करें"
+payment:"भुगतान",
 
+invoice:"इनवॉइस",
+
+cashier:"कैशियर",
+
+waiter:"वेटर",
+
+kitchen:"किचन",
+
+ready:"तैयार",
+
+preparing:"तैयार हो रहा है",
+
+completed:"पूरा"
 
 
 
@@ -207,42 +284,51 @@ confirm:"पुष्टि करें"
 ta:{
 
 
-home:"முகப்பு",
-
-back:"பின்",
-
-refresh:"புதுப்பிக்க",
-
-login:"உள்நுழை",
+welcome:"ஹமீத் பிஸ்ட்ரோவிற்கு வரவேற்கிறோம்",
 
 menu:"மெனு",
 
-order:"ஆர்டர் செய்ய",
-
 cart:"வண்டி",
 
-checkout:"செலுத்த",
+checkout:"செக்அவுட்",
+
+login:"உள்நுழைவு",
+
+logout:"வெளியேறு",
+
+refresh:"புதுப்பிக்கவும்",
+
+home:"முகப்பு",
+
+popular:"பிரபலமான உணவுகள்",
+
+profile:"நிறுவன சுயவிவரம்",
+
+orderType:"ஆர்டர் வகை",
 
 dineIn:"இங்கே சாப்பிட",
 
 takeAway:"எடுத்து செல்ல",
 
-language:"மொழி",
+table:"மேசை",
 
-welcome:"வரவேற்கிறோம்",
+sendOrder:"ஆர்டர் அனுப்பு",
 
-menuOrderSystem:"மெனு மற்றும் ஆர்டர் அமைப்பு",
+confirmOrder:"ஆர்டர் உறுதி",
 
-addToCart:"வண்டியில் சேர்",
+customerName:"வாடிக்கையாளர் பெயர்",
 
-total:"மொத்தம்",
+phone:"தொலைபேசி",
 
-placeOrder:"ஆர்டர் இடு",
+payment:"கட்டணம்",
 
-cancel:"ரத்து",
+invoice:"ரசீது",
 
-confirm:"உறுதி"
+cashier:"காசாளர்",
 
+waiter:"சேவகர்",
+
+kitchen:"சமையலறை"
 
 
 
@@ -257,181 +343,56 @@ confirm:"உறுதி"
 zh:{
 
 
-home:"主页",
-
-back:"返回",
-
-refresh:"刷新",
-
-login:"登录",
+welcome:"欢迎来到 Hameed's Bistro",
 
 menu:"菜单",
-
-order:"立即订购",
 
 cart:"购物车",
 
 checkout:"结账",
 
+login:"登录",
+
+logout:"退出",
+
+refresh:"刷新",
+
+home:"主页",
+
+popular:"热门商品",
+
+profile:"公司简介",
+
+orderType:"订单类型",
+
 dineIn:"堂食",
 
 takeAway:"外带",
 
-language:"语言",
+table:"桌号",
 
-welcome:"欢迎",
+sendOrder:"发送订单",
 
-menuOrderSystem:"菜单和订购系统",
+confirmOrder:"确认订单",
 
-addToCart:"加入购物车",
+customerName:"顾客姓名",
 
-total:"总计",
+phone:"电话号码",
 
-placeOrder:"下订单",
+payment:"付款",
 
-cancel:"取消",
+invoice:"发票",
 
-confirm:"确认"
+cashier:"收银员",
 
+waiter:"服务员",
 
-
-
-}
-
-
-
-};
-
-
-
-
-
-
-
-
-
-// CURRENT LANGUAGE
-
-
-
-function getLanguage(){
-
-
-
-return localStorage.getItem(
-
-"language"
-
-)
-
-|| "en";
+kitchen:"厨房"
 
 
 
 }
 
 
-
-
-
-
-
-
-
-// TRANSLATE FUNCTION
-
-
-
-function translate(key){
-
-
-
-let lang = getLanguage();
-
-
-
-
-
-return translations[lang][key]
-
-||
-
-translations["en"][key]
-
-||
-
-key;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// AUTO TRANSLATE ELEMENTS
-
-
-
-function applyLanguage(){
-
-
-
-document.querySelectorAll(
-
-"[data-i18n]"
-
-)
-
-.forEach(element=>{
-
-
-
-let key =
-
-element.getAttribute(
-
-"data-i18n"
-
-);
-
-
-
-
-
-element.innerText =
-
-translate(key);
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// EXPORT
-
-
-
-export {
-
-translate,
-
-applyLanguage
 
 };
