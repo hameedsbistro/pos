@@ -3,12 +3,7 @@
 
 import { supabase } from "./supabase.js";
 
-
-// =====================================
-// LOCAL STORAGE KEY
-// =====================================
-
-const LOCAL_USER_KEY = "hameed_logged_user";
+const USER_KEY = "hameed_logged_user";
 
 
 // =====================================
@@ -17,24 +12,11 @@ const LOCAL_USER_KEY = "hameed_logged_user";
 
 export function saveLocalUser(user) {
 
-    try {
+    localStorage.setItem(
+        USER_KEY,
+        JSON.stringify(user)
+    );
 
-        localStorage.setItem(
-            LOCAL_USER_KEY,
-            JSON.stringify(user)
-        );
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "saveLocalUser error:",
-            error
-        );
-
-        return false;
-    }
 }
 
 
@@ -44,49 +26,41 @@ export function saveLocalUser(user) {
 
 export function getLocalUser() {
 
-    try {
+    const data =
+        localStorage.getItem(USER_KEY);
 
-        const saved =
-            localStorage.getItem(
-                LOCAL_USER_KEY
-            );
-
-        if (!saved) {
-            return null;
-        }
-
-        return JSON.parse(saved);
-
-    } catch (error) {
-
-        console.error(
-            "getLocalUser error:",
-            error
-        );
-
-        localStorage.removeItem(
-            LOCAL_USER_KEY
-        );
-
+    if (!data) {
         return null;
     }
+
+    try {
+
+        return JSON.parse(data);
+
+    } catch {
+
+        localStorage.removeItem(USER_KEY);
+
+        return null;
+
+    }
+
 }
 
 
 // =====================================
-// REMOVE LOCAL USER
+// CLEAR LOCAL USER
 // =====================================
 
 export function clearLocalUser() {
 
-    localStorage.removeItem(
-        LOCAL_USER_KEY
-    );
+    localStorage.removeItem(USER_KEY);
+
 }
 
 
 // =====================================
-// LOGIN USER
+// LOGIN
 // =====================================
 
 export async function loginUser(
@@ -95,28 +69,12 @@ export async function loginUser(
 ) {
 
     const cleanEmail =
-        String(email || "")
-            .trim()
-            .toLowerCase();
+        email.trim().toLowerCase();
 
-
-    if (!cleanEmail || !password) {
-
-        return {
-            success: false,
-            message:
-                "Email and password are required."
-        };
-    }
-
-
-    // -----------------------------
-    // SUPABASE AUTH
-    // -----------------------------
 
     const {
-        data: authData,
-        error: authError
+        data,
+        error
     } =
         await supabase.auth.signInWithPassword({
 
@@ -127,41 +85,47 @@ export async function loginUser(
         });
 
 
-    if (authError) {
-
-        console.error(
-            "Auth login error:",
-            authError
-        );
+    if (error) {
 
         return {
+
             success: false,
-            message:
-                authError.message
+
+            message: error.message
+
         };
+
     }
 
 
-    if (!authData?.user) {
+    if (!data?.user) {
 
         return {
+
             success: false,
-            message:
-                "Authentication failed."
+
+            message: "Login failed."
+
         };
+
     }
 
 
-    // -----------------------------
-    // LOAD PROFILE
-    // -----------------------------
+    // ---------------------------------
+    // GET USER PROFILE
+    // ---------------------------------
 
     const {
+
         data: profile,
+
         error: profileError
+
     } =
         await supabase
+
             .from("users")
+
             .select(`
                 id,
                 name,
@@ -170,74 +134,80 @@ export async function loginUser(
                 status,
                 created_at
             `)
+
             .eq(
                 "email",
                 cleanEmail
             )
+
             .maybeSingle();
 
 
     if (profileError) {
 
         console.error(
-            "User profile query error:",
+            "Profile error:",
             profileError
         );
 
+
         await supabase.auth.signOut();
 
+
         return {
+
             success: false,
+
             message:
-                "Unable to load user profile."
+                "Profile access error."
+
         };
+
     }
 
 
     if (!profile) {
 
-        console.error(
-            "No public.users profile found for:",
-            cleanEmail
-        );
-
         await supabase.auth.signOut();
 
+
         return {
+
             success: false,
+
             message:
                 "User profile not found."
+
         };
+
     }
 
 
-    // -----------------------------
-    // STATUS
-    // -----------------------------
-
     if (
-        String(profile.status || "")
-            .toLowerCase() !== "active"
+        String(profile.status)
+            .toLowerCase()
+        !== "active"
     ) {
 
         await supabase.auth.signOut();
 
+
         return {
+
             success: false,
+
             message:
-                "Your account is inactive."
+                "User account is inactive."
+
         };
+
     }
 
-
-    // -----------------------------
-    // USER OBJECT
-    // -----------------------------
 
     const user = {
 
         auth_id:
-            authData.user.id,
+            data.user.id,
 
         id:
             profile.id,
@@ -250,7 +220,7 @@ export async function loginUser(
 
         role:
             String(
-                profile.role || ""
+                profile.role
             ).toLowerCase(),
 
         status:
@@ -258,12 +228,9 @@ export async function loginUser(
 
         created_at:
             profile.created_at
+
     };
 
-
-    // -----------------------------
-    // SAVE
-    // -----------------------------
 
     saveLocalUser(user);
 
@@ -275,11 +242,12 @@ export async function loginUser(
         user: user
 
     };
+
 }
 
 
 // =====================================
-// GET CURRENT USER
+// CURRENT USER
 // =====================================
 
 export async function getCurrentUser() {
@@ -291,36 +259,33 @@ export async function getCurrentUser() {
         await supabase.auth.getUser();
 
 
-    if (error || !data?.user) {
+    if (
+        error ||
+        !data?.user
+    ) {
 
         return null;
+
     }
-
-
-    const authUser =
-        data.user;
 
 
     const email =
-        String(
-            authUser.email || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    if (!email) {
-
-        return null;
-    }
+        data.user.email
+            .trim()
+            .toLowerCase();
 
 
     const {
+
         data: profile,
+
         error: profileError
+
     } =
         await supabase
+
             .from("users")
+
             .select(`
                 id,
                 name,
@@ -329,43 +294,29 @@ export async function getCurrentUser() {
                 status,
                 created_at
             `)
+
             .eq(
                 "email",
                 email
             )
+
             .maybeSingle();
 
 
-    if (profileError) {
-
-        console.error(
-            "Current profile error:",
-            profileError
-        );
-
-        return null;
-    }
-
-
-    if (!profile) {
-
-        return null;
-    }
-
-
     if (
-        String(profile.status || "")
-            .toLowerCase() !== "active"
+        profileError ||
+        !profile
     ) {
 
         return null;
+
     }
 
 
     const user = {
 
         auth_id:
-            authUser.id,
+            data.user.id,
 
         id:
             profile.id,
@@ -378,7 +329,7 @@ export async function getCurrentUser() {
 
         role:
             String(
-                profile.role || ""
+                profile.role
             ).toLowerCase(),
 
         status:
@@ -386,6 +337,7 @@ export async function getCurrentUser() {
 
         created_at:
             profile.created_at
+
     };
 
 
@@ -393,6 +345,7 @@ export async function getCurrentUser() {
 
 
     return user;
+
 }
 
 
@@ -401,7 +354,7 @@ export async function getCurrentUser() {
 // =====================================
 
 export async function requireRole(
-    allowedRoles = []
+    roles = []
 ) {
 
     const user =
@@ -414,33 +367,31 @@ export async function requireRole(
             "login.html";
 
         return null;
+
     }
 
 
     if (
-        Array.isArray(allowedRoles) &&
-        allowedRoles.length > 0
+        roles.length > 0 &&
+        !roles.includes(user.role)
     ) {
 
-        if (
-            !allowedRoles.includes(
-                user.role
-            )
-        ) {
+        alert(
+            "Access denied."
+        );
 
-            alert(
-                "You do not have permission to access this page."
-            );
 
-            window.location.href =
-                "index.html";
+        window.location.href =
+            "index.html";
 
-            return null;
-        }
+
+        return null;
+
     }
 
 
     return user;
+
 }
 
 
@@ -450,42 +401,12 @@ export async function requireRole(
 
 export async function logout() {
 
-    try {
-
-        await supabase.auth.signOut();
-
-    } catch (error) {
-
-        console.error(
-            "Logout error:",
-            error
-        );
-    }
-
+    await supabase.auth.signOut();
 
     clearLocalUser();
 
-
     window.location.href =
         "login.html";
+
 }
-
-
-// =====================================
-// AUTH STATE
-// =====================================
-
-supabase.auth.onAuthStateChange(
-
-    (event) => {
-
-        if (
-            event === "SIGNED_OUT"
-        ) {
-
-            clearLocalUser();
-        }
-    }
-
-);
 ```
