@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Cashier Panel - Hameed's Bistro
+</title>
+
+<link rel="stylesheet" href="../css/cashier.css">
+
+</head>
+
+
+<body>
+
+
+<header class="cashier-header">
+
+
+<div class="brand">
+
+<h1>
+Hameed's Bistro
+</h1>
+
+<h3>
+Cashier Panel
+</h3>
+
+</div>
+
+
+
+<div class="user-info">
+
+<p>
+Welcome:
+<span id="userName">
+---
+</span>
+</p>
+
+
+<p>
+Role:
+<span id="userRole">
+---
+</span>
+</p>
+
+</div>
+
+
+
+<div class="controls">
+
+
+<button id="refreshBtn">
+🔄 Refresh
+</button>
+
+
+<button id="logoutBtn">
+Logout
+</button>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+<section class="cashier-actions">
+
+
+<button id="newOrderBtn">
+NEW ORDER
+</button>
+
+
+<button id="paymentBtn">
+PAYMENT
+</button>
+
+
+<button id="invoiceBtn">
+INVOICE LIST
+</button>
+
+
+
+</section>
+
+
+
+
+
+
+
+<section class="current-orders">
+
+
+<h2>
+Current Orders
+</h2>
+
+
+
+<div id="orderGrid"
+class="order-grid">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- OPEN ORDER MODAL -->
+
+
+<div id="orderModal"
+class="modal">
+
+
+<div class="modal-content">
+
+
+<h2>
+Order Details
+</h2>
+
+
+<div id="orderDetails">
+
+
+</div>
+
+
+
+<button id="sendOrderBtn">
+
+Send Order
+
+</button>
+
+
+
+<button id="closeModalBtn">
+
+Close
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- PAYMENT MODAL -->
+
+
+<div id="paymentModal"
+class="modal">
+
+
+<div class="modal-content">
+
+
+<h2>
+Payment
+</h2>
+
+
+
+<select id="paymentTable">
+
+<option>
+Select Table
+</option>
+
+</select>
+
+
+
+
+
+<select id="paymentMethod">
+
+
+<option>
+Cash
+</option>
+
+
+<option>
+Card
+</option>
+
+
+<option>
+DuitNow QR
+</option>
+
+
+</select>
+
+
+
+
+
+<input 
+type="number"
+id="cashAmount"
+placeholder="Enter Amount">
+
+
+
+
+
+<button id="payBtn">
+
+PAY
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<script type="module" src="../js/cashier.js"></script>
+
+
+</body>
+
+</html>
