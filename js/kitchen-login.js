@@ -7,110 +7,151 @@ const loginBtn = document.getElementById("loginBtn");
 loginBtn?.addEventListener("click", async()=>{
 
 
-const email =
-document.getElementById("email").value.trim();
+    const email =
+    document.getElementById("email").value.trim();
 
 
-const password =
-document.getElementById("password").value;
-
-
-
-const message =
-document.getElementById("message");
+    const password =
+    document.getElementById("password").value;
 
 
 
-if(!email || !password){
-
-message.innerText="Enter email and password";
-return;
-
-}
+    const message =
+    document.getElementById("message");
 
 
 
-const {data,error} =
-await supabase.auth.signInWithPassword({
+    if(!email || !password){
 
-email,
-password
+        message.innerText =
+        "Enter email and password";
 
-});
+        return;
+
+    }
 
 
 
-if(error){
+    const {data,error} =
+    await supabase.auth.signInWithPassword({
 
-message.innerText=error.message;
-return;
+        email,
+        password
 
-}
+    });
 
 
 
 
+    if(error){
 
-const {data:user,error:userError}=
+        message.innerText =
+        error.message;
 
-await supabase
+        return;
 
-.from("users")
-
-.select("*")
-
-.eq("email",email)
-
-.single();
+    }
 
 
 
 
 
+    const {data:user,error:userError} =
 
-if(userError || !user){
+    await supabase
 
-await supabase.auth.signOut();
+    .from("users")
 
-message.innerText="User not found";
+    .select("*")
 
-return;
+    .eq("email",email)
 
-}
-
-
-
-
-
-if(
-
-user.role !== "admin" &&
-
-user.role !== "cook"
-
-){
-
-await supabase.auth.signOut();
-
-message.innerText="Kitchen access denied";
-
-return;
-
-}
-
-
-
-
-localStorage.setItem(
-"kitchenUser",
-JSON.stringify(user)
-);
+    .single();
 
 
 
 
 
-window.location.href="/kitchen/index.html";
+
+    if(userError || !user){
+
+
+        await supabase.auth.signOut();
+
+
+        message.innerText =
+        "User not found";
+
+
+        return;
+
+    }
+
+
+
+
+
+    if(
+
+        user.role !== "admin" &&
+
+        user.role !== "cook"
+
+    ){
+
+
+        await supabase.auth.signOut();
+
+
+        message.innerText =
+        "Kitchen access denied";
+
+
+        return;
+
+    }
+
+
+
+
+
+
+
+    if(user.status !== "active"){
+
+
+        await supabase.auth.signOut();
+
+
+        message.innerText =
+        "Account inactive";
+
+
+        return;
+
+    }
+
+
+
+
+
+
+
+    localStorage.setItem(
+
+        "kitchenUser",
+
+        JSON.stringify(user)
+
+    );
+
+
+
+
+
+
+    window.location.href =
+    "/kitchen/index.html";
 
 
 
