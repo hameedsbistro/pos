@@ -1,153 +1,83 @@
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial, sans-serif;
-}
-
-
 body{
 
-    background:#f4f7fb;
-    color:#222;
-    min-height:100vh;
+margin:0;
+font-family:Arial, sans-serif;
+background:#f2f5f7;
 
 }
 
 
+.header{
 
-/* HEADER */
+display:flex;
+justify-content:space-between;
+align-items:center;
 
-.kitchen-header{
+background:#0b4f8a;
+color:white;
 
-    width:100%;
-    background:#ffffff;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:12px 20px;
-    border-bottom:2px solid #ddd;
-    gap:15px;
+padding:15px;
 
 }
 
 
+.brand h1{
 
-
-.brand-section{
-
-    min-width:220px;
+margin:0;
 
 }
 
 
-.brand-section h1{
+.user-info p{
 
-    font-size:28px;
-    color:#0b4f8a;
-
-}
-
-
-.brand-section h3{
-
-    font-size:18px;
-    color:#555;
-    margin-top:4px;
+margin:5px;
 
 }
-
-
-
-
-
-.user-section{
-
-    font-size:16px;
-    line-height:28px;
-    min-width:160px;
-
-}
-
-
-
-.user-section span{
-
-    font-weight:bold;
-    color:#0b4f8a;
-
-}
-
-
-
-
-
-.attendance-section,
-.control-section{
-
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-
-}
-
-
 
 
 button{
 
-    border:none;
-    padding:8px 18px;
-    border-radius:6px;
-    font-size:15px;
-    cursor:pointer;
-    font-weight:bold;
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+
+font-weight:bold;
+
+}
+
+
+.attendance button{
+
+background:#28a745;
+color:white;
+
+}
+
+
+.controls button{
+
+background:white;
+color:#0b4f8a;
 
 }
 
 
 
 
-#checkInBtn{
 
-    background:#16a34a;
-    color:white;
+.station-area{
 
-}
-
-
-
-#checkOutBtn{
-
-    background:#dc2626;
-    color:white;
+padding:20px;
+background:white;
 
 }
 
 
+.station-area select{
 
-#refreshBtn{
-
-    background:#2563eb;
-    color:white;
-
-}
-
-
-
-#logoutBtn{
-
-    background:#f59e0b;
-    color:white;
-
-}
-
-
-
-#backBtn{
-
-    background:#6b7280;
-    color:white;
+padding:10px;
+font-size:16px;
 
 }
 
@@ -157,56 +87,26 @@ button{
 
 
 
-/* READY COMPLETED BUTTON */
+.status-area{
 
-
-.status-buttons{
-
-    display:flex;
-    justify-content:center;
-    gap:25px;
-    margin:15px 0;
+display:flex;
+gap:10px;
+padding:20px;
 
 }
 
 
+.status-area button{
 
-#readyBtn,
-#completedBtn{
-
-    width:150px;
-    background:#0b4f8a;
-    color:white;
-    font-size:18px;
+background:#555;
+color:white;
 
 }
 
 
+.status-area .active{
 
-
-
-
-
-/* SELECT STATION */
-
-
-.station-box{
-
-    display:flex;
-    justify-content:center;
-    margin:10px;
-
-}
-
-
-
-#sectionSelect{
-
-    width:260px;
-    padding:10px;
-    font-size:16px;
-    border-radius:6px;
-    border:1px solid #aaa;
+background:#007bff;
 
 }
 
@@ -215,128 +115,67 @@ button{
 
 
 
+.orders-container{
 
-/* TITLE */
+display:grid;
 
+grid-template-columns:
+repeat(auto-fit,minmax(300px,1fr));
 
-#orderTitle{
+gap:20px;
 
-    text-align:center;
-    margin:15px;
-    font-size:26px;
-    color:#0b4f8a;
-
-}
-
-
-
-
-
-
-
-/* ORDER GRID */
-
-
-.order-grid{
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fill,minmax(320px,1fr));
-
-    gap:15px;
-
-    padding:20px;
+padding:20px;
 
 }
 
 
 
 
-
-
-
-/* ORDER CARD */
 
 
 .order-card{
 
-    background:white;
+background:white;
 
-    border-radius:10px;
+border-radius:10px;
 
-    padding:18px;
+padding:20px;
 
-    box-shadow:
-    0 3px 10px rgba(0,0,0,0.15);
+box-shadow:0 3px 10px #ccc;
+
 
 }
-
 
 
 .order-card h3{
 
-    color:#0b4f8a;
-    margin-bottom:10px;
+color:#0b4f8a;
 
 }
 
 
 
-.order-info{
+.item{
 
-    font-size:18px;
+padding:8px;
 
-    margin-bottom:8px;
-
-}
-
-
-
-.item-row{
-
-    background:#f1f5f9;
-
-    padding:10px;
-
-    margin-top:8px;
-
-    border-radius:6px;
-
-    font-size:20px;
+border-bottom:1px solid #ddd;
 
 }
 
 
 
-.item-note{
+.ready{
 
-    font-size:16px;
-
-    color:#dc2626;
-
-    margin-top:4px;
+background:#28a745;
+color:white;
 
 }
 
 
+.complete{
 
-.order-time{
-
-    margin-top:15px;
-
-    color:#555;
-
-    font-size:15px;
-
-}
-
-
-
-
-
-.hidden{
-
-    display:none;
+background:#dc3545;
+color:white;
 
 }
