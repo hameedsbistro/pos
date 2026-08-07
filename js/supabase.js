@@ -1,30 +1,22 @@
 // js/supabase.js
 
 
-import {
-
-createClient
-
-} from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } 
+from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 
 
 
-
-// ==========================
+// ===============================
 // SUPABASE CONFIG
-// ==========================
+// ===============================
 
-
-// আপনার Supabase Project URL এখানে দিন
 
 const SUPABASE_URL =
+
 "https://wrabxqejkabbheddioxa.supabase.co";
 
 
-
-
-// আপনার Supabase anon public key এখানে দিন
 
 const SUPABASE_ANON_KEY =
 
@@ -35,21 +27,19 @@ const SUPABASE_ANON_KEY =
 
 
 
+// ===============================
+// SUPABASE CLIENT
+// ===============================
 
-// ==========================
-// CREATE CLIENT
-// ==========================
 
-
-export const supabase =
-
-createClient(
+export const supabase = createClient(
 
 SUPABASE_URL,
 
 SUPABASE_ANON_KEY,
 
 {
+
 
 auth:{
 
@@ -64,6 +54,7 @@ detectSessionInUrl:true
 
 
 }
+
 
 }
 
