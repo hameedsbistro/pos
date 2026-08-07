@@ -1,34 +1,27 @@
-// pos/js/cashier.js
+// js/cashier.js
 
 
 import { supabase } from "./supabase.js";
 
 
 
-let currentUser = null;
-
-let orders = [];
+let currentOrder = null;
 
 
 
+// USER CHECK
 
 
-// CHECK LOGIN USER
-
-async function checkUser(){
+function checkUser(){
 
 
-const userData =
-
-JSON.parse(
-
+const user = JSON.parse(
 localStorage.getItem("user")
-
 );
 
 
 
-if(!userData){
+if(!user){
 
 window.location.href="login.html";
 
@@ -38,46 +31,243 @@ return;
 
 
 
-currentUser = userData;
-
-
-
-document.getElementById("userName").innerText =
-
-userData.name || userData.email;
-
-
-
-document.getElementById("userRole").innerText =
-
-userData.role;
-
-
-
-// ACCESS CONTROL
-
-
 if(
 
-userData.role !== "admin" &&
+user.role !== "admin" &&
 
-userData.role !== "manager" &&
+user.role !== "manager" &&
 
-userData.role !== "cashier"
+user.role !== "cashier"
 
 ){
 
 
 alert("Access Denied");
 
-
-window.location.href="index.html";
+window.location.href="login.html";
 
 
 return;
 
+}
+
+
+
+
+
+document.getElementById(
+"userName"
+).innerText=user.name;
+
+
+
+document.getElementById(
+"userRole"
+).innerText=user.role;
+
+
 
 }
+
+
+
+
+
+
+
+
+// LOAD ORDERS
+
+
+async function loadOrders(){
+
+
+
+const {data,error}=await supabase
+
+.from("orders")
+
+.select("*")
+
+.order("id",{ascending:false});
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+const grid=document.getElementById(
+"orderGrid"
+);
+
+
+
+grid.innerHTML="";
+
+
+
+
+
+data.forEach(order=>{
+
+
+
+if(order.status==="Completed") return;
+
+
+
+
+
+let div=document.createElement(
+"div"
+);
+
+
+
+div.className="order-card";
+
+
+
+
+if(order.status){
+
+div.classList.add(
+"order-"+order.status.toLowerCase()
+);
+
+}
+
+
+
+
+
+div.innerHTML=`
+
+<h3>
+Order #${order.order_number || order.id}
+</h3>
+
+
+<p>
+Table:
+${order.table_number || "Take Away"}
+</p>
+
+
+
+<p>
+Status:
+${order.status}
+</p>
+
+
+
+<button class="acceptBtn">
+
+Accept
+
+</button>
+
+
+`;
+
+
+
+
+
+
+
+div.onclick=()=>{
+
+
+openOrder(order);
+
+
+};
+
+
+
+
+
+
+let btn=div.querySelector(
+".acceptBtn"
+);
+
+
+
+btn.onclick=(e)=>{
+
+
+e.stopPropagation();
+
+acceptOrder(order);
+
+
+};
+
+
+
+
+
+
+grid.appendChild(div);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ACCEPT ORDER
+
+
+async function acceptOrder(order){
+
+
+
+await supabase
+
+.from("orders")
+
+.update({
+
+status:"Accepted"
+
+})
+
+.eq(
+"id",
+order.id
+);
+
+
+
+
+alert(
+"Order Accepted"
+);
 
 
 
@@ -94,303 +284,94 @@ loadOrders();
 
 
 
-// LOAD CURRENT ORDERS
-
-
-async function loadOrders(){
-
-
-const container =
-
-document.getElementById(
-
-"orderContainer"
-
-);
-
-
-container.innerHTML="Loading...";
-
-
-
-
-
-const {data,error}=
-
-await supabase
-
-.from("orders")
-
-.select("*")
-
-.in(
-
-"status",
-
-[
-
-"New",
-
-"Accepted",
-
-"Preparing",
-
-"Ready"
-
-]
-
-)
-
-.order(
-
-"created_at",
-
-{
-
-ascending:false
-
-}
-
-);
-
-
-
-
-
-if(error){
-
-
-console.log(error);
-
-container.innerHTML="Error Loading Orders";
-
-return;
-
-
-}
-
-
-
-
-orders=data || [];
-
-
-
-showOrders();
-
-
-}
-
-
-
-
-
-
-
-
-// SHOW ORDER GRID
-
-
-function showOrders(){
-
-
-
-const container =
-
-document.getElementById(
-
-"orderContainer"
-
-);
-
-
-
-container.innerHTML="";
-
-
-
-
-
-if(orders.length===0){
-
-
-container.innerHTML=
-
-`
-
-<h3>
-No Current Orders
-</h3>
-
-`;
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-orders.forEach(order=>{
-
-
-let card=document.createElement("div");
-
-
-card.className="order-card";
-
-
-
-card.innerHTML=
-
-`
-
-<h3>
-
-Order #${order.order_number}
-
-</h3>
-
-
-<p>
-
-Table:
-
-${order.table_number || "Take Away"}
-
-</p>
-
-
-
-<p>
-
-Status:
-
-${order.status}
-
-</p>
-
-
-
-<button>
-
-OPEN
-
-</button>
-
-`;
-
-
-
-
-
-card.querySelector("button")
-
-.onclick=()=>{
-
-
-openOrder(order);
-
-
-};
-
-
-
-container.appendChild(card);
-
-
-
-});
-
-
-
-
-}
-
-
-
-
-
-
-
-
 
 // OPEN ORDER
 
 
-function openOrder(order){
+async function openOrder(order){
 
 
 
-const modal =
+currentOrder=order;
+
+
 
 document.getElementById(
+"orderPanel"
+).style.display="block";
 
-"orderModal"
 
+
+const box=document.getElementById(
+"orderDetails"
 );
 
 
 
-const box =
+box.innerHTML=`
 
-document.getElementById(
-
-"selectedOrder"
-
-);
-
-
-
-
-
-box.innerHTML=
-
-`
 
 <h3>
-
-Order #${order.order_number}
-
+Order #${order.id}
 </h3>
 
 
 <p>
-
 Table:
-
 ${order.table_number}
-
-</p>
-
-
-<p>
-
-Status:
-
-${order.status}
-
 </p>
 
 
 <hr>
 
 
-<h3>
-
-Items
-
-</h3>
+`;
 
 
-<div>
 
-Loading Items...
+
+
+const {data}=await supabase
+
+.from("order_items")
+
+.select("*")
+
+.eq(
+"order_id",
+order.id
+);
+
+
+
+
+
+
+data.forEach(item=>{
+
+
+box.innerHTML+=`
+
+
+<div class="order-item">
+
+
+<b>
+${item.item_name}
+</b>
+
+
+<br>
+
+Qty:
+${item.quantity}
+
+
+<br>
+
+Note:
+${item.item_note || "-"}
+
 
 </div>
 
@@ -398,9 +379,7 @@ Loading Items...
 `;
 
 
-
-
-modal.style.display="flex";
+});
 
 
 
@@ -417,18 +396,15 @@ modal.style.display="flex";
 // CLOSE ORDER
 
 
-document
-
-.getElementById("closeModalBtn")
-
+document.getElementById(
+"closeOrderBtn"
+)
 .onclick=()=>{
 
 
-document
-
-.getElementById("orderModal")
-
-.style.display="none";
+document.getElementById(
+"orderPanel"
+).style.display="none";
 
 
 };
@@ -441,43 +417,44 @@ document
 
 
 
-// REFRESH
+// SEND KITCHEN
 
 
-document
-
-.getElementById("refreshBtn")
-
-.onclick=()=>{
-
-
-location.reload();
-
-
-};
+document.getElementById(
+"sendOrderBtn"
+)
+.onclick=async()=>{
 
 
 
+if(!currentOrder)
+return;
+
+
+
+await supabase
+
+.from("orders")
+
+.update({
+
+status:"New"
+
+})
+
+.eq(
+"id",
+currentOrder.id
+);
 
 
 
 
 
+alert(
+"Sent To Kitchen"
+);
 
-// LOGOUT
-
-
-document
-
-.getElementById("logoutBtn")
-
-.onclick=()=>{
-
-
-localStorage.removeItem("user");
-
-
-window.location.href="login.html";
 
 
 };
@@ -493,18 +470,62 @@ window.location.href="login.html";
 // PAYMENT BUTTON
 
 
-document
+document.getElementById(
+"paymentBtn"
+)
+.onclick=async()=>{
 
-.getElementById("paymentBtn")
-
-.onclick=()=>{
 
 
-document
+const {data}=await supabase
 
-.getElementById("paymentModal")
+.from("orders")
 
-.style.display="flex";
+.select("table_number,id")
+
+.eq(
+"status",
+"Accepted"
+);
+
+
+
+
+
+const select=document.getElementById(
+"paymentTable"
+);
+
+
+
+select.innerHTML="";
+
+
+
+data.forEach(order=>{
+
+
+select.innerHTML+=`
+
+<option value="${order.id}">
+
+${order.table_number}
+
+</option>
+
+`;
+
+
+
+});
+
+
+
+
+document.getElementById(
+"paymentPanel"
+).style.display="block";
+
 
 
 };
@@ -520,40 +541,24 @@ document
 // OPEN PAYMENT
 
 
-document
-
-.getElementById("openPaymentBtn")
-
+document.getElementById(
+"openPaymentBtn"
+)
 .onclick=()=>{
 
 
-let table =
+
+let id=
 
 document.getElementById(
-
 "paymentTable"
-
 ).value;
-
-
-
-if(!table){
-
-
-alert("Select Table");
-
-
-return;
-
-
-}
-
 
 
 
 window.location.href=
 
-"payment.html?table="+table;
+"payment.html?id="+id;
 
 
 
@@ -567,77 +572,36 @@ window.location.href=
 
 
 
-// INVOICE
+// INVOICE LIST
 
-
-document
-
-.getElementById("invoiceBtn")
-
-.onclick=()=>{
-
-
-document
-
-.getElementById("invoiceModal")
-
-.style.display="flex";
-
-
-
-loadInvoices();
-
-
-
-};
-
-
-
-
-
-
-
-
-
-async function loadInvoices(){
-
-
-
-const box=
 
 document.getElementById(
-
-"invoiceList"
-
-);
-
-
-
-box.innerHTML="Loading...";
+"invoiceBtn"
+)
+.onclick=async()=>{
 
 
 
-const {data}=
-
-await supabase
+const {data}=await supabase
 
 .from("invoices")
 
 .select("*")
 
 .order(
-
-"created_at",
-
+"id",
 {
-
 ascending:false
-
 }
-
 );
 
 
+
+
+
+const box=document.getElementById(
+"invoiceList"
+);
 
 
 
@@ -645,27 +609,24 @@ box.innerHTML="";
 
 
 
-(data || []).forEach(inv=>{
+
+data?.forEach(invoice=>{
 
 
-box.innerHTML +=
-
-`
+box.innerHTML+=`
 
 <div class="invoice-item">
 
 
 Invoice:
-
-${inv.invoice_number}
+${invoice.invoice_number}
 
 
 <br>
 
 
 Amount:
-
-RM ${Number(inv.total).toFixed(2)}
+RM ${Number(invoice.amount).toFixed(2)}
 
 
 </div>
@@ -674,34 +635,41 @@ RM ${Number(inv.total).toFixed(2)}
 `;
 
 
-
 });
 
 
-}
 
 
 
+document.getElementById(
+"invoicePanel"
+).style.display="block";
 
-
-
-
-
-document
-
-.getElementById("closeInvoiceBtn")
-
-.onclick=()=>{
-
-
-document
-
-.getElementById("invoiceModal")
-
-.style.display="none";
 
 
 };
+
+
+
+
+
+
+
+
+
+document.getElementById(
+"closeInvoiceBtn"
+)
+.onclick=()=>{
+
+
+document.getElementById(
+"invoicePanel"
+).style.display="none";
+
+
+};
+
 
 
 
@@ -713,16 +681,13 @@ document
 // NEW ORDER
 
 
-document
-
-.getElementById("newOrderBtn")
-
+document.getElementById(
+"newOrderBtn"
+)
 .onclick=()=>{
 
 
-window.location.href=
-
-"waiter.html";
+window.location.href="waiter.html";
 
 
 };
@@ -734,7 +699,73 @@ window.location.href=
 
 
 
-// START
+
+// REFRESH
+
+
+document.getElementById(
+"refreshBtn"
+)
+.onclick=()=>{
+
+
+location.reload();
+
+
+};
+
+
+
+
+
+
+
+
+// LOGOUT
+
+
+document.getElementById(
+"logoutBtn"
+)
+.onclick=()=>{
+
+
+localStorage.removeItem(
+"user"
+);
+
+
+
+window.location.href="login.html";
+
+
+};
+
+
+
+
+
+
+
+
+
+// AUTO LIVE CHECK
+
+
+setInterval(()=>{
+
+
+loadOrders();
+
+
+},5000);
+
+
+
+
+
 
 
 checkUser();
+
+loadOrders();
