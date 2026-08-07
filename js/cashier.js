@@ -1,29 +1,23 @@
 import { supabase } from "./supabase.js";
 
 
-// USER CHECK
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user =
+JSON.parse(
+localStorage.getItem("user")
+);
+
 
 
 if(!user){
 
-    window.location.href="login.html";
+window.location.href="login.html";
 
 }
 
 
-if(
-    user.role !== "admin" &&
-    user.role !== "manager" &&
-    user.role !== "cashier"
-){
 
-    alert("Access Denied");
 
-    window.location.href="login.html";
-
-}
 
 
 
@@ -32,13 +26,24 @@ user.name || "---";
 
 
 document.getElementById("userRole").innerText =
-user.role || "---";
+user.role || "cashier";
 
 
 
 
 
-let currentOrders=[];
+
+const orderContainer =
+document.getElementById(
+"orderContainer"
+);
+
+
+
+
+
+
+let orders=[];
 
 let selectedOrder=null;
 
@@ -46,21 +51,47 @@ let selectedOrder=null;
 
 
 
-// LOAD CURRENT ORDERS
+
+
+
+
+// LOAD ORDERS
+
 
 async function loadOrders(){
 
 
+
 const {
+
 data,
+
 error
+
 }=await supabase
 
 .from("orders")
 
 .select("*")
 
-.order("created_at",{ascending:false});
+.in(
+"status",
+[
+"New",
+"Accepted",
+"Ready"
+]
+)
+
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+
+
 
 
 
@@ -76,11 +107,13 @@ return;
 
 
 
-currentOrders=data || [];
 
+
+orders=data;
 
 
 showOrders();
+
 
 
 }
@@ -95,62 +128,49 @@ showOrders();
 
 // SHOW ORDERS
 
+
 function showOrders(){
 
 
-const box=document.getElementById(
-"orderContainer"
+
+orderContainer.innerHTML="";
+
+
+
+
+
+
+orders.forEach(order=>{
+
+
+
+let total =
+Number(
+order.total || 0
 );
 
 
 
-box.innerHTML="";
 
 
 
 
-
-currentOrders.forEach(order=>{
-
-
-
-if(
-order.status==="Completed" ||
-order.payment_status==="Paid"
-){
-
-return;
-
-}
+orderContainer.innerHTML += `
 
 
 
+<div class="order-card ${order.status}">
 
-
-let div=document.createElement("div");
-
-
-div.className="order-card";
-
-
-
-div.innerHTML=`
 
 
 <h3>
-
-Order #${order.id.slice(0,6)}
-
-</h3>
-
-
-<p>
 
 Table:
 
 ${order.table_number || "Take Away"}
 
-</p>
+</h3>
+
 
 
 <p>
@@ -163,36 +183,62 @@ ${order.status}
 
 
 
-<button class="open-btn">
 
-Open
+<p>
+
+Amount:
+
+RM ${total.toFixed(2)}
+
+</p>
+
+
+
+
+
+<button onclick="openOrder('${order.id}')">
+
+View
 
 </button>
+
+
+
+
+${
+order.status==="New"
+
+?
+
+`
+
+<button onclick="acceptOrder('${order.id}')">
+
+Accept
+
+</button>
+
+`
+
+:
+
+""
+
+}
+
+
+
+</div>
+
 
 
 `;
 
 
 
-
-
-div.querySelector(".open-btn")
-
-.onclick=()=>{
-
-
-openOrder(order);
-
-
-};
-
-
-
-box.appendChild(div);
-
-
-
 });
+
+
 
 
 
@@ -208,16 +254,22 @@ box.appendChild(div);
 
 // OPEN ORDER
 
-function openOrder(order){
 
-
-selectedOrder=order;
+window.openOrder=function(id){
 
 
 
-document.getElementById(
-"orderModal"
-).style.display="block";
+selectedOrder =
+orders.find(
+x=>x.id===id
+);
+
+
+
+localStorage.setItem(
+"paymentOrder",
+id
+);
 
 
 
@@ -225,55 +277,26 @@ document.getElementById(
 
 document.getElementById(
 "selectedOrder"
-).innerHTML=`
+).innerHTML = `
 
 
 
 <h3>
-Order Details
+
+Table:
+
+${selectedOrder.table_number}
+
 </h3>
 
 
 <p>
-Order No:
-${order.id}
-</p>
 
+Status:
 
-<p>
-Table:
-${order.table_number}
-</p>
-
-
-
-<hr>
-
-
-
-${
-
-(order.order_items || [])
-
-.map(item=>`
-
-
-<p>
-
-${item.item_name}
-
-x
-
-${item.quantity}
+${selectedOrder.status}
 
 </p>
-
-
-`)
-
-.join("")
-
-}
 
 
 
@@ -283,6 +306,13 @@ ${item.quantity}
 
 
 
+document.getElementById(
+"orderModal"
+)
+.style.display="flex";
+
+
+
 }
 
 
@@ -293,79 +323,10 @@ ${item.quantity}
 
 
 
+// ACCEPT ORDER
 
 
-// CLOSE ORDER
-
-
-document.getElementById(
-"closeModalBtn"
-)
-
-.onclick=()=>{
-
-
-document.getElementById(
-"orderModal"
-).style.display="none";
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-// ADD ITEM
-
-
-document.getElementById(
-"addItemBtn"
-)
-
-.onclick=()=>{
-
-
-alert(
-"Menu will open for adding items"
-);
-
-
-// next step connect menu
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-// SEND ORDER
-
-
-document.getElementById(
-"sendOrderBtn"
-)
-
-.onclick=async()=>{
-
-
-
-if(!selectedOrder)
-return;
-
+window.acceptOrder=async function(id){
 
 
 
@@ -381,21 +342,10 @@ status:"Accepted"
 
 .eq(
 "id",
-selectedOrder.id
+id
 );
 
 
-
-
-alert(
-"Order Sent"
-);
-
-
-
-document.getElementById(
-"orderModal"
-).style.display="none";
 
 
 
@@ -403,7 +353,7 @@ loadOrders();
 
 
 
-};
+}
 
 
 
@@ -423,112 +373,16 @@ document.getElementById(
 .onclick=()=>{
 
 
-document.getElementById(
-"paymentModal"
-).style.display="block";
+if(!selectedOrder){
 
-
-
-loadPaymentTables();
-
-
-
-};
-
-
-
-
-
-
-
-
-
-// LOAD TABLES PAYMENT
-
-function loadPaymentTables(){
-
-
-const select=
-document.getElementById(
-"paymentTable"
-);
-
-
-
-select.innerHTML=`
-
-<option>
-
-Select Table
-
-</option>
-
-`;
-
-
-
-currentOrders.forEach(order=>{
-
-
-if(order.table_number){
-
-
-
-select.innerHTML +=`
-
-<option value="${order.id}">
-
-${order.table_number}
-
-</option>
-
-
-`;
-
-
-
-}
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// OPEN PAYMENT
-
-
-document.getElementById(
-"openPaymentBtn"
-)
-
-.onclick=()=>{
-
-
-let id=
-document.getElementById(
-"paymentTable"
-).value;
-
-
-
-if(!id){
 
 alert(
-"Select Table"
+"Select Order First"
 );
 
+
 return;
+
 
 }
 
@@ -537,7 +391,7 @@ return;
 
 localStorage.setItem(
 "paymentOrder",
-id
+selectedOrder.id
 );
 
 
@@ -556,85 +410,49 @@ window.location.href=
 
 
 
-
-
-
-// INVOICE LIST
+// INVOICE BUTTON
 
 
 document.getElementById(
 "invoiceBtn"
 )
 
-.onclick=async()=>{
-
+.onclick=()=>{
 
 
 document.getElementById(
 "invoiceModal"
-).style.display="block";
+)
+
+.style.display="flex";
 
 
 
-const {
-data
-}=await supabase
-
-.from("orders")
-
-.select("*")
-
-.eq(
-"payment_status",
-"Paid"
-);
+};
 
 
 
-const box=
+
+
+
+
+
+
+// CLOSE MODAL
+
+
 document.getElementById(
-"invoiceList"
-);
+"closeModalBtn"
+)
+
+.onclick=()=>{
 
 
+document.getElementById(
+"orderModal"
+)
 
-box.innerHTML="";
-
-
-
-(data || []).forEach(order=>{
-
-
-box.innerHTML +=`
-
-
-<div class="invoice-item">
-
-
-Invoice:
-
-${order.id}
-
-
-
-<br>
-
-
-Amount:
-
-RM ${order.total || "0.00"}
-
-
-
-</div>
-
-
-`;
-
-
-
-});
-
+.style.display="none";
 
 
 };
@@ -655,30 +473,9 @@ document.getElementById(
 
 document.getElementById(
 "invoiceModal"
-).style.display="none";
-
-
-};
-
-
-
-
-
-
-
-
-
-// NEW ORDER
-
-
-document.getElementById(
-"newOrderBtn"
 )
 
-.onclick=()=>{
-
-
-window.location.href="menu.html";
+.style.display="none";
 
 
 };
@@ -701,7 +498,7 @@ document.getElementById(
 .onclick=()=>{
 
 
-location.reload();
+loadOrders();
 
 
 };
@@ -724,13 +521,61 @@ document.getElementById(
 .onclick=()=>{
 
 
-localStorage.removeItem("user");
+localStorage.removeItem(
+"user"
+);
 
 
-window.location.href="login.html";
+window.location.href=
+"login.html";
 
 
 };
+
+
+
+
+
+
+
+
+
+// REALTIME
+
+
+supabase
+
+.channel(
+"orders-channel"
+)
+
+.on(
+
+"postgres_changes",
+
+{
+
+event:"*",
+
+schema:"public",
+
+table:"orders"
+
+},
+
+()=>{
+
+
+loadOrders();
+
+
+}
+
+)
+
+.subscribe();
+
+
 
 
 
