@@ -1,106 +1,134 @@
 import { supabase } from "./supabase.js";
 
 
-const orderContainer = 
-document.getElementById("orderContainer");
+let currentStatus = "New";
+let currentSection = "";
 
 
-const orderTitle =
-document.getElementById("orderTitle");
 
+
+
+// LOAD STATIONS
+
+async function loadStations(){
+
+
+    const { data, error } = await supabase
+    .from("kitchen_sections")
+    .select("*")
+    .eq("status","active")
+    .order("section_name");
+
+
+
+    if(error){
+
+        console.log(error);
+        return;
+
+    }
+
+
+
+    const select =
+    document.getElementById("sectionSelect");
+
+
+
+    data.forEach(section=>{
+
+
+        const option =
+        document.createElement("option");
+
+
+        option.value = section.id;
+
+        option.textContent =
+        section.section_name;
+
+
+        select.appendChild(option);
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+// LOAD ORDERS
 
 
 async function loadOrders(){
 
 
-const { data, error } = await supabase
 
+let query =
+supabase
 .from("orders")
-
 .select(`
 
 id,
-orderNumber,
-tableNumber,
-ordered_by_type,
-ordered_by_name,
-created_at,
+order_number,
+table_number,
 status,
+created_at,
 
 order_items(
-
-"itemName",
+item_name,
 quantity,
 item_note
-
 )
 
 `)
-
-.eq("status","New")
-
-.order(
-"created_at",
-{
-ascending:false
-}
-);
+.eq("status",currentStatus)
+.order("created_at",{ascending:false});
 
 
+
+
+
+const {data,error}=await query;
 
 
 
 if(error){
 
-orderContainer.innerHTML = `
-
-<div class="order-card">
-
-<h3>
-Database Error
-</h3>
-
-<p>
-${error.message}
-</p>
-
-</div>
-
-`;
+console.log(error);
 
 return;
 
 }
 
+
+
+
+const container =
+document.getElementById("orderContainer");
+
+
+
+container.innerHTML="";
 
 
 
 
 if(!data || data.length===0){
 
-
-orderContainer.innerHTML = `
-
-<div class="order-card">
-
-<h3>
-No New Orders
-</h3>
-
-</div>
-
+container.innerHTML=
+`
+<h3>No Orders Found</h3>
 `;
 
 return;
 
-
 }
-
-
-
-
-
-orderContainer.innerHTML="";
 
 
 
@@ -109,41 +137,40 @@ orderContainer.innerHTML="";
 data.forEach(order=>{
 
 
-let itemsHTML="";
+const card =
+document.createElement("div");
+
+
+card.className="order-card";
 
 
 
-order.order_items?.forEach(item=>{
+let items="";
 
 
-itemsHTML += `
 
-<div class="item-row">
-
-<strong>
-${item.quantity} × ${item."itemName"}
-</strong>
+order.order_items.forEach(item=>{
 
 
-${
-item.item_note
-?
-`
-<div class="item-note">
+items +=`
+
+<div class="item">
+
+<b>${item.item_name}</b>
+
+<br>
+
+Qty: ${item.quantity}
+
+<br>
 
 Note:
-${item.item_note}
-
-</div>
-`
-:
-""
-}
-
+${item.item_note ?? ""}
 
 </div>
 
 `;
+
 
 });
 
@@ -151,106 +178,195 @@ ${item.item_note}
 
 
 
-orderContainer.innerHTML += `
+
+card.innerHTML=`
+
+<h3>
+Order #${order.order_number}
+</h3>
 
 
-<div class="order-card">
-
-
-<h2>
-
-Order No:
-${order.orderNumber}
-
-</h2>
-
-
-
-<div>
-
+<p>
 Table:
-${order.tableNumber || "-"}
-
-</div>
-
+${order.table_number ?? "-"}
+</p>
 
 
-<div>
-
-Ordered By:
-
-${
-order.ordered_by_name
-?
-order.ordered_by_name
-:
-order.ordered_by_type
-}
-
-</div>
-
-
-<hr>
-
-
-${itemsHTML}
+${items}
 
 
 
-<hr>
-
-
-
-<div>
-
-${new Date(order.created_at)
-.toLocaleString()}
-
-</div>
-
-
-</div>
+<button class="ready"
+data-id="${order.id}">
+READY
+</button>
 
 
 `;
 
 
 
+container.appendChild(card);
+
+
+
 });
 
 
+
+
+
+
+// READY BUTTON
+
+document
+.querySelectorAll(".ready")
+.forEach(btn=>{
+
+
+btn.onclick=async()=>{
+
+
+await updateStatus(
+btn.dataset.id,
+"Ready"
+);
+
+
+};
+
+
+});
+
+
+
+
+
 }
 
 
 
 
-loadOrders();
 
 
 
 
-// Live New Order Update
+// UPDATE STATUS
 
-supabase
 
-.channel("kitchen-orders")
+async function updateStatus(id,status){
 
-.on(
 
-"postgres_changes",
 
-{
-event:"*",
-schema:"public",
-table:"orders"
-},
+const {error}=await supabase
+.from("orders")
+.update({
 
-()=>{
+status:status
+
+})
+.eq("id",id);
+
+
+
+
+if(error){
+
+alert(error.message);
+
+}
+else{
 
 loadOrders();
 
 }
 
-)
 
-.subscribe();
+}
+
+
+
+
+
+
+
+// BUTTONS
+
+
+
+document
+.getElementById("refreshBtn")
+.onclick=()=>loadOrders();
+
+
+
+
+document
+.getElementById("newBtn")
+.onclick=()=>{
+
+
+currentStatus="New";
+
+loadOrders();
+
+
+};
+
+
+
+
+document
+.getElementById("readyBtn")
+.onclick=()=>{
+
+
+currentStatus="Ready";
+
+loadOrders();
+
+
+};
+
+
+
+
+
+document
+.getElementById("completedBtn")
+.onclick=()=>{
+
+
+currentStatus="Completed";
+
+loadOrders();
+
+
+};
+
+
+
+
+
+document
+.getElementById("sectionSelect")
+.onchange=(e)=>{
+
+
+currentSection=e.target.value;
+
+loadOrders();
+
+
+};
+
+
+
+
+
+
+
+
+loadStations();
+
+loadOrders();
