@@ -288,4 +288,3 @@ passwordInput?.addEventListener(
 console.log(
     "Hameed's Bistro login.js loaded."
 );
-```
