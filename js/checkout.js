@@ -3,90 +3,42 @@
 
 import { supabase } from "./supabase.js";
 
+import { changeLanguage } from "./language.js";
 
 
-let cart = JSON.parse(
+
+
+
+// ===============================
+// LOAD CART
+// ===============================
+
+
+let cart =
+
+JSON.parse(
 
 localStorage.getItem("cart")
 
-) || [];
+)
+
+||
+
+[];
+
+
 
 
 
 let orderType =
 
-localStorage.getItem("orderType") || "Dine In";
+localStorage.getItem(
+"orderType"
+)
 
+||
 
-
-
-
-// CHECK LOGIN
-
-
-async function checkCustomer(){
-
-
-
-const user = JSON.parse(
-
-localStorage.getItem("customer")
-
-);
-
-
-
-
-if(!user){
-
-
-
-let confirmLogin = confirm(
-
-"Please Login or Create Account to place order"
-
-);
-
-
-
-if(confirmLogin){
-
-window.location.href="login.html";
-
-}
-
-else{
-
-window.location.href="register.html";
-
-}
-
-
-return false;
-
-
-}
-
-
-
-
-document.getElementById(
-"customerName"
-).value = user.name || "";
-
-
-
-document.getElementById(
-"customerPhone"
-).value = user.phone || "";
-
-
-
-return true;
-
-
-
-}
+"Dine In";
 
 
 
@@ -94,31 +46,57 @@ return true;
 
 
 
-
-
+// ===============================
 // SHOW ORDER TYPE
+// ===============================
 
+
+const orderTypeBox =
 
 document.getElementById(
 "orderType"
-).innerText = orderType;
+);
+
+
+
+if(orderTypeBox){
+
+orderTypeBox.innerText =
+orderType;
+
+}
 
 
 
 
 
 
-// TABLE CONTROL
+
+
+
+// ===============================
+// TABLE BOX
+// ===============================
+
+
+const tableBox =
+
+document.getElementById(
+"tableBox"
+);
+
+
+
 
 
 if(orderType==="Take Away"){
 
 
+if(tableBox){
 
-document.getElementById(
-"tableBox"
-).style.display="none";
+tableBox.style.display="none";
 
+}
 
 
 }
@@ -131,69 +109,20 @@ document.getElementById(
 
 
 
-// PLACE ORDER
+// ===============================
+// CONFIRM ORDER
+// ===============================
 
 
-document.getElementById(
-"confirmOrderBtn"
-)
-.onclick=async()=>{
+document
 
+.getElementById("confirmOrderBtn")
 
+?.addEventListener(
 
-let logged = await checkCustomer();
+"click",
 
-
-
-if(!logged)
-return;
-
-
-
-
-
-let user = JSON.parse(
-
-localStorage.getItem("customer")
-
-);
-
-
-
-
-
-let table = null;
-
-
-
-if(orderType==="Dine In"){
-
-
-
-table = document.getElementById(
-"tableNumber"
-).value;
-
-
-
-if(!table){
-
-
-alert(
-"Please Select Table"
-);
-
-
-return;
-
-
-}
-
-
-
-}
-
-
+async()=>{
 
 
 
@@ -202,11 +131,93 @@ return;
 if(cart.length===0){
 
 
-
 alert(
 "Cart Empty"
 );
 
+
+return;
+
+
+}
+
+
+
+
+
+
+
+const customerName =
+
+document
+
+.getElementById(
+"customerName"
+)
+
+.value.trim();
+
+
+
+
+
+
+
+const phone =
+
+document
+
+.getElementById(
+"customerPhone"
+)
+
+.value.trim();
+
+
+
+
+
+
+
+const tableNumber =
+
+document
+
+.getElementById(
+"tableNumber"
+)
+
+?.value || "";
+
+
+
+
+
+
+
+const note =
+
+document
+
+.getElementById(
+"orderNote"
+)
+
+.value.trim();
+
+
+
+
+
+
+
+
+if(orderType==="Dine In" && !tableNumber){
+
+
+alert(
+"Please select table"
+);
 
 
 return;
@@ -221,31 +232,110 @@ return;
 
 
 
-// CREATE ORDER
+
+// ===============================
+// CALCULATE TOTAL
+// ===============================
 
 
-const {data:order,error}=await supabase
+let total = 0;
+
+
+
+cart.forEach(item=>{
+
+
+total +=
+
+item.price *
+
+item.quantity;
+
+
+});
+
+
+
+
+
+
+
+
+
+// ===============================
+// ORDER NUMBER
+// ===============================
+
+
+const orderNumber =
+
+"HMB-" +
+
+Date.now();
+
+
+
+
+
+
+
+
+
+// ===============================
+// INSERT ORDER
+// ===============================
+
+
+const {
+
+data:order,
+
+error:orderError
+
+}=await supabase
 
 .from("orders")
 
 .insert({
 
-customer_id:user.id,
+order_number:
+orderNumber,
 
 
-customer_name:user.name,
+table_number:
+tableNumber,
 
 
-phone:user.phone,
+order_type:
+orderType,
 
 
-order_type:orderType,
+ordered_by_type:
+"customer",
 
 
-table_number:table,
+ordered_by_name:
+customerName || "Guest",
 
 
-status:"New"
+customer_name:
+customerName,
+
+
+customer_phone:
+phone,
+
+
+status:
+"New",
+
+
+payment_status:
+"Pending",
+
+
+total_amount:
+total
 
 
 })
@@ -260,14 +350,17 @@ status:"New"
 
 
 
-if(error){
+
+if(orderError){
 
 
-console.log(error);
+console.log(orderError);
+
 
 alert(
 "Order Failed"
 );
+
 
 return;
 
@@ -282,26 +375,38 @@ return;
 
 
 
-// ORDER ITEMS
+// ===============================
+// INSERT ORDER ITEMS
+// ===============================
 
 
-let items = cart.map(item=>({
+const orderItems =
+
+cart.map(item=>({
 
 
-
-order_id:order.id,
-
-
-
-item_name:item.itemName,
+order_id:
+order.id,
 
 
+item_name:
+item.itemName,
 
-quantity:item.quantity,
+
+quantity:
+item.quantity,
 
 
+price:
+item.price,
 
-item_note:item.note || ""
+
+section_id:
+item.section_id,
+
+
+item_note:
+note
 
 
 
@@ -313,11 +418,18 @@ item_note:item.note || ""
 
 
 
-const {error:itemError}=await supabase
+
+const {
+
+error:itemError
+
+}=await supabase
 
 .from("order_items")
 
-.insert(items);
+.insert(orderItems);
+
+
 
 
 
@@ -332,7 +444,7 @@ console.log(itemError);
 
 
 alert(
-"Item Error"
+"Item Save Failed"
 );
 
 
@@ -348,20 +460,9 @@ return;
 
 
 
-
-alert(
-
-"Order Sent Successfully"
-
-);
-
-
-
-
-
-
-
+// ===============================
 // CLEAR CART
+// ===============================
 
 
 localStorage.removeItem(
@@ -370,12 +471,60 @@ localStorage.removeItem(
 
 
 
+
+
+
+
+alert(
+
+"Order Confirmed"
+
+);
+
+
+
+
+
+
+window.location.href =
+
+"index.html";
+
+
+
+
+
+
+
+});
+
+
+
+
+
+
+
+
+// ===============================
+// HEADER
+// ===============================
+
+
+document
+
+.getElementById("homeBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
 window.location.href="index.html";
 
 
-
-};
-
+});
 
 
 
@@ -383,11 +532,50 @@ window.location.href="index.html";
 
 
 
+document
+
+.getElementById("backBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+history.back();
+
+
+});
 
 
 
 
-// START
 
 
-checkCustomer();
+
+document
+
+.getElementById("refreshBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+location.reload();
+
+
+});
+
+
+
+
+
+
+
+
+
+changeLanguage();
