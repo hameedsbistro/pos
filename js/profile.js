@@ -1,24 +1,85 @@
-// pos/js/profile.js
+// js/profile.js
+
+
+import { changeLanguage } from "./language.js";
+
+import { getLocalUser } from "./auth.js";
 
 
 
-// HOME BUTTON
 
+// ===============================
+// RESTAURANT DATA
+// ===============================
+
+
+const restaurant = {
+
+
+name:
+"Hameed's Bistro",
+
+
+address:
+"Your Restaurant Address Here",
+
+
+phone:
+"Your Contact Number",
+
+
+opening:
+"Everyday: 10:00 AM - 10:00 PM"
+
+
+
+};
+
+
+
+
+
+
+
+
+
+// ===============================
+// LOAD PROFILE
+// ===============================
+
+
+function loadProfile(){
+
+
+
+const name =
 
 document.getElementById(
-"homeBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
+"restaurantName"
+);
 
 
-window.location.href="../index.html";
+
+const address =
+
+document.getElementById(
+"restaurantAddress"
+);
 
 
-}
 
+const phone =
+
+document.getElementById(
+"restaurantPhone"
+);
+
+
+
+const opening =
+
+document.getElementById(
+"openingHours"
 );
 
 
@@ -27,12 +88,142 @@ window.location.href="../index.html";
 
 
 
-// BACK BUTTON
+if(name){
+
+name.innerText =
+restaurant.name;
+
+}
 
 
-document.getElementById(
-"backBtn"
-)?.addEventListener(
+
+if(address){
+
+address.innerText =
+restaurant.address;
+
+}
+
+
+
+if(phone){
+
+phone.innerText =
+restaurant.phone;
+
+}
+
+
+
+if(opening){
+
+opening.innerText =
+restaurant.opening;
+
+}
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// LOGIN BUTTON
+// ===============================
+
+
+document
+
+.getElementById("loginBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+
+const user =
+
+getLocalUser();
+
+
+
+
+
+if(user){
+
+
+window.location.href =
+"index.html";
+
+
+}
+
+else{
+
+
+window.location.href =
+"login.html";
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+
+
+// ===============================
+// HEADER BUTTONS
+// ===============================
+
+
+document
+
+.getElementById("homeBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+window.location.href =
+"index.html";
+
+
+});
+
+
+
+
+
+
+
+document
+
+.getElementById("backBtn")
+
+?.addEventListener(
 
 "click",
 
@@ -42,9 +233,7 @@ document.getElementById(
 history.back();
 
 
-}
-
-);
+});
 
 
 
@@ -52,12 +241,11 @@ history.back();
 
 
 
-// REFRESH BUTTON
+document
 
+.getElementById("refreshBtn")
 
-document.getElementById(
-"refreshBtn"
-)?.addEventListener(
+?.addEventListener(
 
 "click",
 
@@ -67,9 +255,7 @@ document.getElementById(
 location.reload();
 
 
-}
-
-);
+});
 
 
 
@@ -78,87 +264,10 @@ location.reload();
 
 
 
-// CART BUTTON
+
+// START
 
 
-document.getElementById(
-"cartBtn"
-)?.addEventListener(
+loadProfile();
 
-"click",
-
-()=>{
-
-
-window.location.href="cart.html";
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-// LOGIN BUTTON
-
-
-document.getElementById(
-"loginBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
-
-
-window.location.href="../login.html";
-
-
-}
-
-);
-
-
-
-
-
-
-
-
-// MENU BUTTON
-
-
-const menuBtn =
-
-document.getElementById(
-"menuBtn"
-);
-
-
-
-if(menuBtn){
-
-
-menuBtn.addEventListener(
-
-"click",
-
-()=>{
-
-
-alert(
-"Menu Open"
-);
-
-
-}
-
-);
-
-
-}
+changeLanguage();
