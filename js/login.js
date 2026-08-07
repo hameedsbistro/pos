@@ -1,4 +1,3 @@
-```javascript
 // js/login.js
 
 import { loginUser } from "./auth.js";
