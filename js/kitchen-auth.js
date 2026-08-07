@@ -2,7 +2,7 @@ import { supabase } from "./supabase.js";
 
 
 
-async function checkKitchenAccess(){
+async function kitchenAuth(){
 
 
 
@@ -11,7 +11,7 @@ data:{
 user
 }
 
-}= await supabase.auth.getUser();
+}=await supabase.auth.getUser();
 
 
 
@@ -20,7 +20,6 @@ user
 if(!user){
 
 window.location.href="/kitchen-login.html";
-
 return;
 
 }
@@ -30,25 +29,17 @@ return;
 
 
 
+const {data:userData,error}=
 
-const {
-
-data:userData,
-
-error
-
-}= await supabase
+await supabase
 
 .from("users")
 
 .select("*")
 
 .eq(
-
 "email",
-
 user.email
-
 )
 
 .single();
@@ -59,18 +50,13 @@ user.email
 
 
 
-
 if(error || !userData){
-
 
 await supabase.auth.signOut();
 
-
 window.location.href="/kitchen-login.html";
 
-
 return;
-
 
 }
 
@@ -80,30 +66,18 @@ return;
 
 
 
-
-
-// ROLE CHECK
-
-
 if(
 
-userData.role !== "admin" &&
+userData.role!=="admin" &&
 
-userData.role !== "cook"
+userData.role!=="cook"
 
 ){
 
 
 await supabase.auth.signOut();
 
-
-alert(
-"Kitchen access denied"
-);
-
-
 window.location.href="/kitchen-login.html";
-
 
 return;
 
@@ -116,9 +90,39 @@ return;
 
 
 
+// USER NAME
 
 
-// SAVE USER
+const name =
+document.getElementById("userName");
+
+
+const role =
+document.getElementById("userRole");
+
+
+
+
+
+if(name){
+
+name.innerText =
+userData.name || "User";
+
+}
+
+
+
+
+if(role){
+
+role.innerText =
+userData.role;
+
+}
+
+
+
 
 
 localStorage.setItem(
@@ -131,52 +135,6 @@ JSON.stringify(userData)
 
 
 
-
-
-
-
-
-
-// SHOW NAME
-
-
-const userName =
-
-document.getElementById("userName");
-
-
-
-const userRole =
-
-document.getElementById("userRole");
-
-
-
-
-
-if(userName){
-
-userName.innerText =
-userData.name || user.email;
-
-}
-
-
-
-
-
-if(userRole){
-
-userRole.innerText =
-userData.role;
-
-}
-
-
-
-
-
-
 }
 
 
@@ -186,29 +144,14 @@ userData.role;
 
 
 
-
-// LOGOUT FUNCTION
-
-
-const logoutBtn =
-
-document.getElementById("logoutBtn");
+// LOGOUT
 
 
+document
 
+.getElementById("logoutBtn")
 
-if(logoutBtn){
-
-
-
-logoutBtn.addEventListener(
-
-"click",
-
-async()=>{
-
-
-try{
+?.addEventListener("click",async()=>{
 
 
 await supabase.auth.signOut();
@@ -224,25 +167,7 @@ window.location.href="/kitchen-login.html";
 
 
 
-}
-
-catch(error){
-
-
-console.log(error);
-
-
-}
-
-
-
-}
-
-
-);
-
-
-}
+});
 
 
 
@@ -250,4 +175,4 @@ console.log(error);
 
 
 
-checkKitchenAccess();
+kitchenAuth();
