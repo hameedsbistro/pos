@@ -19,12 +19,9 @@ user
 
 if(!user){
 
-
 window.location.href="/kitchen-login.html";
 
-
 return;
-
 
 }
 
@@ -61,6 +58,8 @@ user.email
 
 
 
+
+
 if(error || !userData){
 
 
@@ -83,8 +82,7 @@ return;
 
 
 
-// ONLY ADMIN AND COOK
-
+// ROLE CHECK
 
 
 if(
@@ -96,9 +94,12 @@ userData.role !== "cook"
 ){
 
 
-
 await supabase.auth.signOut();
 
+
+alert(
+"Kitchen access denied"
+);
 
 
 window.location.href="/kitchen-login.html";
@@ -117,39 +118,7 @@ return;
 
 
 
-// SHOW USER NAME
-
-
-
-const name =
-document.getElementById("userName");
-
-
-const role =
-document.getElementById("userRole");
-
-
-
-
-
-if(name){
-
-name.innerText=userData.name;
-
-}
-
-
-
-if(role){
-
-role.innerText=userData.role;
-
-}
-
-
-
-
-
+// SAVE USER
 
 
 localStorage.setItem(
@@ -163,6 +132,51 @@ JSON.stringify(userData)
 
 
 
+
+
+
+
+
+// SHOW NAME
+
+
+const userName =
+
+document.getElementById("userName");
+
+
+
+const userRole =
+
+document.getElementById("userRole");
+
+
+
+
+
+if(userName){
+
+userName.innerText =
+userData.name || user.email;
+
+}
+
+
+
+
+
+if(userRole){
+
+userRole.innerText =
+userData.role;
+
+}
+
+
+
+
+
+
 }
 
 
@@ -173,18 +187,28 @@ JSON.stringify(userData)
 
 
 
-// LOGOUT
+// LOGOUT FUNCTION
 
 
-document
+const logoutBtn =
 
-.getElementById("logoutBtn")
+document.getElementById("logoutBtn");
 
-?.addEventListener(
+
+
+
+if(logoutBtn){
+
+
+
+logoutBtn.addEventListener(
 
 "click",
 
 async()=>{
+
+
+try{
 
 
 await supabase.auth.signOut();
@@ -202,7 +226,23 @@ window.location.href="/kitchen-login.html";
 
 }
 
+catch(error){
+
+
+console.log(error);
+
+
+}
+
+
+
+}
+
+
 );
+
+
+}
 
 
 
