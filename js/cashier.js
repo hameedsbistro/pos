@@ -1,96 +1,66 @@
-// js/cashier.js
-
-
 import { supabase } from "./supabase.js";
-
-
-
-let currentOrder = null;
-
 
 
 // USER CHECK
 
-
-function checkUser(){
-
-
-const user = JSON.parse(
-localStorage.getItem("user")
-);
-
+const user = JSON.parse(localStorage.getItem("user"));
 
 
 if(!user){
 
-window.location.href="login.html";
-
-return;
+    window.location.href="login.html";
 
 }
-
 
 
 if(
-
-user.role !== "admin" &&
-
-user.role !== "manager" &&
-
-user.role !== "cashier"
-
+    user.role !== "admin" &&
+    user.role !== "manager" &&
+    user.role !== "cashier"
 ){
 
+    alert("Access Denied");
 
-alert("Access Denied");
-
-window.location.href="login.html";
-
-
-return;
+    window.location.href="login.html";
 
 }
 
 
 
+document.getElementById("userName").innerText =
+user.name || "---";
 
 
-document.getElementById(
-"userName"
-).innerText=user.name;
-
-
-
-document.getElementById(
-"userRole"
-).innerText=user.role;
-
-
-
-}
+document.getElementById("userRole").innerText =
+user.role || "---";
 
 
 
 
 
+let currentOrders=[];
+
+let selectedOrder=null;
 
 
 
-// LOAD ORDERS
 
+
+// LOAD CURRENT ORDERS
 
 async function loadOrders(){
 
 
-
-const {data,error}=await supabase
+const {
+data,
+error
+}=await supabase
 
 .from("orders")
 
 .select("*")
 
-.order("id",{ascending:false});
-
+.order("created_at",{ascending:false});
 
 
 
@@ -106,45 +76,12 @@ return;
 
 
 
-
-const grid=document.getElementById(
-"orderGrid"
-);
+currentOrders=data || [];
 
 
 
-grid.innerHTML="";
+showOrders();
 
-
-
-
-
-data.forEach(order=>{
-
-
-
-if(order.status==="Completed") return;
-
-
-
-
-
-let div=document.createElement(
-"div"
-);
-
-
-
-div.className="order-card";
-
-
-
-
-if(order.status){
-
-div.classList.add(
-"order-"+order.status.toLowerCase()
-);
 
 }
 
@@ -152,30 +89,83 @@ div.classList.add(
 
 
 
+
+
+
+
+// SHOW ORDERS
+
+function showOrders(){
+
+
+const box=document.getElementById(
+"orderContainer"
+);
+
+
+
+box.innerHTML="";
+
+
+
+
+
+currentOrders.forEach(order=>{
+
+
+
+if(
+order.status==="Completed" ||
+order.payment_status==="Paid"
+){
+
+return;
+
+}
+
+
+
+
+
+let div=document.createElement("div");
+
+
+div.className="order-card";
+
+
+
 div.innerHTML=`
 
+
 <h3>
-Order #${order.order_number || order.id}
+
+Order #${order.id.slice(0,6)}
+
 </h3>
 
 
 <p>
-Table:
-${order.table_number || "Take Away"}
-</p>
 
+Table:
+
+${order.table_number || "Take Away"}
+
+</p>
 
 
 <p>
+
 Status:
+
 ${order.status}
+
 </p>
 
 
 
-<button class="acceptBtn">
+<button class="open-btn">
 
-Accept
+Open
 
 </button>
 
@@ -186,9 +176,9 @@ Accept
 
 
 
+div.querySelector(".open-btn")
 
-
-div.onclick=()=>{
+.onclick=()=>{
 
 
 openOrder(order);
@@ -198,80 +188,11 @@ openOrder(order);
 
 
 
-
-
-
-let btn=div.querySelector(
-".acceptBtn"
-);
-
-
-
-btn.onclick=(e)=>{
-
-
-e.stopPropagation();
-
-acceptOrder(order);
-
-
-};
-
-
-
-
-
-
-grid.appendChild(div);
+box.appendChild(div);
 
 
 
 });
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ACCEPT ORDER
-
-
-async function acceptOrder(order){
-
-
-
-await supabase
-
-.from("orders")
-
-.update({
-
-status:"Accepted"
-
-})
-
-.eq(
-"id",
-order.id
-);
-
-
-
-
-alert(
-"Order Accepted"
-);
-
-
-
-loadOrders();
 
 
 
@@ -287,33 +208,36 @@ loadOrders();
 
 // OPEN ORDER
 
-
-async function openOrder(order){
-
+function openOrder(order){
 
 
-currentOrder=order;
+selectedOrder=order;
 
 
 
 document.getElementById(
-"orderPanel"
+"orderModal"
 ).style.display="block";
 
 
 
-const box=document.getElementById(
-"orderDetails"
-);
 
 
+document.getElementById(
+"selectedOrder"
+).innerHTML=`
 
-box.innerHTML=`
 
 
 <h3>
-Order #${order.id}
+Order Details
 </h3>
+
+
+<p>
+Order No:
+${order.id}
+</p>
 
 
 <p>
@@ -322,64 +246,40 @@ ${order.table_number}
 </p>
 
 
+
 <hr>
 
 
-`;
+
+${
+
+(order.order_items || [])
+
+.map(item=>`
 
 
+<p>
 
-
-
-const {data}=await supabase
-
-.from("order_items")
-
-.select("*")
-
-.eq(
-"order_id",
-order.id
-);
-
-
-
-
-
-
-data.forEach(item=>{
-
-
-box.innerHTML+=`
-
-
-<div class="order-item">
-
-
-<b>
 ${item.item_name}
-</b>
 
+x
 
-<br>
-
-Qty:
 ${item.quantity}
 
-
-<br>
-
-Note:
-${item.item_note || "-"}
+</p>
 
 
-</div>
+`)
+
+.join("")
+
+}
+
 
 
 `;
 
 
-});
 
 
 
@@ -393,17 +293,20 @@ ${item.item_note || "-"}
 
 
 
+
+
 // CLOSE ORDER
 
 
 document.getElementById(
-"closeOrderBtn"
+"closeModalBtn"
 )
+
 .onclick=()=>{
 
 
 document.getElementById(
-"orderPanel"
+"orderModal"
 ).style.display="none";
 
 
@@ -417,18 +320,52 @@ document.getElementById(
 
 
 
-// SEND KITCHEN
+
+
+// ADD ITEM
+
+
+document.getElementById(
+"addItemBtn"
+)
+
+.onclick=()=>{
+
+
+alert(
+"Menu will open for adding items"
+);
+
+
+// next step connect menu
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+// SEND ORDER
 
 
 document.getElementById(
 "sendOrderBtn"
 )
+
 .onclick=async()=>{
 
 
 
-if(!currentOrder)
+if(!selectedOrder)
 return;
+
 
 
 
@@ -438,22 +375,31 @@ await supabase
 
 .update({
 
-status:"New"
+status:"Accepted"
 
 })
 
 .eq(
 "id",
-currentOrder.id
+selectedOrder.id
 );
-
 
 
 
 
 alert(
-"Sent To Kitchen"
+"Order Sent"
 );
+
+
+
+document.getElementById(
+"orderModal"
+).style.display="none";
+
+
+
+loadOrders();
 
 
 
@@ -473,43 +419,47 @@ alert(
 document.getElementById(
 "paymentBtn"
 )
-.onclick=async()=>{
+
+.onclick=()=>{
+
+
+document.getElementById(
+"paymentModal"
+).style.display="block";
 
 
 
-const {data}=await supabase
+loadPaymentTables();
 
-.from("orders")
 
-.select("table_number,id")
 
-.eq(
-"status",
-"Accepted"
-);
+};
 
 
 
 
 
-const select=document.getElementById(
+
+
+
+
+// LOAD TABLES PAYMENT
+
+function loadPaymentTables(){
+
+
+const select=
+document.getElementById(
 "paymentTable"
 );
 
 
 
-select.innerHTML="";
+select.innerHTML=`
 
+<option>
 
-
-data.forEach(order=>{
-
-
-select.innerHTML+=`
-
-<option value="${order.id}">
-
-${order.table_number}
+Select Table
 
 </option>
 
@@ -517,18 +467,35 @@ ${order.table_number}
 
 
 
+currentOrders.forEach(order=>{
+
+
+if(order.table_number){
+
+
+
+select.innerHTML +=`
+
+<option value="${order.id}">
+
+${order.table_number}
+
+</option>
+
+
+`;
+
+
+
+}
+
+
+
 });
 
 
 
-
-document.getElementById(
-"paymentPanel"
-).style.display="block";
-
-
-
-};
+}
 
 
 
@@ -544,25 +511,45 @@ document.getElementById(
 document.getElementById(
 "openPaymentBtn"
 )
+
 .onclick=()=>{
 
 
-
 let id=
-
 document.getElementById(
 "paymentTable"
 ).value;
 
 
 
-window.location.href=
+if(!id){
 
-"payment.html?id="+id;
+alert(
+"Select Table"
+);
+
+return;
+
+}
+
+
+
+
+localStorage.setItem(
+"paymentOrder",
+id
+);
+
+
+
+window.location.href=
+"payment.html";
 
 
 
 };
+
+
 
 
 
@@ -578,28 +565,34 @@ window.location.href=
 document.getElementById(
 "invoiceBtn"
 )
+
 .onclick=async()=>{
 
 
 
-const {data}=await supabase
+document.getElementById(
+"invoiceModal"
+).style.display="block";
 
-.from("invoices")
+
+
+const {
+data
+}=await supabase
+
+.from("orders")
 
 .select("*")
 
-.order(
-"id",
-{
-ascending:false
-}
+.eq(
+"payment_status",
+"Paid"
 );
 
 
 
-
-
-const box=document.getElementById(
+const box=
+document.getElementById(
 "invoiceList"
 );
 
@@ -609,24 +602,28 @@ box.innerHTML="";
 
 
 
+(data || []).forEach(order=>{
 
-data?.forEach(invoice=>{
 
+box.innerHTML +=`
 
-box.innerHTML+=`
 
 <div class="invoice-item">
 
 
 Invoice:
-${invoice.invoice_number}
+
+${order.id}
+
 
 
 <br>
 
 
 Amount:
-RM ${Number(invoice.amount).toFixed(2)}
+
+RM ${order.total || "0.00"}
+
 
 
 </div>
@@ -635,15 +632,8 @@ RM ${Number(invoice.amount).toFixed(2)}
 `;
 
 
+
 });
-
-
-
-
-
-document.getElementById(
-"invoicePanel"
-).style.display="block";
 
 
 
@@ -656,15 +646,15 @@ document.getElementById(
 
 
 
-
 document.getElementById(
 "closeInvoiceBtn"
 )
+
 .onclick=()=>{
 
 
 document.getElementById(
-"invoicePanel"
+"invoiceModal"
 ).style.display="none";
 
 
@@ -684,10 +674,11 @@ document.getElementById(
 document.getElementById(
 "newOrderBtn"
 )
+
 .onclick=()=>{
 
 
-window.location.href="waiter.html";
+window.location.href="menu.html";
 
 
 };
@@ -706,6 +697,7 @@ window.location.href="waiter.html";
 document.getElementById(
 "refreshBtn"
 )
+
 .onclick=()=>{
 
 
@@ -721,19 +713,18 @@ location.reload();
 
 
 
+
 // LOGOUT
 
 
 document.getElementById(
 "logoutBtn"
 )
+
 .onclick=()=>{
 
 
-localStorage.removeItem(
-"user"
-);
-
+localStorage.removeItem("user");
 
 
 window.location.href="login.html";
@@ -746,26 +737,5 @@ window.location.href="login.html";
 
 
 
-
-
-
-// AUTO LIVE CHECK
-
-
-setInterval(()=>{
-
-
-loadOrders();
-
-
-},5000);
-
-
-
-
-
-
-
-checkUser();
 
 loadOrders();
