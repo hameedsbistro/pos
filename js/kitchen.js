@@ -97,7 +97,7 @@ async function loadSections(){
 
 const {data}=await supabase
 
-.from("sections")
+.from("Kitchen Section")
 
 .select("*")
 
