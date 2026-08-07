@@ -2,29 +2,14 @@ import { supabase } from "./supabase.js";
 
 
 
-const user = JSON.parse(
+const user =
+JSON.parse(
 localStorage.getItem("user")
 );
 
 
 
 if(!user){
-
-window.location.href="login.html";
-
-}
-
-
-
-
-
-if(
-user.role !== "waiter" &&
-user.role !== "manager" &&
-user.role !== "admin"
-){
-
-alert("Access Denied");
 
 window.location.href="login.html";
 
@@ -45,10 +30,13 @@ user.role || "---";
 
 
 
+let menu = [];
+
+let cart = [];
 
 let selectedTable = "";
 
-let cart = [];
+
 
 
 
@@ -59,27 +47,18 @@ let cart = [];
 // TABLE SELECT
 
 
-const tableSelect =
-document.getElementById(
-"tableSelect"
-);
-
-
-
-if(tableSelect){
-
-
-tableSelect.onchange=()=>{
+document
+.getElementById("tableSelect")
+.addEventListener(
+"change",
+(e)=>{
 
 
 selectedTable =
-tableSelect.value;
+e.target.value;
 
 
-};
-
-
-}
+});
 
 
 
@@ -111,7 +90,13 @@ error
 .eq(
 "status",
 "active"
+)
+
+.order(
+"category"
 );
+
+
 
 
 
@@ -129,17 +114,37 @@ return;
 
 
 
+
+menu=data;
+
+
+
+displayMenu();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+// DISPLAY MENU
+
+
+function displayMenu(){
+
+
+
 const box =
 document.getElementById(
 "menuContainer"
 );
-
-
-
-if(!box)
-return;
-
-
 
 
 
@@ -149,16 +154,14 @@ box.innerHTML="";
 
 
 
-data.forEach(item=>{
+menu.forEach(item=>{
 
 
 
-box.innerHTML +=`
-
+box.innerHTML += `
 
 
 <div class="menu-item">
-
 
 
 <h3>
@@ -177,8 +180,8 @@ RM ${Number(item.dine_in_price).toFixed(2)}
 
 
 
-
-<button onclick="addItem('${item.id}')">
+<button class="add-btn"
+data-id="${item.id}">
 
 Add
 
@@ -188,6 +191,220 @@ Add
 
 </div>
 
+
+`;
+
+
+
+});
+
+
+
+
+
+
+document
+.querySelectorAll(".add-btn")
+.forEach(btn=>{
+
+
+
+btn.onclick=()=>{
+
+
+addToCart(
+btn.dataset.id
+);
+
+
+};
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ADD CART
+
+
+function addToCart(id){
+
+
+
+let item =
+menu.find(
+x=>x.id===id
+);
+
+
+
+
+let exist =
+cart.find(
+x=>x.id===id
+);
+
+
+
+
+
+if(exist){
+
+
+exist.quantity++;
+
+
+}
+
+else{
+
+
+cart.push({
+
+id:item.id,
+
+item_name:item.item_name,
+
+price:Number(item.dine_in_price),
+
+quantity:1
+
+
+});
+
+
+}
+
+
+
+
+
+showCart();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// SHOW CART
+
+
+function showCart(){
+
+
+
+const box =
+document.getElementById(
+"cartContainer"
+);
+
+
+
+box.innerHTML="";
+
+
+
+
+
+if(cart.length===0){
+
+
+box.innerHTML=
+
+"<p>No Item Selected</p>";
+
+return;
+
+
+}
+
+
+
+
+
+
+cart.forEach((item,index)=>{
+
+
+
+
+
+box.innerHTML += `
+
+
+<div class="cart-item">
+
+
+<span>
+
+${item.item_name}
+
+</span>
+
+
+
+<span>
+
+
+RM ${(item.price*item.quantity).toFixed(2)}
+
+
+</span>
+
+
+
+<button onclick="minusItem(${index})">
+
+-
+
+</button>
+
+
+
+<span>
+
+${item.quantity}
+
+</span>
+
+
+
+<button onclick="plusItem(${index})">
+
++
+
+</button>
+
+
+
+<button onclick="removeItem(${index})">
+
+✕
+
+
+</button>
+
+
+
+</div>
 
 
 `;
@@ -210,20 +427,67 @@ Add
 
 
 
-// ADD ITEM
+window.plusItem=function(index){
 
 
-window.addItem=function(id){
+cart[index].quantity++;
+
+
+showCart();
+
+
+}
 
 
 
-alert(
-"Item Added"
-);
 
 
 
-};
+
+window.minusItem=function(index){
+
+
+if(cart[index].quantity>1){
+
+
+cart[index].quantity--;
+
+
+}
+
+else{
+
+
+cart.splice(index,1);
+
+
+}
+
+
+
+showCart();
+
+
+
+}
+
+
+
+
+
+
+
+
+window.removeItem=function(index){
+
+
+cart.splice(index,1);
+
+
+showCart();
+
+
+}
 
 
 
@@ -236,14 +500,9 @@ alert(
 // SEND ORDER
 
 
-document.getElementById(
-"sendOrderBtn"
-)
-
-?.addEventListener(
-"click",
-
-async()=>{
+document
+.getElementById("sendOrderBtn")
+.onclick=async()=>{
 
 
 
@@ -251,7 +510,7 @@ if(!selectedTable){
 
 
 alert(
-"Select Table"
+"Please Select Table"
 );
 
 
@@ -259,8 +518,6 @@ return;
 
 
 }
-
-
 
 
 
@@ -269,7 +526,7 @@ if(cart.length===0){
 
 
 alert(
-"Add Item First"
+"Cart Empty"
 );
 
 
@@ -277,7 +534,6 @@ return;
 
 
 }
-
 
 
 
@@ -297,9 +553,11 @@ error
 .insert({
 
 
-customer_name:
 
-user.name,
+order_type:
+
+"Dine In",
+
 
 
 table_number:
@@ -307,9 +565,11 @@ table_number:
 selectedTable,
 
 
-order_type:
 
-"Dine In",
+customer_name:
+
+"Walk In",
+
 
 
 order_items:
@@ -317,9 +577,11 @@ order_items:
 cart,
 
 
+
 status:
 
 "New",
+
 
 
 payment_status:
@@ -327,9 +589,11 @@ payment_status:
 "Pending",
 
 
+
 created_by:
 
 user.id
+
 
 
 });
@@ -361,21 +625,20 @@ return;
 
 
 
-
-
 alert(
 "Order Sent To Cashier"
 );
 
 
 
-
-
 cart=[];
 
 
+showCart();
 
-});
+
+
+};
 
 
 
@@ -388,20 +651,13 @@ cart=[];
 // REFRESH
 
 
-document.getElementById(
-"refreshBtn"
-)
-
-?.addEventListener(
-"click",
-
-()=>{
+document
+.getElementById("refreshBtn")
+.onclick=()=>{
 
 location.reload();
 
-}
-
-);
+};
 
 
 
@@ -412,14 +668,9 @@ location.reload();
 // LOGOUT
 
 
-document.getElementById(
-"logoutBtn"
-)
-
-?.addEventListener(
-"click",
-
-()=>{
+document
+.getElementById("logoutBtn")
+.onclick=()=>{
 
 
 localStorage.removeItem(
@@ -431,11 +682,7 @@ window.location.href=
 "login.html";
 
 
-}
-
-);
-
-
+};
 
 
 
