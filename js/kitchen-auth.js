@@ -1,88 +1,66 @@
 import { supabase } from "./supabase.js";
 
 
-// ==========================
-// CHECK LOGIN USER
-// ==========================
+async function loadUser(){
 
-const kitchenUser = 
-JSON.parse(
-localStorage.getItem("kitchenUser")
-);
+    const email = localStorage.getItem("userEmail");
 
-
-
-if(!kitchenUser){
+    if(!email){
+        console.log("No user email found");
+        return;
+    }
 
 
-    window.location.href =
-    "/kitchen-login.html";
+    const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .single();
 
 
-}
+    if(error){
+
+        console.log(error);
+        return;
+
+    }
 
 
+    document.getElementById("userName").innerText =
+        data.name;
 
 
-// ==========================
-// SHOW USER INFO
-// ==========================
-
-
-const userName =
-document.getElementById("userName");
-
-
-const userRole =
-document.getElementById("userRole");
-
-
-
-if(userName){
-
-    userName.innerText =
-    kitchenUser.name || "User";
+    document.getElementById("userRole").innerText =
+        data.role;
 
 }
 
 
 
-if(userRole){
-
-    userRole.innerText =
-    kitchenUser.role || "-";
-
-}
+document
+.getElementById("logoutBtn")
+.addEventListener("click",()=>{
 
 
+    localStorage.clear();
 
-
-
-// ==========================
-// LOGOUT
-// ==========================
-
-
-const logoutBtn =
-document.getElementById("logoutBtn");
-
-
-
-logoutBtn?.addEventListener(
-"click",
-async()=>{
-
-
-    await supabase.auth.signOut();
-
-
-    localStorage.removeItem(
-    "kitchenUser"
-    );
-
-
-    window.location.href =
-    "/kitchen-login.html";
+    window.location.href="../index.html";
 
 
 });
+
+
+
+document
+.getElementById("backBtn")
+.addEventListener("click",()=>{
+
+
+    window.history.back();
+
+
+});
+
+
+
+loadUser();
