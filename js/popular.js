@@ -1,164 +1,90 @@
-// pos/js/popular.js
+// js/popular.js
 
 
+import { supabase } from "./supabase.js";
 
-import { db } from "./firebase.js";
-
-
-
-import {
-
-collection,
-
-getDocs,
-
-query,
-
-where,
-
-limit
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { changeLanguage } from "./language.js";
 
 
 
 
 
 
-
-const popularItems =
-
-document.getElementById(
-"popularItems"
-);
-
-
-
-
-
-
-
-
-let cart =
-
-JSON.parse(
-
-localStorage.getItem("cart")
-
-)
-
-||
-
-[];
-
-
-
-
-
-
-
-
-
+// ===============================
 // LOAD POPULAR ITEMS
+// ===============================
 
 
 async function loadPopular(){
 
 
 
-try{
+const {
 
+data,
 
+error
 
-const q = query(
+}=await supabase
 
-collection(db,"menu"),
+.from("menu")
 
-where(
-"popular",
-"==",
-true
-),
+.select(`
 
-limit(15)
+id,
 
-);
+item_name,
 
+image,
 
+category,
 
+dine_in_price,
 
+take_away_price,
 
+section_id
 
+`)
 
-const snapshot =
+.eq(
 
-await getDocs(q);
+"status",
 
+"active"
 
+)
 
-
-
-
-
-popularItems.innerHTML="";
-
-
-
-
-
-
-
-
-snapshot.forEach(doc=>{
-
-
-
-let item = {
-
-
-id:doc.id,
-
-...doc.data()
-
-
-};
+.limit(8);
 
 
 
 
 
 
-createCard(item);
 
-
-
-
-});
-
-
-
-
-
-
-}
-
-catch(error){
+if(error){
 
 
 console.log(
-"Popular Load Error",
 error
 );
 
 
+return;
+
+
 }
 
 
 
+
+
+
+showPopular(data);
+
+
+
 }
 
 
@@ -169,62 +95,101 @@ error
 
 
 
-// CREATE CARD
+// ===============================
+// DISPLAY POPULAR
+// ===============================
+
+
+function showPopular(items){
 
 
 
-function createCard(item){
+const container =
 
-
-
-let card =
-
-document.createElement(
-"div"
+document.getElementById(
+"popularContainer"
 );
 
 
 
-card.className =
-"popular-card";
+
+
+if(!container){
+
+return;
+
+}
 
 
 
 
 
 
-card.innerHTML = `
+container.innerHTML="";
 
 
 
-<img src="${item.image || '../images/menu/default.jpg'}">
+
+
+
+
+
+items.forEach(item=>{
+
+
+
+
+
+container.innerHTML += `
+
+
+
+<div class="popular-card">
+
+
+
+<img src="${item.image || '../images/no-image.png'}">
 
 
 
 <h3>
 
-${item.itemName}
+${item.item_name}
 
 </h3>
 
 
 
+<p>
 
-<div class="popular-price">
+${item.category}
 
-RM ${Number(item.dineInPrice).toFixed(2)}
+</p>
+
+
+
+<h4>
+
+RM ${Number(item.dine_in_price || 0).toFixed(2)}
+
+</h4>
+
+
+
+
+
+<button
+
+onclick="openMenu()">
+
+Order Now
+
+</button>
+
+
 
 </div>
 
-
-
-
-
-<button class="popular-add-btn">
-
-Add To Cart
-
-</button>
 
 
 `;
@@ -233,173 +198,10 @@ Add To Cart
 
 
 
-
-
-card.querySelector(
-".popular-add-btn"
-)
-.onclick=()=>{
-
-
-addCart(item);
-
-
-};
-
-
-
-
-
-
-
-popularItems.appendChild(card);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ADD CART
-
-
-
-function addCart(item){
-
-
-
-let exist =
-
-cart.find(
-
-x=>
-
-x.id===item.id
-
-);
-
-
-
-
-
-
-if(exist){
-
-
-exist.quantity++;
-
-
-}
-
-else{
-
-
-cart.push({
-
-
-id:item.id,
-
-
-itemName:item.itemName,
-
-
-price:item.dineInPrice,
-
-
-image:item.image,
-
-
-quantity:1
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-localStorage.setItem(
-
-"cart",
-
-JSON.stringify(cart)
-
-);
-
-
-
-
-
-
-
-updateCart();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// UPDATE CART COUNT
-
-
-
-function updateCart(){
-
-
-
-let count=0;
-
-
-
-cart.forEach(item=>{
-
-
-count += item.quantity;
-
-
 });
 
 
 
-
-
-
-let cartCount =
-
-document.getElementById(
-"cartCount"
-);
-
-
-
-if(cartCount){
-
-
-cartCount.innerText=count;
-
-
-}
-
-
-
 }
 
 
@@ -410,25 +212,20 @@ cartCount.innerText=count;
 
 
 
-// HEADER BUTTONS
+// ===============================
+// OPEN MENU
+// ===============================
 
 
-
-document.getElementById(
-"homeBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
+window.openMenu=function(){
 
 
-window.location.href="../index.html";
+window.location.href =
+"menu.html";
 
 
 }
 
-);
 
 
 
@@ -437,32 +234,16 @@ window.location.href="../index.html";
 
 
 
-document.getElementById(
-"backBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
+// ===============================
+// REFRESH
+// ===============================
 
 
-history.back();
+document
 
+.getElementById("refreshBtn")
 
-}
-
-);
-
-
-
-
-
-
-
-
-document.getElementById(
-"refreshBtn"
-)?.addEventListener(
+?.addEventListener(
 
 "click",
 
@@ -472,9 +253,7 @@ document.getElementById(
 location.reload();
 
 
-}
-
-);
+});
 
 
 
@@ -483,51 +262,10 @@ location.reload();
 
 
 
-document.getElementById(
-"cartBtn"
-)?.addEventListener(
 
-"click",
-
-()=>{
-
-
-window.location.href="cart.html";
-
-
-}
-
-);
-
-
-
-
-
-
-
-document.getElementById(
-"loginBtn"
-)?.addEventListener(
-
-"click",
-
-()=>{
-
-
-window.location.href="../login.html";
-
-
-}
-
-);
-
-
-
-
-
-
+// START
 
 
 loadPopular();
 
-updateCart();
+changeLanguage();
