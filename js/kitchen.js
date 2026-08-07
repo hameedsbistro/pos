@@ -1,31 +1,29 @@
-// js/kitchen.js
-
+// root/js/kitchen.js
 
 import { supabase } from "./supabase.js";
 
 
 
-let currentStatus="New";
+let currentStatus = "Accepted";
 
-let currentSection="";
-
-
+let currentSection = "";
 
 
 
 
-// LOAD USER
 
 
-function loadUser(){
+
+// ===============================
+// CHECK USER
+// ===============================
 
 
-const user=
+function checkUser(){
 
-JSON.parse(
 
+const user = JSON.parse(
 localStorage.getItem("user")
-
 );
 
 
@@ -43,20 +41,15 @@ return;
 
 
 if(
-
 user.role !== "cook" &&
-
 user.role !== "admin" &&
-
 user.role !== "manager"
-
 ){
 
 
 alert("Access Denied");
 
 window.location.href="../login.html";
-
 
 return;
 
@@ -67,15 +60,32 @@ return;
 
 
 
-document.getElementById(
-"userName"
-).innerText=user.name;
+const name =
+document.getElementById("userName");
+
+
+const role =
+document.getElementById("userRole");
 
 
 
-document.getElementById(
-"userRole"
-).innerText=user.role;
+
+if(name){
+
+name.innerText =
+user.name || "---";
+
+}
+
+
+
+if(role){
+
+role.innerText =
+user.role || "---";
+
+}
+
 
 
 }
@@ -88,18 +98,27 @@ document.getElementById(
 
 
 
-// LOAD SECTION
+// ===============================
+// LOAD KITCHEN SECTIONS
+// ===============================
 
 
 async function loadSections(){
 
 
 
-const {data}=await supabase
+const {
+data,
+error
 
-.from("Kitchen Section")
+}= await supabase
+
+
+.from("kitchen_sections")
+
 
 .select("*")
+
 
 .eq(
 "status",
@@ -110,8 +129,20 @@ const {data}=await supabase
 
 
 
-const select=
 
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+const select =
 document.getElementById(
 "sectionSelect"
 );
@@ -120,10 +151,32 @@ document.getElementById(
 
 
 
-data?.forEach(section=>{
+if(!select)
+return;
 
 
-select.innerHTML +=`
+
+
+
+select.innerHTML = `
+
+<option value="">
+
+All Stations
+
+</option>
+
+`;
+
+
+
+
+
+
+data.forEach(section=>{
+
+
+select.innerHTML += `
 
 <option value="${section.section_name}">
 
@@ -131,8 +184,8 @@ ${section.section_name}
 
 </option>
 
-
 `;
+
 
 
 });
@@ -141,15 +194,18 @@ ${section.section_name}
 
 
 
-select.onchange=()=>{
 
 
-currentSection=
+select.onchange = ()=>{
 
+
+currentSection =
 select.value;
 
 
+
 loadOrders();
+
 
 
 };
@@ -166,16 +222,29 @@ loadOrders();
 
 
 
+
+
+
+// ===============================
 // LOAD ORDERS
+// ===============================
 
 
 async function loadOrders(){
 
 
 
-const {data,error}=await supabase
+const {
+
+data,
+
+error
+
+}= await supabase
+
 
 .from("orders")
+
 
 .select(`
 
@@ -185,6 +254,7 @@ order_items(*)
 
 `)
 
+
 .eq(
 
 "status",
@@ -193,9 +263,10 @@ currentStatus
 
 )
 
+
 .order(
 
-"id",
+"created_at",
 
 {
 
@@ -226,11 +297,19 @@ return;
 
 
 
-const container=
-
+const container =
 document.getElementById(
 "orderContainer"
 );
+
+
+
+
+
+if(!container)
+return;
+
+
 
 
 
@@ -244,28 +323,34 @@ container.innerHTML="";
 
 
 
+
 data.forEach(order=>{
 
 
 
-let items=order.order_items;
+let items =
+order.order_items || [];
 
 
 
 
 
 
-// SECTION FILTER
+
+// STATION FILTER
 
 
 if(currentSection){
 
 
-
 items = items.filter(item=>{
 
 
-return item.section_name===currentSection;
+return (
+
+item.section_name === currentSection
+
+);
 
 
 });
@@ -273,8 +358,13 @@ return item.section_name===currentSection;
 
 
 
-if(items.length===0)
+
+if(items.length===0){
+
 return;
+
+}
+
 
 
 }
@@ -287,25 +377,34 @@ return;
 
 
 
-let card=document.createElement(
+const card =
+document.createElement(
 "div"
 );
 
 
 
-card.className="order-card";
+card.className =
+"order-card";
 
 
 
 
 
-card.innerHTML=`
 
-<h3>
+
+
+card.innerHTML = `
+
+
+<div class="order-header">
+
+
+<h2>
 
 Order #${order.order_number || order.id}
 
-</h3>
+</h2>
 
 
 <p>
@@ -318,8 +417,11 @@ ${order.table_number || "Take Away"}
 
 
 
-<hr>
+</div>
 
+
+
+<hr>
 
 
 `;
@@ -330,32 +432,43 @@ ${order.table_number || "Take Away"}
 
 
 
+
+
 items.forEach(item=>{
 
 
-card.innerHTML+=`
-
-<div class="item">
+card.innerHTML += `
 
 
-<b>
+<div class="kitchen-item">
+
+
+<h3>
+
 ${item.item_name}
-</b>
+
+</h3>
 
 
-<br>
 
+<p>
 
-Qty:
+Quantity:
+
 ${item.quantity}
 
+</p>
 
 
-<br>
 
+<p>
 
 Note:
+
 ${item.item_note || "-"}
+
+</p>
+
 
 
 </div>
@@ -374,19 +487,75 @@ ${item.item_note || "-"}
 
 
 
-let btn=document.createElement(
+
+
+// BUTTON
+
+
+if(currentStatus==="Accepted"){
+
+
+const btn =
+document.createElement(
 "button"
 );
 
 
 
-if(currentStatus==="New"){
+btn.innerText =
+"START PREPARING";
 
 
-btn.innerText="READY";
 
 
-btn.onclick=()=>{
+btn.onclick = ()=>{
+
+
+updateStatus(
+
+order.id,
+
+"Preparing"
+
+);
+
+
+
+};
+
+
+
+card.appendChild(btn);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+if(currentStatus==="Preparing"){
+
+
+const btn =
+document.createElement(
+"button"
+);
+
+
+
+btn.innerText =
+"READY";
+
+
+
+
+btn.onclick = ()=>{
 
 
 updateStatus(
@@ -398,18 +567,42 @@ order.id,
 );
 
 
+
 };
+
+
+
+card.appendChild(btn);
+
 
 
 }
 
-else if(currentStatus==="Ready"){
 
 
-btn.innerText="COMPLETED";
 
 
-btn.onclick=()=>{
+
+
+
+
+if(currentStatus==="Ready"){
+
+
+const btn =
+document.createElement(
+"button"
+);
+
+
+
+btn.innerText =
+"COMPLETED";
+
+
+
+
+btn.onclick = ()=>{
 
 
 updateStatus(
@@ -421,7 +614,13 @@ order.id,
 );
 
 
+
 };
+
+
+
+card.appendChild(btn);
+
 
 
 }
@@ -432,11 +631,10 @@ order.id,
 
 
 
-card.appendChild(btn);
-
 
 
 container.appendChild(card);
+
 
 
 
@@ -455,22 +653,36 @@ container.appendChild(card);
 
 
 
+
+
+// ===============================
 // UPDATE STATUS
+// ===============================
 
 
-async function updateStatus(id,status){
+async function updateStatus(
+id,
+status
+){
 
 
 
-await supabase
+const {
+
+error
+
+}= await supabase
+
 
 .from("orders")
+
 
 .update({
 
 status:status
 
 })
+
 
 .eq(
 
@@ -479,6 +691,18 @@ status:status
 id
 
 );
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
 
 
 
@@ -498,21 +722,30 @@ loadOrders();
 
 
 
+
+
+
+// ===============================
 // STATUS BUTTONS
+// ===============================
 
 
 document.getElementById(
 "newBtn"
 )
-?.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
-currentStatus="New";
+currentStatus="Accepted";
+
 
 loadOrders();
 
 
-};
+
+});
 
 
 
@@ -522,15 +755,20 @@ loadOrders();
 document.getElementById(
 "readyBtn"
 )
-?.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
 currentStatus="Ready";
 
+
 loadOrders();
 
 
-};
+
+});
+
 
 
 
@@ -540,15 +778,19 @@ loadOrders();
 document.getElementById(
 "completedBtn"
 )
-?.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
 currentStatus="Completed";
 
+
 loadOrders();
 
 
-};
+
+});
 
 
 
@@ -559,19 +801,26 @@ loadOrders();
 
 
 
+
+
+// ===============================
 // REFRESH
+// ===============================
 
 
 document.getElementById(
 "refreshBtn"
 )
-.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
 location.reload();
 
 
-};
+
+});
 
 
 
@@ -581,13 +830,20 @@ location.reload();
 
 
 
+
+
+
+// ===============================
 // LOGOUT
+// ===============================
 
 
 document.getElementById(
 "logoutBtn"
 )
-.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
 localStorage.removeItem(
@@ -599,13 +855,22 @@ localStorage.removeItem(
 window.location.href="../login.html";
 
 
-};
+
+});
 
 
 
 
 
 
+
+
+
+
+
+// ===============================
+// LIVE UPDATE
+// ===============================
 
 
 setInterval(()=>{
@@ -622,7 +887,14 @@ loadOrders();
 
 
 
-loadUser();
+
+
+
+
+// START
+
+
+checkUser();
 
 loadSections();
 
