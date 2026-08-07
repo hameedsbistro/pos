@@ -1,20 +1,20 @@
 import { supabase } from "./supabase.js";
 
 
+// ==========================
+// USER CHECK
+// ==========================
 
-const user =
-JSON.parse(
-localStorage.getItem("user")
+const user = JSON.parse(
+    localStorage.getItem("user")
 );
-
 
 
 if(!user){
 
-window.location.href="login.html";
+    window.location.href="login.html";
 
 }
-
 
 
 
@@ -24,10 +24,15 @@ user.name || "---";
 
 
 document.getElementById("userRole").innerText =
-user.role || "---";
+user.role || "waiter";
 
 
 
+
+
+// ==========================
+// VARIABLES
+// ==========================
 
 
 let menu = [];
@@ -42,21 +47,19 @@ let selectedTable = "";
 
 
 
-
-
+// ==========================
 // TABLE SELECT
+// ==========================
 
 
 document
 .getElementById("tableSelect")
-.addEventListener(
+?.addEventListener(
 "change",
 (e)=>{
 
-
 selectedTable =
 e.target.value;
-
 
 });
 
@@ -67,12 +70,12 @@ e.target.value;
 
 
 
-
+// ==========================
 // LOAD MENU
+// ==========================
 
 
 async function loadMenu(){
-
 
 
 const {
@@ -85,19 +88,18 @@ error
 
 .from("menu")
 
-.select("*")
+.select(`
+id,
+item_name,
+dine_in_price,
+section_name,
+status
+`)
 
 .eq(
 "status",
 "active"
-)
-
-.order(
-"category"
 );
-
-
-
 
 
 
@@ -113,14 +115,10 @@ return;
 
 
 
-
-
-menu=data;
-
+menu = data;
 
 
 displayMenu();
-
 
 
 }
@@ -132,13 +130,12 @@ displayMenu();
 
 
 
-
-
+// ==========================
 // DISPLAY MENU
+// ==========================
 
 
 function displayMenu(){
-
 
 
 const box =
@@ -152,13 +149,10 @@ box.innerHTML="";
 
 
 
-
-
 menu.forEach(item=>{
 
 
-
-box.innerHTML += `
+box.innerHTML +=`
 
 
 <div class="menu-item">
@@ -171,12 +165,19 @@ ${item.item_name}
 </h3>
 
 
-
 <p>
 
 RM ${Number(item.dine_in_price).toFixed(2)}
 
 </p>
+
+
+
+<small>
+
+${item.section_name || "Main Kitchen"}
+
+</small>
 
 
 
@@ -202,11 +203,9 @@ Add
 
 
 
-
 document
 .querySelectorAll(".add-btn")
 .forEach(btn=>{
-
 
 
 btn.onclick=()=>{
@@ -218,7 +217,6 @@ btn.dataset.id
 
 
 };
-
 
 
 });
@@ -235,11 +233,12 @@ btn.dataset.id
 
 
 
+// ==========================
 // ADD CART
+// ==========================
 
 
 function addToCart(id){
-
 
 
 let item =
@@ -249,12 +248,10 @@ x=>x.id===id
 
 
 
-
 let exist =
 cart.find(
 x=>x.id===id
 );
-
 
 
 
@@ -276,9 +273,17 @@ id:item.id,
 
 item_name:item.item_name,
 
-price:Number(item.dine_in_price),
+price:Number(
+item.dine_in_price
+),
 
-quantity:1
+quantity:1,
+
+
+// KITCHEN ROUTE
+
+section:
+item.section_name || "Main Kitchen"
 
 
 });
@@ -288,10 +293,7 @@ quantity:1
 
 
 
-
-
 showCart();
-
 
 
 }
@@ -304,11 +306,12 @@ showCart();
 
 
 
+// ==========================
 // SHOW CART
+// ==========================
 
 
 function showCart(){
-
 
 
 const box =
@@ -323,12 +326,10 @@ box.innerHTML="";
 
 
 
-
 if(cart.length===0){
 
 
 box.innerHTML=
-
 "<p>No Item Selected</p>";
 
 return;
@@ -340,14 +341,11 @@ return;
 
 
 
-
-cart.forEach((item,index)=>{
-
-
+cart.forEach(
+(item,index)=>{
 
 
-
-box.innerHTML += `
+box.innerHTML +=`
 
 
 <div class="cart-item">
@@ -360,12 +358,9 @@ ${item.item_name}
 </span>
 
 
-
 <span>
 
-
-RM ${(item.price*item.quantity).toFixed(2)}
-
+RM ${(item.price * item.quantity).toFixed(2)}
 
 </span>
 
@@ -379,11 +374,7 @@ RM ${(item.price*item.quantity).toFixed(2)}
 
 
 
-<span>
-
 ${item.quantity}
-
-</span>
 
 
 
@@ -395,10 +386,10 @@ ${item.quantity}
 
 
 
+
 <button onclick="removeItem(${index})">
 
 ✕
-
 
 </button>
 
@@ -414,9 +405,6 @@ ${item.quantity}
 });
 
 
-
-
-
 }
 
 
@@ -425,20 +413,20 @@ ${item.quantity}
 
 
 
+
+
+// ==========================
+// CART BUTTONS
+// ==========================
 
 
 window.plusItem=function(index){
 
-
 cart[index].quantity++;
-
 
 showCart();
 
-
 }
-
-
 
 
 
@@ -449,29 +437,21 @@ window.minusItem=function(index){
 
 if(cart[index].quantity>1){
 
-
 cart[index].quantity--;
-
 
 }
 
 else{
 
-
 cart.splice(index,1);
 
-
 }
-
 
 
 showCart();
 
 
-
 }
-
-
 
 
 
@@ -497,12 +477,17 @@ showCart();
 
 
 
+// ==========================
 // SEND ORDER
+// ==========================
 
 
 document
 .getElementById("sendOrderBtn")
-.onclick=async()=>{
+?.addEventListener(
+"click",
+
+async()=>{
 
 
 
@@ -515,7 +500,6 @@ alert(
 
 
 return;
-
 
 }
 
@@ -532,8 +516,27 @@ alert(
 
 return;
 
-
 }
+
+
+
+
+
+
+let total = 0;
+
+
+cart.forEach(item=>{
+
+
+total +=
+
+item.price *
+
+item.quantity;
+
+
+});
 
 
 
@@ -553,47 +556,36 @@ error
 .insert({
 
 
-
-order_type:
-
-"Dine In",
-
-
-
-table_number:
-
-selectedTable,
-
-
-
 customer_name:
-
 "Walk In",
 
 
+table_number:
+selectedTable,
+
+
+order_type:
+"Dine In",
+
 
 order_items:
-
 cart,
 
 
+total:
+total,
+
 
 status:
-
 "New",
 
 
-
 payment_status:
-
 "Pending",
 
 
-
 created_by:
-
 user.id
-
 
 
 });
@@ -617,9 +609,7 @@ alert(
 
 return;
 
-
 }
-
 
 
 
@@ -631,6 +621,8 @@ alert(
 
 
 
+
+
 cart=[];
 
 
@@ -638,7 +630,7 @@ showCart();
 
 
 
-};
+});
 
 
 
@@ -648,16 +640,20 @@ showCart();
 
 
 
+// ==========================
 // REFRESH
+// ==========================
 
 
 document
 .getElementById("refreshBtn")
-.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 location.reload();
 
-};
+});
 
 
 
@@ -665,12 +661,17 @@ location.reload();
 
 
 
+
+// ==========================
 // LOGOUT
+// ==========================
 
 
 document
 .getElementById("logoutBtn")
-.onclick=()=>{
+?.addEventListener(
+"click",
+()=>{
 
 
 localStorage.removeItem(
@@ -682,11 +683,19 @@ window.location.href=
 "login.html";
 
 
-};
+});
 
 
 
 
+
+
+
+
+
+// START
 
 
 loadMenu();
+
+showCart();
