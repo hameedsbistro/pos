@@ -4,19 +4,24 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>
 Cashier Panel - Hameed's Bistro
 </title>
 
-<link rel="stylesheet" href="../css/cashier.css">
+
+<link rel="stylesheet" href="css/cashier.css">
+
 
 </head>
 
 
 <body>
 
+
+<!-- HEADER -->
 
 <header class="cashier-header">
 
@@ -32,6 +37,7 @@ Cashier Panel
 </h3>
 
 </div>
+
 
 
 
@@ -52,7 +58,9 @@ Role:
 </span>
 </p>
 
+
 </div>
+
 
 
 
@@ -78,34 +86,15 @@ Logout
 
 
 
-<section class="cashier-actions">
 
 
-<button id="newOrderBtn">
-NEW ORDER
-</button>
+<!-- CURRENT ORDER PANEL -->
 
 
-<button id="paymentBtn">
-PAYMENT
-</button>
+<section class="current-order-panel">
 
 
-<button id="invoiceBtn">
-INVOICE LIST
-</button>
-
-
-
-</section>
-
-
-
-
-
-
-
-<section class="current-orders">
+<div class="panel-header">
 
 
 <h2>
@@ -114,14 +103,51 @@ Current Orders
 
 
 
-<div id="orderGrid"
-class="order-grid">
+<div class="panel-buttons">
+
+
+<button id="paymentBtn">
+Payment
+</button>
+
+
+<button id="invoiceBtn">
+Invoice List
+</button>
+
+
+<button id="newOrderBtn">
+New Order
+</button>
+
 
 
 </div>
 
 
+</div>
+
+
+
+
+
+
+
+
+<!-- ORDER GRID -->
+
+
+<div id="orderContainer" class="order-grid">
+
+
+<!-- Orders load here -->
+
+</div>
+
+
+
 </section>
+
 
 
 
@@ -134,8 +160,7 @@ class="order-grid">
 <!-- OPEN ORDER MODAL -->
 
 
-<div id="orderModal"
-class="modal">
+<div id="orderModal" class="modal">
 
 
 <div class="modal-content">
@@ -146,26 +171,35 @@ Order Details
 </h2>
 
 
-<div id="orderDetails">
+
+<div id="selectedOrder">
 
 
 </div>
 
 
 
-<button id="sendOrderBtn">
 
-Send Order
 
+<div class="modal-buttons">
+
+
+<button id="addItemBtn">
+Add More Item
 </button>
 
+
+<button id="sendOrderBtn">
+Send Order
+</button>
 
 
 <button id="closeModalBtn">
-
 Close
-
 </button>
+
+
+</div>
 
 
 
@@ -185,8 +219,7 @@ Close
 <!-- PAYMENT MODAL -->
 
 
-<div id="paymentModal"
-class="modal">
+<div id="paymentModal" class="modal">
 
 
 <div class="modal-content">
@@ -198,35 +231,19 @@ Payment
 
 
 
+
+<label>
+Select Table
+</label>
+
+
 <select id="paymentTable">
 
-<option>
+
+<option value="">
 Select Table
 </option>
 
-</select>
-
-
-
-
-
-<select id="paymentMethod">
-
-
-<option>
-Cash
-</option>
-
-
-<option>
-Card
-</option>
-
-
-<option>
-DuitNow QR
-</option>
-
 
 </select>
 
@@ -234,23 +251,52 @@ DuitNow QR
 
 
 
-<input 
-type="number"
-id="cashAmount"
-placeholder="Enter Amount">
-
-
-
-
-
-<button id="payBtn">
-
-PAY
-
+<button id="openPaymentBtn">
+Open Payment
 </button>
 
 
 
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- INVOICE LIST -->
+
+
+<div id="invoiceModal" class="modal">
+
+
+<div class="modal-content">
+
+
+<h2>
+Invoice List
+</h2>
+
+
+
+<div id="invoiceList">
+
+</div>
+
+
+
+<button id="closeInvoiceBtn">
+Close
+</button>
+
+
 </div>
 
 
@@ -261,9 +307,13 @@ PAY
 
 
 
-<script type="module" src="../js/cashier.js"></script>
+
+
+
+<script type="module" src="js/cashier.js"></script>
 
 
 </body>
+
 
 </html>
