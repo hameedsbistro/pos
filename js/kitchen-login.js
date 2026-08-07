@@ -1,7 +1,8 @@
 import { supabase } from "./supabase.js";
 
 
-const loginBtn =
+
+const loginBtn = 
 document.getElementById("loginBtn");
 
 
@@ -21,28 +22,17 @@ document.getElementById("password").value;
 
 
 
+
 const message =
 document.getElementById("message");
 
 
 
 
-const {data,error}=
+if(!email || !password){
 
-await supabase.auth.signInWithPassword({
-
-email,
-password
-
-});
-
-
-
-
-
-if(error){
-
-message.innerText=error.message;
+message.innerText =
+"Please enter email and password";
 
 return;
 
@@ -53,9 +43,49 @@ return;
 
 
 
+// LOGIN
+
 const {
 
-data:user,
+data,
+
+error
+
+}= await supabase.auth.signInWithPassword({
+
+email,
+
+password
+
+});
+
+
+
+
+
+
+
+if(error){
+
+message.innerText =
+error.message;
+
+return;
+
+}
+
+
+
+
+
+
+
+// GET USER DATA
+
+
+const {
+
+data:userData,
 
 error:userError
 
@@ -81,13 +111,14 @@ email
 
 
 
-if(userError || !user){
+
+if(userError || !userData){
 
 
 await supabase.auth.signOut();
 
 
-message.innerText=
+message.innerText =
 "User not found";
 
 
@@ -103,14 +134,15 @@ return;
 
 
 
-// Permission
+
+// KITCHEN PERMISSION
 
 
 if(
 
-user.role !== "admin" &&
+userData.role !== "admin" &&
 
-user.role !== "cook"
+userData.role !== "cook"
 
 ){
 
@@ -118,9 +150,8 @@ user.role !== "cook"
 await supabase.auth.signOut();
 
 
-message.innerText=
-
-"Only Cook/Admin allowed";
+message.innerText =
+"Only Cook/Admin can access Kitchen";
 
 
 return;
@@ -135,11 +166,15 @@ return;
 
 
 
+
+// SAVE SESSION
+
+
 localStorage.setItem(
 
 "kitchenUser",
 
-JSON.stringify(user)
+JSON.stringify(userData)
 
 );
 
@@ -148,7 +183,13 @@ JSON.stringify(user)
 
 
 
-window.location.href="/kitchen/";
+
+
+// FINAL REDIRECT
+
+
+window.location.href =
+"/kitchen/index.html";
 
 
 
