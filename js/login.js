@@ -3,28 +3,25 @@
 import { loginUser } from "./auth.js";
 
 
-// ==========================================
-// GET ELEMENTS
-// ==========================================
+// ========================================
+// ELEMENTS
+// ========================================
 
-const loginForm = document.getElementById("loginForm");
+const form = document.getElementById("loginForm");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const messageBox = document.getElementById("loginMessage");
 
 
-// ==========================================
+// ========================================
 // MESSAGE
-// ==========================================
+// ========================================
 
-function showMessage(message, type = "error") {
+function showMessage(message) {
 
     if (messageBox) {
 
         messageBox.textContent = message;
-
-        messageBox.className = `login-message ${type}`;
-
         messageBox.style.display = "block";
 
     } else {
@@ -36,182 +33,105 @@ function showMessage(message, type = "error") {
 }
 
 
-// ==========================================
-// DISABLE / ENABLE LOGIN BUTTON
-// ==========================================
+// ========================================
+// BUTTON LOADING
+// ========================================
 
-function setLoading(loading) {
+function setLoading(isLoading) {
 
     const button =
-        loginForm?.querySelector(
+        form?.querySelector(
             'button[type="submit"]'
         );
 
     if (!button) return;
 
-
-    if (loading) {
+    if (isLoading) {
 
         button.disabled = true;
-
-        button.dataset.originalText =
-            button.textContent;
-
-        button.textContent =
-            "Logging in...";
+        button.textContent = "Logging in...";
 
     } else {
 
         button.disabled = false;
-
-        button.textContent =
-            button.dataset.originalText ||
-            "Login";
+        button.textContent = "Login";
 
     }
 
 }
 
 
-// ==========================================
-// REDIRECT BY ROLE
-// ==========================================
+// ========================================
+// REDIRECT
+// ========================================
 
-function redirectByRole(user) {
+function redirectUser(user) {
 
-    if (!user) {
+    const role =
+        String(user?.role || "")
+            .trim()
+            .toLowerCase();
 
-        showMessage(
-            "User profile not found.",
-            "error"
-        );
 
+    console.log("Logged user:", user);
+    console.log("Role:", role);
+
+
+    if (role === "admin") {
+
+        window.location.href = "admin.html";
         return;
 
     }
 
 
-    const role =
-        String(user.role || "")
-            .trim()
-            .toLowerCase();
+    if (role === "manager") {
 
-
-    console.log(
-        "Logged in user:",
-        user
-    );
-
-
-    console.log(
-        "User role:",
-        role
-    );
-
-
-    switch (role) {
-
-
-        // ==================================
-        // ADMIN
-        // ==================================
-
-        case "admin":
-
-            window.location.replace(
-                "admin.html"
-            );
-
-            break;
-
-
-        // ==================================
-        // MANAGER
-        // ==================================
-
-        case "manager":
-
-            window.location.replace(
-                "admin.html"
-            );
-
-            break;
-
-
-        // ==================================
-        // CASHIER
-        // ==================================
-
-        case "cashier":
-
-            window.location.replace(
-                "cashier.html"
-            );
-
-            break;
-
-
-        // ==================================
-        // WAITER
-        // ==================================
-
-        case "waiter":
-
-            window.location.replace(
-                "waiter.html"
-            );
-
-            break;
-
-
-        // ==================================
-        // COOK
-        // ==================================
-
-        case "cook":
-
-            window.location.replace(
-                "kitchen.html"
-            );
-
-            break;
-
-
-        // ==================================
-        // UNKNOWN ROLE
-        // ==================================
-
-        default:
-
-            showMessage(
-                `Unknown user role: ${role || "not assigned"}`,
-                "error"
-            );
-
-            console.error(
-                "Unknown role:",
-                user
-            );
-
-            break;
+        window.location.href = "admin.html";
+        return;
 
     }
+
+
+    if (role === "cashier") {
+
+        window.location.href = "cashier.html";
+        return;
+
+    }
+
+
+    if (role === "waiter") {
+
+        window.location.href = "waiter.html";
+        return;
+
+    }
+
+
+    if (role === "cook") {
+
+        window.location.href = "kitchen.html";
+        return;
+
+    }
+
+
+    showMessage(
+        "Unknown user role: " + role
+    );
 
 }
 
 
-// ==========================================
+// ========================================
 // LOGIN
-// ==========================================
+// ========================================
 
 async function handleLogin(event) {
 
     event.preventDefault();
 
-
-    // --------------------------------------
-    // GET VALUES
-    // --------------------------------------
 
     const email =
         emailInput?.value
@@ -223,18 +143,11 @@ async function handleLogin(event) {
         passwordInput?.value || "";
 
 
-    // --------------------------------------
-    // VALIDATION
-    // --------------------------------------
-
     if (!email) {
 
         showMessage(
-            "Please enter your email.",
-            "error"
+            "Please enter your email."
         );
-
-        emailInput?.focus();
 
         return;
 
@@ -244,36 +157,20 @@ async function handleLogin(event) {
     if (!password) {
 
         showMessage(
-            "Please enter your password.",
-            "error"
+            "Please enter your password."
         );
-
-        passwordInput?.focus();
 
         return;
 
     }
 
 
-    // --------------------------------------
-    // LOADING
-    // --------------------------------------
-
     setLoading(true);
 
-
-    showMessage(
-        "Checking login...",
-        "loading"
-    );
+    showMessage("Logging in...");
 
 
     try {
-
-
-        // ==================================
-        // LOGIN THROUGH AUTH.JS
-        // ==================================
 
         const result =
             await loginUser(
@@ -288,19 +185,11 @@ async function handleLogin(event) {
         );
 
 
-        // ==================================
-        // LOGIN FAILED
-        // ==================================
-
-        if (
-            !result ||
-            result.success !== true
-        ) {
+        if (!result?.success) {
 
             showMessage(
                 result?.message ||
-                "Login failed.",
-                "error"
+                "Login failed."
             );
 
             setLoading(false);
@@ -310,19 +199,10 @@ async function handleLogin(event) {
         }
 
 
-        // ==================================
-        // USER PROFILE
-        // ==================================
-
-        const user =
-            result.user;
-
-
-        if (!user) {
+        if (!result.user) {
 
             showMessage(
-                "User profile not found.",
-                "error"
+                "User profile not found."
             );
 
             setLoading(false);
@@ -332,27 +212,13 @@ async function handleLogin(event) {
         }
 
 
-        // ==================================
-        // SUCCESS
-        // ==================================
-
         showMessage(
-            `Welcome ${user.name || ""}`,
-            "success"
+            "Login successful."
         );
 
 
-        // ==================================
-        // ROLE REDIRECT
-        // ==================================
-
-        setTimeout(
-            () => {
-
-                redirectByRole(user);
-
-            },
-            300
+        redirectUser(
+            result.user
         );
 
 
@@ -366,8 +232,7 @@ async function handleLogin(event) {
 
         showMessage(
             error?.message ||
-            "Unexpected login error.",
-            "error"
+            "Unexpected login error."
         );
 
 
@@ -378,13 +243,13 @@ async function handleLogin(event) {
 }
 
 
-// ==========================================
+// ========================================
 // FORM EVENT
-// ==========================================
+// ========================================
 
-if (loginForm) {
+if (form) {
 
-    loginForm.addEventListener(
+    form.addEventListener(
         "submit",
         handleLogin
     );
@@ -392,25 +257,23 @@ if (loginForm) {
 } else {
 
     console.error(
-        "loginForm element not found."
+        "loginForm not found."
     );
 
 }
 
 
-// ==========================================
-// ENTER KEY SUPPORT
-// ==========================================
+// ========================================
+// ENTER KEY
+// ========================================
 
 passwordInput?.addEventListener(
     "keydown",
-    (event) => {
+    function(event) {
 
-        if (
-            event.key === "Enter"
-        ) {
+        if (event.key === "Enter") {
 
-            loginForm?.requestSubmit();
+            form?.requestSubmit();
 
         }
 
@@ -418,65 +281,11 @@ passwordInput?.addEventListener(
 );
 
 
-// ==========================================
-// EMAIL ENTER SUPPORT
-// ==========================================
-
-emailInput?.addEventListener(
-    "keydown",
-    (event) => {
-
-        if (
-            event.key === "Enter"
-        ) {
-
-            passwordInput?.focus();
-
-        }
-
-    }
-);
-
-
-// ==========================================
-// CLEAR MESSAGE WHEN USER TYPES
-// ==========================================
-
-emailInput?.addEventListener(
-    "input",
-    () => {
-
-        if (messageBox) {
-
-            messageBox.style.display =
-                "none";
-
-        }
-
-    }
-);
-
-
-passwordInput?.addEventListener(
-    "input",
-    () => {
-
-        if (messageBox) {
-
-            messageBox.style.display =
-                "none";
-
-        }
-
-    }
-);
-
-
-// ==========================================
-// PAGE READY
-// ==========================================
+// ========================================
+// READY
+// ========================================
 
 console.log(
-    "Hameed's Bistro login.js loaded successfully."
+    "Hameed's Bistro login.js loaded."
 );
 ```
