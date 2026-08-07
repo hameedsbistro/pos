@@ -1,95 +1,105 @@
 import { supabase } from "./supabase.js";
 
-const checkInBtn = document.getElementById("checkInBtn");
-const checkOutBtn = document.getElementById("checkOutBtn");
 
-async function getKitchenUser() {
 
-    const localUser =
-        JSON.parse(localStorage.getItem("kitchenUser"));
+const user = 
+JSON.parse(
+localStorage.getItem("kitchenUser")
+);
 
-    if (localUser) return localUser;
 
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
 
-    if (!user) return null;
+const checkInBtn =
+document.getElementById("checkInBtn");
 
-    const { data } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", user.email)
-        .single();
 
-    return data;
+const checkOutBtn =
+document.getElementById("checkOutBtn");
+
+
+
+
+
+// ===========================
+// CURRENT DATE
+// ===========================
+
+
+function today(){
+
+    return new Date()
+    .toISOString()
+    .split("T")[0];
 
 }
 
 
 
-// ======================
+// ===========================
+// CURRENT TIME
+// ===========================
+
+
+function currentTime(){
+
+    return new Date()
+    .toLocaleTimeString(
+        "en-GB",
+        {
+            hour12:false
+        }
+    );
+
+}
+
+
+
+
+
+// ===========================
 // CHECK IN
-// ======================
+// ===========================
 
-checkInBtn?.addEventListener("click", async () => {
 
-    const user = await getKitchenUser();
+checkInBtn?.addEventListener(
+"click",
+async()=>{
 
-    if (!user) {
-        alert("User not found");
-        return;
-    }
 
-    const today =
-        new Date().toISOString().split("T")[0];
+    const date =
+    today();
 
 
 
-    const { data: existing } = await supabase
-        .from("attendance")
-        .select("*")
-        .eq("staff_id", user.id)
-        .eq("attendance_date", today)
-        .maybeSingle();
+    const {data:existing}=
+
+    await supabase
+
+    .from("attendance")
+
+    .select("*")
+
+    .eq(
+        "staff_id",
+        user.id
+    )
+
+    .eq(
+        "attendance_date",
+        date
+    )
+
+    .maybeSingle();
 
 
 
-    if (existing) {
-        alert("Already Checked In");
-        return;
-    }
 
 
+    if(existing){
 
-    const now =
-        new Date().toLocaleTimeString();
-
-
-
-    const { error } = await supabase
-        .from("attendance")
-        .insert({
-
-            staff_id: user.id,
-
-            staff_name: user.name,
-
-            role: user.role,
-
-            attendance_date: today,
-
-            check_in: now,
-
-            status: "Present"
-
-        });
-
-
-
-    if (error) {
-
-        alert(error.message);
+        alert(
+        "Already Checked In"
+        );
 
         return;
 
@@ -97,23 +107,115 @@ checkInBtn?.addEventListener("click", async () => {
 
 
 
-    alert("Check In Successful");
+
+
+
+
+    const {error}=
+
+    await supabase
+
+    .from("attendance")
+
+    .insert({
+
+        staff_id:user.id,
+
+        staff_name:user.name,
+
+        role:user.role,
+
+        attendance_date:date,
+
+        check_in:currentTime(),
+
+        status:"Present"
+
+    });
+
+
+
+
+
+    if(error){
+
+        console.log(error);
+
+        alert(
+        error.message
+        );
+
+        return;
+
+    }
+
+
+
+    alert(
+    "Check In Successful"
+    );
+
 
 });
 
 
 
-// ======================
+
+
+
+
+
+
+// ===========================
 // CHECK OUT
-// ======================
+// ===========================
 
-checkOutBtn?.addEventListener("click", async () => {
 
-    const user = await getKitchenUser();
+checkOutBtn?.addEventListener(
+"click",
+async()=>{
 
-    if (!user) {
 
-        alert("User not found");
+    const date =
+    today();
+
+
+
+
+
+    const {data:attendance}=
+
+    await supabase
+
+    .from("attendance")
+
+    .select("*")
+
+    .eq(
+        "staff_id",
+        user.id
+    )
+
+    .eq(
+        "attendance_date",
+        date
+    )
+
+    .maybeSingle();
+
+
+
+
+
+
+
+    if(!attendance){
+
+
+        alert(
+        "Check In First"
+        );
+
 
         return;
 
@@ -121,35 +223,42 @@ checkOutBtn?.addEventListener("click", async () => {
 
 
 
-    const today =
-        new Date().toISOString().split("T")[0];
 
 
 
-    const now =
-        new Date().toLocaleTimeString();
+
+    const {error}=
+
+    await supabase
+
+    .from("attendance")
+
+    .update({
+
+        check_out:currentTime(),
+
+        status:"Completed"
+
+    })
+
+    .eq(
+        "id",
+        attendance.id
+    );
 
 
 
-    const { error } = await supabase
-
-        .from("attendance")
-
-        .update({
-
-            check_out: now
-
-        })
-
-        .eq("staff_id", user.id)
-
-        .eq("attendance_date", today);
 
 
 
-    if (error) {
 
-        alert(error.message);
+    if(error){
+
+        console.log(error);
+
+        alert(
+        error.message
+        );
 
         return;
 
@@ -157,6 +266,10 @@ checkOutBtn?.addEventListener("click", async () => {
 
 
 
-    alert("Check Out Successful");
+    alert(
+    "Check Out Successful"
+    );
+
+
 
 });
