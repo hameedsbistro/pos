@@ -1,7 +1,7 @@
-/* =========================
+/* =====================================
    HAMEED'S BISTRO
-   KITCHEN DISPLAY CSS
-========================= */
+   KITCHEN DISPLAY TV CSS
+===================================== */
 
 
 *{
@@ -12,37 +12,60 @@
 body{
 
     margin:0;
+
     padding:0;
+
+    width:100%;
+
+    height:100vh;
+
+    overflow:hidden;
 
     font-family:Arial, sans-serif;
 
-    background:#f3f5f7;
+    background:#f1f3f5;
 
     color:#222;
 
 }
 
 
-/* =========================
-   HEADER
-========================= */
+
+/* ===============================
+   HEADER PANEL
+================================ */
 
 
 .kitchen-header{
 
     width:100%;
 
-    background:#ffffff;
+    background:white;
 
     padding:15px 25px;
 
     display:flex;
 
-    justify-content:space-between;
-
     align-items:center;
 
-    border-bottom:2px solid #ddd;
+    justify-content:space-between;
+
+    border-bottom:3px solid #ddd;
+
+    min-height:120px;
+
+}
+
+
+
+
+/* LEFT BRAND */
+
+.brand-area{
+
+    text-align:left;
+
+    min-width:300px;
 
 }
 
@@ -52,9 +75,9 @@ body{
 
     margin:0;
 
-    font-size:34px;
+    font-size:38px;
 
-    font-weight:700;
+    font-weight:800;
 
 }
 
@@ -62,9 +85,9 @@ body{
 
 .brand-area h3{
 
-    margin:5px 0 0;
+    margin:8px 0 0;
 
-    font-size:20px;
+    font-size:24px;
 
     color:#555;
 
@@ -73,97 +96,113 @@ body{
 
 
 
-/* =========================
-   USER AREA
-========================= */
 
 
-.user-area{
+/* USER */
+
+.user-info{
 
     display:flex;
 
     align-items:center;
 
-    gap:18px;
+    gap:35px;
 
 }
 
 
 
-.welcome-area{
+.welcome-box{
 
-    font-size:15px;
+    font-size:20px;
 
-    line-height:1.6;
-
-}
-
-
-
-.welcome-area b{
-
-    font-size:16px;
+    line-height:1.8;
 
 }
 
 
 
+.welcome-box b{
+
+    font-size:22px;
+
+}
 
 
-.attendance-area{
+
+
+
+/* CHECK IN OUT */
+
+.attendance-box{
 
     display:flex;
 
-    gap:8px;
+    flex-direction:column;
+
+    gap:10px;
 
 }
 
 
 
-.action-area{
+.attendance-box button{
 
-    display:flex;
+    width:130px;
 
-    gap:8px;
-
-}
-
-
-
-
-button{
+    height:42px;
 
     border:none;
 
+    border-radius:8px;
+
+    background:#1976d2;
+
+    color:white;
+
+    font-size:17px;
+
     cursor:pointer;
 
-    padding:9px 14px;
-
-    border-radius:6px;
-
-    font-size:14px;
-
 }
 
 
 
 
 
-#checkInBtn{
 
-    background:#2e7d32;
 
-    color:white;
+/* RIGHT BUTTONS */
+
+.action-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
 
 }
 
 
 
-#checkOutBtn{
+.action-box button{
 
-    background:#ef6c00;
+    width:140px;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#37474f;
 
     color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
 
 }
 
@@ -173,19 +212,6 @@ button{
 
     background:#c62828;
 
-    color:white;
-
-}
-
-
-
-#refreshBtn,
-#backBtn{
-
-    background:#37474f;
-
-    color:white;
-
 }
 
 
@@ -194,36 +220,44 @@ button{
 
 
 
-/* =========================
-   READY COMPLETED BUTTON
-========================= */
+/* ===============================
+   READY COMPLETED
+================================ */
 
 
-.status-area{
-
-    width:100%;
+.status-buttons{
 
     display:flex;
 
     justify-content:center;
 
-    gap:20px;
+    gap:30px;
 
-    padding:15px;
+    margin:20px 0;
 
 }
 
 
 
-.status-area button{
+.status-buttons button{
 
-    min-width:130px;
+    width:180px;
 
-    background:#1565c0;
+    height:55px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#00897b;
 
     color:white;
 
-    font-size:16px;
+    font-size:22px;
+
+    font-weight:bold;
+
+    cursor:pointer;
 
 }
 
@@ -234,269 +268,23 @@ button{
 
 
 
-/* =========================
-   SECTION SELECT
-========================= */
+/* ===============================
+   SECTION
+================================ */
 
 
-.section-area{
+.section-select-box{
 
     text-align:center;
 
-    margin-bottom:10px;
+    margin-bottom:15px;
 
 }
 
 
 
-.section-area select{
+.section-select-box select{
 
-    width:220px;
+    width:300px;
 
-    padding:10px;
-
-    border-radius:6px;
-
-    border:1px solid #aaa;
-
-    font-size:16px;
-
-}
-
-
-
-
-
-
-
-
-/* =========================
-   NEW ORDERS
-========================= */
-
-
-.orders-container{
-
-    width:100%;
-
-    padding:15px;
-
-}
-
-
-
-.orders-container h2{
-
-    text-align:center;
-
-    font-size:28px;
-
-    margin:10px;
-
-}
-
-
-
-
-
-
-.order-grid{
-
-    display:grid;
-
-    grid-template-columns:
-
-    repeat(auto-fill,minmax(250px,1fr));
-
-    gap:15px;
-
-}
-
-
-
-
-
-.order-card{
-
-    background:white;
-
-    padding:18px;
-
-    border-radius:12px;
-
-    box-shadow:
-
-    0 3px 10px rgba(0,0,0,0.15);
-
-}
-
-
-
-.order-card h3{
-
-    margin-top:0;
-
-    font-size:20px;
-
-}
-
-
-
-.order-card p{
-
-    font-size:16px;
-
-}
-
-
-
-
-
-.order-card button{
-
-    margin-top:10px;
-
-    margin-right:8px;
-
-}
-
-
-
-
-
-.prepare-btn{
-
-    background:#fb8c00;
-
-    color:white;
-
-}
-
-
-
-.ready-btn{
-
-    background:#43a047;
-
-    color:white;
-
-}
-
-
-
-
-
-
-
-/* =========================
-   READY / COMPLETE VIEW
-========================= */
-
-
-.orders-view{
-
-    display:none;
-
-    padding:15px;
-
-}
-
-
-
-.orders-view h2{
-
-    text-align:center;
-
-}
-
-
-
-
-
-
-
-
-
-/* =========================
-   TV 16:9 DISPLAY
-========================= */
-
-
-@media(min-width:1200px){
-
-
-.order-grid{
-
-    grid-template-columns:
-
-    repeat(4,1fr);
-
-}
-
-
-
-.order-card{
-
-    min-height:180px;
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-/* =========================
-   MOBILE
-========================= */
-
-
-@media(max-width:900px){
-
-
-
-.kitchen-header{
-
-    flex-direction:column;
-
-    gap:15px;
-
-}
-
-
-
-.user-area{
-
-    flex-wrap:wrap;
-
-    justify-content:center;
-
-}
-
-
-
-.brand-area{
-
-    text-align:center;
-
-}
-
-
-
-.order-grid{
-
-    grid-template-columns:
-
-    repeat(1,1fr);
-
-}
-
-
-
-}
+    height
