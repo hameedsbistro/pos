@@ -1,47 +1,141 @@
-// pos/js/admin-menu.js
+// js/menu.js
+
 
 import { supabase } from "./supabase.js";
 
-
-
-const csvFile =
-document.getElementById("csvFile");
-
-
-const uploadBtn =
-document.getElementById("uploadCsvBtn");
-
-
-const saveBtn =
-document.getElementById("saveMenuBtn");
-
-
-const menuTable =
-document.getElementById("menuTable");
+import { changeLanguage } from "./language.js";
 
 
 
 
 
+
+let menuItems = [];
+
+let orderType =
+
+localStorage.getItem(
+"orderType"
+)
+
+||
+
+"Dine In";
+
+
+
+
+
+
+
+
+// ===============================
 // LOAD MENU
+// ===============================
 
 
 async function loadMenu(){
 
 
-menuTable.innerHTML="";
 
+const {
 
-const { data, error } = await supabase
+data,
+
+error
+
+}=await supabase
+
 .from("menu")
-.select("*")
-.order("created_at", { ascending:false });
+
+.select(`
+
+id,
+
+category,
+
+item_name,
+
+image,
+
+dine_in_price,
+
+take_away_price,
+
+section_id
+
+`)
+
+.eq(
+
+"status",
+
+"active"
+
+)
+
+.order(
+"category"
+);
+
+
+
+
 
 
 
 if(error){
 
+
 console.log(error);
+
+
+return;
+
+
+}
+
+
+
+
+
+menuItems = data;
+
+
+showMenu(menuItems);
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// DISPLAY MENU
+// ===============================
+
+
+function showMenu(items){
+
+
+
+const container =
+
+document.getElementById(
+"menuContainer"
+);
+
+
+
+
+
+if(!container){
+
 return;
 
 }
@@ -49,51 +143,91 @@ return;
 
 
 
-data.forEach(item=>{
 
-
-let row =
-document.createElement("tr");
+container.innerHTML="";
 
 
 
-row.innerHTML = `
-
-
-<td>
-${item.category || ""}
-</td>
-
-
-<td>
-${item.itemname || item.itemName || ""}
-</td>
-
-
-<td>
-RM ${Number(item.dineinprice || item.dineInPrice).toFixed(2)}
-</td>
-
-
-<td>
-RM ${Number(item.takeawayprice || item.takeAwayPrice).toFixed(2)}
-</td>
-
-
-<td>
-${item.popular ? "YES" : "NO"}
-</td>
 
 
 
-<td>
 
-<button class="delete-btn"
+
+items.forEach(item=>{
+
+
+
+
+
+let price =
+
+orderType === "Take Away"
+
+?
+
+item.take_away_price
+
+:
+
+item.dine_in_price;
+
+
+
+
+
+
+
+
+
+container.innerHTML += `
+
+
+
+<div class="menu-card">
+
+
+
+<img src="${item.image || '../images/no-image.png'}">
+
+
+
+<h3>
+
+${item.item_name}
+
+</h3>
+
+
+
+<p>
+
+${item.category}
+
+</p>
+
+
+
+<h4>
+
+RM ${Number(price).toFixed(2)}
+
+</h4>
+
+
+
+
+<button class="addCartBtn"
+
 data-id="${item.id}">
-Delete
+
+Add
+
 </button>
 
-</td>
+
+
+</div>
+
 
 
 `;
@@ -101,190 +235,32 @@ Delete
 
 
 
-row.querySelector(".delete-btn")
-.onclick = async()=>{
-
-
-await supabase
-.from("menu")
-.delete()
-.eq("id",item.id);
-
-
-
-loadMenu();
-
-
-};
-
-
-
-
-menuTable.appendChild(row);
-
-
-
 });
 
 
 
-}
 
 
 
 
 
+document
+
+.querySelectorAll(".addCartBtn")
+
+.forEach(btn=>{
 
 
-
-// SAVE SINGLE ITEM
-
-
-saveBtn.onclick = async()=>{
+btn.onclick=()=>{
 
 
-
-let item = {
-
-
-category:
-document.getElementById("category").value,
-
-
-itemName:
-document.getElementById("itemName").value,
-
-
-dineInPrice:
-Number(
-document.getElementById("dineInPrice").value
-),
-
-
-takeAwayPrice:
-Number(
-document.getElementById("takeAwayPrice").value
-),
-
-
-image:
-document.getElementById("image").value,
-
-
-popular:
-document.getElementById("popular").checked,
-
-
-status:
-"active"
+addToCart(
+btn.dataset.id
+);
 
 
 };
 
-
-
-
-const {error}= await supabase
-.from("menu")
-.insert([item]);
-
-
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-
-alert("Menu Added");
-
-
-
-loadMenu();
-
-
-};
-
-
-
-
-
-
-
-
-
-// CSV UPLOAD
-
-
-uploadBtn.onclick = async()=>{
-
-
-
-const file =
-csvFile.files[0];
-
-
-
-if(!file){
-
-alert("Select CSV File");
-
-return;
-
-}
-
-
-
-
-const text =
-await file.text();
-
-
-
-let rows =
-text.trim().split("\n");
-
-
-
-
-
-let headers =
-rows[0]
-.split(",")
-.map(h=>h.trim());
-
-
-
-
-
-let items=[];
-
-
-
-for(let i=1;i<rows.length;i++){
-
-
-let values =
-rows[i]
-.split(",");
-
-
-
-let obj={};
-
-
-
-headers.forEach((header,index)=>{
-
-
-obj[header]=values[index];
 
 
 });
@@ -293,93 +269,116 @@ obj[header]=values[index];
 
 
 
-items.push({
 
-category:
-obj.category,
+}
 
 
-itemName:
-obj.itemName,
 
 
-dineInPrice:
-Number(obj.dineInPrice),
 
 
-takeAwayPrice:
-Number(obj.takeAwayPrice),
 
 
-image:
-obj.image || "",
+
+// ===============================
+// CATEGORY FILTER
+// ===============================
 
 
-popular:
-obj.popular==="true",
+document
+
+.querySelectorAll(".category-btn")
+
+.forEach(btn=>{
 
 
-status:
-"active"
+btn.onclick=()=>{
+
+
+let category =
+
+btn.dataset.category;
+
+
+
+
+
+
+if(category==="all"){
+
+
+showMenu(menuItems);
+
+
+}
+
+else{
+
+
+showMenu(
+
+menuItems.filter(
+
+item=>
+
+item.category === category
+
+)
+
+);
+
+
+}
+
+
+
+
+};
+
 
 
 });
 
 
 
-}
 
 
 
 
 
-const {error}=await supabase
-.from("menu")
-.insert(items);
+
+// ===============================
+// ORDER TYPE
+// ===============================
 
 
+document
+
+.getElementById("dineInBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
 
 
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
+orderType="Dine In";
 
 
+localStorage.setItem(
 
-alert(
-"CSV Uploaded Successfully"
+"orderType",
+
+orderType
+
 );
 
 
 
-loadMenu();
+showMenu(menuItems);
 
 
-
-};
-
-
-
-
-
-
-
-
-
-// REFRESH
-
-document.getElementById(
-"refreshBtn"
-)?.addEventListener(
-"click",
-()=>{
-
-location.reload();
 
 });
 
@@ -390,4 +389,344 @@ location.reload();
 
 
 
+
+document
+
+.getElementById("takeAwayBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+orderType="Take Away";
+
+
+localStorage.setItem(
+
+"orderType",
+
+orderType
+
+);
+
+
+
+showMenu(menuItems);
+
+
+
+});
+
+
+
+
+
+
+
+
+
+// ===============================
+// ADD TO CART
+// ===============================
+
+
+function addToCart(id){
+
+
+
+const item =
+
+menuItems.find(
+
+x=>x.id===id
+
+);
+
+
+
+
+
+let price =
+
+orderType==="Take Away"
+
+?
+
+item.take_away_price
+
+:
+
+item.dine_in_price;
+
+
+
+
+
+
+let cart =
+
+JSON.parse(
+
+localStorage.getItem("cart")
+
+)
+
+||
+
+[];
+
+
+
+
+
+
+
+let exist =
+
+cart.find(
+
+x=>x.id===id
+
+);
+
+
+
+
+
+
+
+if(exist){
+
+
+exist.quantity++;
+
+
+}
+
+else{
+
+
+cart.push({
+
+id:item.id,
+
+
+itemName:item.item_name,
+
+
+price:Number(price),
+
+
+quantity:1,
+
+
+category:item.category,
+
+
+section_id:item.section_id,
+
+
+orderType:orderType
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+localStorage.setItem(
+
+"cart",
+
+JSON.stringify(cart)
+
+);
+
+
+
+
+
+
+updateCartCount();
+
+
+
+alert(
+
+item.item_name+
+
+" Added"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// CART COUNT
+// ===============================
+
+
+function updateCartCount(){
+
+
+
+let cart =
+
+JSON.parse(
+
+localStorage.getItem("cart")
+
+)
+
+||
+
+[];
+
+
+
+
+let count=0;
+
+
+
+cart.forEach(item=>{
+
+
+count += item.quantity;
+
+
+});
+
+
+
+
+
+const countBox =
+
+document.getElementById(
+"cartCount"
+);
+
+
+
+
+
+if(countBox){
+
+
+countBox.innerText=count;
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// HEADER BUTTONS
+// ===============================
+
+
+document
+
+.getElementById("cartBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+window.location.href="cart.html";
+
+
+});
+
+
+
+
+
+document
+
+.getElementById("homeBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+window.location.href="index.html";
+
+
+});
+
+
+
+
+
+
+
+document
+
+.getElementById("refreshBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+location.reload();
+
+
+});
+
+
+
+
+
+
+
+
+
+// START
+
+
 loadMenu();
+
+updateCartCount();
+
+changeLanguage();
