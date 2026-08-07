@@ -1,50 +1,131 @@
-// pos/js/auth.js
+// js/auth.js
+
 
 import { supabase } from "./supabase.js";
 
 
-// LOGIN
-
-export async function loginUser(email, password){
 
 
-const { data, error } = await supabase.auth.signInWithPassword({
 
-    email: email,
+// =================================
+// GET AUTH SESSION
+// =================================
 
-    password: password
 
-});
+export async function getSessionUser(){
+
+
+
+const {
+
+data
+
+}=await supabase.auth.getSession();
+
+
+
+
+
+if(!data.session){
+
+return null;
+
+}
+
+
+
+
+
+return data.session.user;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// GET PROFILE FROM USERS TABLE
+// =================================
+
+
+export async function getUserProfile(){
+
+
+
+const authUser =
+
+await getSessionUser();
+
+
+
+
+
+if(!authUser){
+
+return null;
+
+}
+
+
+
+
+
+
+const {
+
+data,
+
+error
+
+}=await supabase
+
+.from("users")
+
+.select("*")
+
+.eq(
+
+"id",
+
+authUser.id
+
+)
+
+.single();
+
+
+
+
 
 
 
 if(error){
 
-    throw error;
+
+console.log(
+"User profile error:",
+error.message
+);
+
+
+return null;
+
 
 }
 
 
 
-return data.user;
 
 
-}
+return data;
 
-
-
-
-
-
-// LOGOUT
-
-export async function logoutUser(){
-
-
-await supabase.auth.signOut();
-
-
-window.location.href="../login.html";
 
 
 }
@@ -54,52 +135,251 @@ window.location.href="../login.html";
 
 
 
-// GET CURRENT USER
-
-export async function getCurrentUser(){
-
-
-const { 
-
-data:{user}
-
-} = await supabase.auth.getUser();
 
 
 
-return user;
+// =================================
+// LOGIN CHECK
+// =================================
 
 
-}
+export async function requireLogin(){
 
 
 
+const user =
+
+await getUserProfile();
 
 
-
-// CHECK LOGIN
-
-export async function checkAuth(){
-
-
-const user = await getCurrentUser();
 
 
 
 if(!user){
 
 
-window.location.href="../login.html";
+window.location.href =
+"login.html";
 
 
-return false;
+return null;
 
 
 }
 
 
 
-return true;
+
+
+
+if(user.status !== "active"){
+
+
+alert(
+"Account inactive"
+);
+
+
+await logout();
+
+
+return null;
+
+
+}
+
+
+
+
+
+
+
+return user;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// ROLE CHECK
+// =================================
+
+
+export async function requireRole(
+roles=[]
+){
+
+
+
+const user =
+
+await requireLogin();
+
+
+
+
+
+if(!user){
+
+return null;
+
+}
+
+
+
+
+
+
+if(
+!roles.includes(
+user.role
+)
+
+){
+
+
+
+alert(
+"You don't have permission"
+);
+
+
+
+window.history.back();
+
+
+
+return null;
+
+
+
+}
+
+
+
+
+
+
+return user;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// SAVE LOCAL USER
+// =================================
+
+
+export function saveLocalUser(user){
+
+
+
+localStorage.setItem(
+
+"user",
+
+JSON.stringify(user)
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// GET LOCAL USER
+// =================================
+
+
+export function getLocalUser(){
+
+
+
+const user =
+
+localStorage.getItem(
+"user"
+);
+
+
+
+
+
+if(!user){
+
+return null;
+
+}
+
+
+
+
+
+return JSON.parse(user);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// LOGOUT
+// =================================
+
+
+export async function logout(){
+
+
+
+await supabase.auth.signOut();
+
+
+
+
+
+localStorage.removeItem(
+"user"
+);
+
+
+
+
+
+window.location.href =
+"login.html";
+
 
 
 }
