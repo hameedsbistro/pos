@@ -1,34 +1,55 @@
 import { supabase } from "./supabase.js";
 
 
-// ===============================
+// ==========================
 // ELEMENTS
-// ===============================
+// ==========================
 
-const userNameEl = document.getElementById("userName");
-const userRoleEl = document.getElementById("userRole");
+const userName =
+document.getElementById("userName");
 
-const sectionSelect = document.getElementById("sectionSelect");
-
-const newOrdersBox = document.getElementById("newOrders");
-
-const readyBtn = document.getElementById("readyBtn");
-const completedBtn = document.getElementById("completedBtn");
-
-const newOrderView = document.getElementById("newOrderView");
-const readyView = document.getElementById("readyView");
-const completedView = document.getElementById("completedView");
-
-const refreshBtn = document.getElementById("refreshBtn");
+const userRole =
+document.getElementById("userRole");
 
 
+const newOrderView =
+document.getElementById("newOrderView");
 
-// ===============================
-// CURRENT USER
-// ===============================
+const readyView =
+document.getElementById("readyView");
+
+const completedView =
+document.getElementById("completedView");
 
 
-let kitchenUser =
+const newOrders =
+document.getElementById("newOrders");
+
+const readyOrders =
+document.getElementById("readyOrders");
+
+const completedOrders =
+document.getElementById("completedOrders");
+
+
+const readyBtn =
+document.getElementById("readyBtn");
+
+const completedBtn =
+document.getElementById("completedBtn");
+
+
+const refreshBtn =
+document.getElementById("refreshBtn");
+
+
+
+// ==========================
+// USER
+// ==========================
+
+
+const kitchenUser =
 JSON.parse(
 localStorage.getItem("kitchenUser")
 );
@@ -43,86 +64,66 @@ window.location.href="/kitchen-login.html";
 
 
 
-// HEADER USER
-
-if(userNameEl){
-
-userNameEl.innerText =
+userName.innerText =
 kitchenUser.name || kitchenUser.email;
 
-}
 
-
-if(userRoleEl){
-
-userRoleEl.innerText =
+userRole.innerText =
 kitchenUser.role;
 
-}
 
 
 
 
-// ===============================
-// LOAD SECTIONS
-// ===============================
 
 
-async function loadSections(){
+// ==========================
+// DEFAULT VIEW
+// ==========================
 
 
-const {data,error}=
-
-await supabase
-
-.from("kitchen_sections")
-
-.select("*")
-
-.eq("status","active");
+function showNewOrders(){
 
 
+newOrderView.classList.remove("hidden");
 
-if(error){
+readyView.classList.add("hidden");
 
-console.log(error);
+completedView.classList.add("hidden");
 
-return;
 
 }
 
 
 
-sectionSelect.innerHTML =
-`
-<option value="">
-Select Section
-</option>
-`;
+function showReadyOrders(){
+
+
+newOrderView.classList.add("hidden");
+
+readyView.classList.remove("hidden");
+
+completedView.classList.add("hidden");
+
+
+loadReadyOrders();
+
+
+}
 
 
 
-data.forEach(section=>{
+function showCompletedOrders(){
 
 
-let option =
-document.createElement("option");
+newOrderView.classList.add("hidden");
+
+readyView.classList.add("hidden");
+
+completedView.classList.remove("hidden");
 
 
-option.value =
-section.id;
-
-
-option.textContent =
-section.name;
-
-
-
-sectionSelect.appendChild(option);
-
-
-
-});
+loadCompletedOrders();
 
 
 }
@@ -131,18 +132,20 @@ sectionSelect.appendChild(option);
 
 
 
-// ===============================
+
+
+
+// ==========================
 // LOAD NEW ORDERS
-// ===============================
+// ==========================
 
 
 async function loadNewOrders(){
 
 
+const {data,error}=
 
-let query =
-
-supabase
+await supabase
 
 .from("orders")
 
@@ -150,17 +153,12 @@ supabase
 
 .eq("status","new")
 
-.order("created_at",
+.order(
+"created_at",
 {
 ascending:false
-});
-
-
-
-
-const {data,error}=
-
-await query;
+}
+);
 
 
 
@@ -174,13 +172,12 @@ return;
 
 
 
-displayOrders(
+renderOrders(
 data,
-newOrdersBox
+newOrders
 );
 
 
-
 }
 
 
@@ -189,208 +186,11 @@ newOrdersBox
 
 
 
-// ===============================
-// DISPLAY BASIC
-// (Card Part 2)
-// ===============================
 
+// ==========================
+// READY ORDERS
+// ==========================
 
-function displayOrders(
-orders,
-container
-){
-
-
-container.innerHTML="";
-
-
-if(!orders || orders.length===0){
-
-
-container.innerHTML=
-`
-<h3 style="text-align:center">
-No Orders
-</h3>
-`;
-
-
-return;
-
-}
-
-
-
-
-orders.forEach(order=>{
-
-
-let card =
-document.createElement("div");
-
-
-card.className =
-"order-card";
-
-
-
-card.innerHTML=
-`
-
-<h3>
-Order #${order.id}
-</h3>
-
-
-<p>
-Table: ${order.table_no || "-"}
-</p>
-
-
-<p>
-Status:
-${order.status}
-</p>
-
-
-`;
-
-
-
-container.appendChild(card);
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-// ===============================
-// REALTIME ORDER LISTENER
-// ===============================
-
-
-
-supabase
-
-.channel("kitchen-orders")
-
-.on(
-
-"postgres_changes",
-
-{
-
-event:"*",
-
-schema:"public",
-
-table:"orders"
-
-},
-
-(payload)=>{
-
-
-console.log(
-"New Update",
-payload
-);
-
-
-loadNewOrders();
-
-
-
-}
-
-)
-
-.subscribe();
-
-
-
-
-
-
-
-
-
-// ===============================
-// BUTTONS
-// ===============================
-
-
-
-refreshBtn?.addEventListener(
-"click",
-()=>{
-
-
-loadNewOrders();
-
-
-});
-
-
-
-
-
-readyBtn?.addEventListener(
-"click",
-()=>{
-
-
-newOrderView.style.display="none";
-
-readyView.style.display="block";
-
-completedView.style.display="none";
-
-
-});
-
-
-
-
-
-
-completedBtn?.addEventListener(
-"click",
-()=>{
-
-
-newOrderView.style.display="none";
-
-readyView.style.display="none";
-
-completedView.style.display="block";
-
-
-});
-
-
-
-
-
-
-
-// START
-
-loadSections();
-
-loadNewOrders();
-// ===============================
-// LOAD READY ORDERS
-// ===============================
 
 async function loadReadyOrders(){
 
@@ -417,17 +217,16 @@ ascending:false
 if(error){
 
 console.log(error);
+
 return;
 
 }
 
 
-
-displayOrders(
+renderOrders(
 data,
-document.getElementById("readyOrders")
+readyOrders
 );
-
 
 
 }
@@ -436,9 +235,12 @@ document.getElementById("readyOrders")
 
 
 
-// ===============================
-// LOAD COMPLETED ORDERS
-// ===============================
+
+
+
+// ==========================
+// COMPLETED
+// ==========================
 
 
 async function loadCompletedOrders(){
@@ -466,17 +268,17 @@ ascending:false
 if(error){
 
 console.log(error);
+
 return;
 
 }
 
 
 
-displayOrders(
+renderOrders(
 data,
-document.getElementById("completedOrders")
+completedOrders
 );
-
 
 
 }
@@ -488,13 +290,14 @@ document.getElementById("completedOrders")
 
 
 
-// ===============================
-// UPDATE ORDER STATUS
-// ===============================
+
+// ==========================
+// UPDATE STATUS
+// ==========================
 
 
-async function updateOrderStatus(
-orderId,
+async function updateStatus(
+id,
 status
 ){
 
@@ -513,7 +316,7 @@ status:status
 
 .eq(
 "id",
-orderId
+id
 );
 
 
@@ -535,7 +338,6 @@ loadReadyOrders();
 loadCompletedOrders();
 
 
-
 }
 
 
@@ -545,12 +347,12 @@ loadCompletedOrders();
 
 
 
-// ===============================
-// UPDATED ORDER CARD
-// ===============================
+// ==========================
+// ORDER CARD
+// ==========================
 
 
-function displayOrders(
+function renderOrders(
 orders,
 container
 ){
@@ -566,7 +368,7 @@ if(!orders || orders.length===0){
 container.innerHTML=
 
 `
-<h3 style="text-align:center">
+<h3>
 No Orders
 </h3>
 `;
@@ -578,12 +380,10 @@ return;
 
 
 
-
 orders.forEach(order=>{
 
 
-
-let card =
+const card =
 document.createElement("div");
 
 
@@ -591,23 +391,26 @@ card.className="order-card";
 
 
 
-let itemsHTML="";
+let itemHTML="";
 
 
 
-if(order.items){
+if(
+Array.isArray(order.items)
+){
 
 
 order.items.forEach(item=>{
 
 
-itemsHTML +=
+itemHTML +=
 
 `
 <p>
 ${item.name} × ${item.qty}
 </p>
 `;
+
 
 
 });
@@ -637,8 +440,7 @@ ${order.table_no || "-"}
 <hr>
 
 
-${itemsHTML}
-
+${itemHTML}
 
 
 <p>
@@ -647,30 +449,26 @@ Status:
 </p>
 
 
-
-<div>
-
-
 ${
 order.status==="new"
 
 ?
 
 `
-<button 
-class="prepare-btn"
-onclick="updateOrderStatus('${order.id}','preparing')">
+
+<button
+class="prepare-btn">
 
 Preparing
 
 </button>
+
 `
 
-:
-
-""
+:""
 
 }
+
 
 
 
@@ -680,32 +478,67 @@ order.status==="preparing"
 ?
 
 `
+
 <button
-class="ready-btn"
-onclick="updateOrderStatus('${order.id}','ready')">
+class="ready-btn">
 
 Ready
 
 </button>
+
 `
 
-:
-
-""
+:""
 
 }
 
-
-
-</div>
 
 
 `;
 
 
 
-container.appendChild(card);
 
+
+const prepare =
+card.querySelector(".prepare-btn");
+
+
+if(prepare){
+
+prepare.onclick=()=>{
+
+updateStatus(
+order.id,
+"preparing"
+);
+
+};
+
+}
+
+
+
+const ready =
+card.querySelector(".ready-btn");
+
+
+if(ready){
+
+ready.onclick=()=>{
+
+updateStatus(
+order.id,
+"ready"
+);
+
+};
+
+}
+
+
+
+container.appendChild(card);
 
 
 });
@@ -719,56 +552,259 @@ container.appendChild(card);
 
 
 
-// ===============================
-// BUTTON VIEW UPDATE
-// ===============================
+
+
+// ==========================
+// BUTTONS
+// ==========================
+
+
+readyBtn.onclick =
+showReadyOrders;
+
+
+completedBtn.onclick =
+showCompletedOrders;
+
+
+refreshBtn.onclick =
+loadNewOrders;
 
 
 
-readyBtn?.addEventListener(
-"click",
+
+
+
+
+// ==========================
+// REALTIME
+// ==========================
+
+
+supabase
+
+.channel(
+"kitchen-live-orders"
+)
+
+.on(
+
+"postgres_changes",
+
+{
+
+event:"*",
+
+schema:"public",
+
+table:"orders"
+
+},
+
 ()=>{
 
 
-newOrderView.style.display="none";
-
-readyView.style.display="block";
-
-completedView.style.display="none";
+loadNewOrders();
 
 
-loadReadyOrders();
+}
 
+)
 
-});
+.subscribe();
 
 
 
 
 
 
-completedBtn?.addEventListener(
+
+// START
+
+showNewOrders();
+
+loadNewOrders();
+import { supabase } from "./supabase.js";
+
+
+// ===============================
+// CHECK KITCHEN AUTH
+// ===============================
+
+
+async function checkKitchenAuth(){
+
+
+const {
+data:{
+session
+}
+
+}=
+
+await supabase.auth.getSession();
+
+
+
+if(!session){
+
+
+localStorage.removeItem(
+"kitchenUser"
+);
+
+
+window.location.href=
+"/kitchen-login.html";
+
+
+return;
+
+
+}
+
+
+
+
+
+const email =
+session.user.email;
+
+
+
+const {
+data:user,
+error
+}=
+
+await supabase
+
+.from("users")
+
+.select("*")
+
+.eq(
+"email",
+email
+)
+
+.single();
+
+
+
+
+
+
+if(error || !user){
+
+
+await supabase.auth.signOut();
+
+
+window.location.href=
+"/kitchen-login.html";
+
+
+return;
+
+
+}
+
+
+
+
+
+// ONLY ADMIN + COOK
+
+
+if(
+
+user.role !== "admin"
+
+&&
+
+user.role !== "cook"
+
+){
+
+
+await supabase.auth.signOut();
+
+
+window.location.href=
+"/kitchen-login.html";
+
+
+return;
+
+
+}
+
+
+
+
+
+
+// SAVE USER
+
+
+localStorage.setItem(
+
+"kitchenUser",
+
+JSON.stringify(user)
+
+);
+
+
+
+}
+
+
+
+
+
+// RUN
+
+checkKitchenAuth();
+
+
+
+
+
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+
+const logoutBtn =
+document.getElementById("logoutBtn");
+
+
+
+logoutBtn?.addEventListener(
+
 "click",
-()=>{
+
+async()=>{
 
 
-newOrderView.style.display="none";
-
-readyView.style.display="none";
-
-completedView.style.display="block";
+await supabase.auth.signOut();
 
 
-loadCompletedOrders();
-
-
-});
+localStorage.removeItem(
+"kitchenUser"
+);
 
 
 
+window.location.href=
+"/kitchen-login.html";
 
 
-// GLOBAL FUNCTION FOR BUTTON
 
-window.updateOrderStatus =
-updateOrderStatus;
+}
+
+);
