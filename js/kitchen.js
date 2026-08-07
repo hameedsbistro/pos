@@ -1,61 +1,165 @@
+// js/kitchen.js
+
+
 import { supabase } from "./supabase.js";
 
 
-let currentStatus = "New";
-let currentSection = "";
+
+let currentStatus="New";
+
+let currentSection="";
 
 
 
 
 
-// LOAD STATIONS
 
-async function loadStations(){
-
-
-    const { data, error } = await supabase
-    .from("kitchen_sections")
-    .select("*")
-    .eq("status","active")
-    .order("section_name");
+// LOAD USER
 
 
+function loadUser(){
 
-    if(error){
 
-        console.log(error);
-        return;
+const user=
 
-    }
+JSON.parse(
+
+localStorage.getItem("user")
+
+);
 
 
 
-    const select =
-    document.getElementById("sectionSelect");
+if(!user){
+
+window.location.href="../login.html";
+
+return;
+
+}
 
 
 
-    data.forEach(section=>{
 
 
-        const option =
-        document.createElement("option");
+if(
+
+user.role !== "cook" &&
+
+user.role !== "admin" &&
+
+user.role !== "manager"
+
+){
 
 
-        option.value = section.id;
+alert("Access Denied");
 
-        option.textContent =
-        section.section_name;
-
-
-        select.appendChild(option);
+window.location.href="../login.html";
 
 
-    });
+return;
+
+
+}
+
+
+
+
+
+document.getElementById(
+"userName"
+).innerText=user.name;
+
+
+
+document.getElementById(
+"userRole"
+).innerText=user.role;
+
+
+}
+
+
+
+
+
+
+
+
+
+// LOAD SECTION
+
+
+async function loadSections(){
+
+
+
+const {data}=await supabase
+
+.from("sections")
+
+.select("*")
+
+.eq(
+"status",
+"active"
+);
+
+
+
+
+
+const select=
+
+document.getElementById(
+"sectionSelect"
+);
+
+
+
+
+
+data?.forEach(section=>{
+
+
+select.innerHTML +=`
+
+<option value="${section.section_name}">
+
+${section.section_name}
+
+</option>
+
+
+`;
+
+
+});
+
+
+
+
+
+select.onchange=()=>{
+
+
+currentSection=
+
+select.value;
+
+
+loadOrders();
+
+
+};
 
 
 
 }
+
+
+
 
 
 
@@ -69,32 +173,41 @@ async function loadOrders(){
 
 
 
-let query =
-supabase
+const {data,error}=await supabase
+
 .from("orders")
+
 .select(`
 
-id,
-order_number,
-table_number,
-status,
-created_at,
+*,
 
-order_items(
-item_name,
-quantity,
-item_note
-)
+order_items(*)
 
 `)
-.eq("status",currentStatus)
-.order("created_at",{ascending:false});
+
+.eq(
+
+"status",
+
+currentStatus
+
+)
+
+.order(
+
+"id",
+
+{
+
+ascending:false
+
+}
+
+);
 
 
 
 
-
-const {data,error}=await query;
 
 
 
@@ -109,8 +222,16 @@ return;
 
 
 
-const container =
-document.getElementById("orderContainer");
+
+
+
+
+const container=
+
+document.getElementById(
+"orderContainer"
+);
+
 
 
 
@@ -119,17 +240,6 @@ container.innerHTML="";
 
 
 
-if(!data || data.length===0){
-
-container.innerHTML=
-`
-<h3>No Orders Found</h3>
-`;
-
-return;
-
-}
-
 
 
 
@@ -137,39 +247,122 @@ return;
 data.forEach(order=>{
 
 
-const card =
-document.createElement("div");
+
+let items=order.order_items;
+
+
+
+
+
+
+// SECTION FILTER
+
+
+if(currentSection){
+
+
+
+items = items.filter(item=>{
+
+
+return item.section_name===currentSection;
+
+
+});
+
+
+
+
+if(items.length===0)
+return;
+
+
+}
+
+
+
+
+
+
+
+
+
+let card=document.createElement(
+"div"
+);
+
 
 
 card.className="order-card";
 
 
 
-let items="";
+
+
+card.innerHTML=`
+
+<h3>
+
+Order #${order.order_number || order.id}
+
+</h3>
+
+
+<p>
+
+Table:
+
+${order.table_number || "Take Away"}
+
+</p>
 
 
 
-order.order_items.forEach(item=>{
+<hr>
 
 
-items +=`
+
+`;
+
+
+
+
+
+
+
+items.forEach(item=>{
+
+
+card.innerHTML+=`
 
 <div class="item">
 
-<b>${item.item_name}</b>
+
+<b>
+${item.item_name}
+</b>
+
 
 <br>
 
-Qty: ${item.quantity}
+
+Qty:
+${item.quantity}
+
+
 
 <br>
+
 
 Note:
-${item.item_note ?? ""}
+${item.item_note || "-"}
+
 
 </div>
 
+
 `;
+
 
 
 });
@@ -179,30 +372,67 @@ ${item.item_note ?? ""}
 
 
 
-card.innerHTML=`
-
-<h3>
-Order #${order.order_number}
-</h3>
 
 
-<p>
-Table:
-${order.table_number ?? "-"}
-</p>
-
-
-${items}
+let btn=document.createElement(
+"button"
+);
 
 
 
-<button class="ready"
-data-id="${order.id}">
-READY
-</button>
+if(currentStatus==="New"){
 
 
-`;
+btn.innerText="READY";
+
+
+btn.onclick=()=>{
+
+
+updateStatus(
+
+order.id,
+
+"Ready"
+
+);
+
+
+};
+
+
+}
+
+else if(currentStatus==="Ready"){
+
+
+btn.innerText="COMPLETED";
+
+
+btn.onclick=()=>{
+
+
+updateStatus(
+
+order.id,
+
+"Completed"
+
+);
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+card.appendChild(btn);
 
 
 
@@ -214,35 +444,9 @@ container.appendChild(card);
 
 
 
-
-
-
-// READY BUTTON
-
-document
-.querySelectorAll(".ready")
-.forEach(btn=>{
-
-
-btn.onclick=async()=>{
-
-
-await updateStatus(
-btn.dataset.id,
-"Ready"
-);
-
-
-};
-
-
-});
-
-
-
-
-
 }
+
+
 
 
 
@@ -258,28 +462,30 @@ async function updateStatus(id,status){
 
 
 
-const {error}=await supabase
+await supabase
+
 .from("orders")
+
 .update({
 
 status:status
 
 })
-.eq("id",id);
+
+.eq(
+
+"id",
+
+id
+
+);
 
 
 
 
-if(error){
-
-alert(error.message);
-
-}
-else{
 
 loadOrders();
 
-}
 
 
 }
@@ -290,20 +496,15 @@ loadOrders();
 
 
 
-// BUTTONS
 
 
-
-document
-.getElementById("refreshBtn")
-.onclick=()=>loadOrders();
+// STATUS BUTTONS
 
 
-
-
-document
-.getElementById("newBtn")
-.onclick=()=>{
+document.getElementById(
+"newBtn"
+)
+?.onclick=()=>{
 
 
 currentStatus="New";
@@ -316,9 +517,12 @@ loadOrders();
 
 
 
-document
-.getElementById("readyBtn")
-.onclick=()=>{
+
+
+document.getElementById(
+"readyBtn"
+)
+?.onclick=()=>{
 
 
 currentStatus="Ready";
@@ -332,9 +536,11 @@ loadOrders();
 
 
 
-document
-.getElementById("completedBtn")
-.onclick=()=>{
+
+document.getElementById(
+"completedBtn"
+)
+?.onclick=()=>{
 
 
 currentStatus="Completed";
@@ -348,14 +554,21 @@ loadOrders();
 
 
 
-document
-.getElementById("sectionSelect")
-.onchange=(e)=>{
 
 
-currentSection=e.target.value;
 
-loadOrders();
+
+
+// REFRESH
+
+
+document.getElementById(
+"refreshBtn"
+)
+.onclick=()=>{
+
+
+location.reload();
 
 
 };
@@ -367,6 +580,50 @@ loadOrders();
 
 
 
-loadStations();
+
+// LOGOUT
+
+
+document.getElementById(
+"logoutBtn"
+)
+.onclick=()=>{
+
+
+localStorage.removeItem(
+"user"
+);
+
+
+
+window.location.href="../login.html";
+
+
+};
+
+
+
+
+
+
+
+
+setInterval(()=>{
+
+
+loadOrders();
+
+
+},5000);
+
+
+
+
+
+
+
+loadUser();
+
+loadSections();
 
 loadOrders();
