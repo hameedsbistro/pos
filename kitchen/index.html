@@ -9,95 +9,88 @@
 
 
 <title>
-Kitchen Display - Hameed's Bistro
+Hameed's Bistro - Kitchen Display
 </title>
 
 
 <link rel="stylesheet" href="../css/kitchen.css">
 
-</head>
 
+</head>
 
 
 <body>
 
 
-
-<!-- TOP HEADER -->
+<!-- HEADER PANEL -->
 
 <header class="kitchen-header">
 
 
+    <!-- LEFT BRAND -->
 
-<div class="brand-area">
+    <div class="brand-area">
 
+        <h1>
+        Hameed's Bistro
+        </h1>
 
-<h1>
-Hameed's Bistro
-</h1>
+        <h3>
+        Kitchen Display
+        </h3>
 
-
-<h3>
-Kitchen Display
-</h3>
-
-
-</div>
+    </div>
 
 
 
 
 
+    <!-- USER INFO -->
+
+    <div class="user-info">
 
 
-<div class="user-area">
+        <div class="welcome-box">
+
+            <div>
+            Welcome:
+            <b id="userName">
+            Admin
+            </b>
+            </div>
 
 
-<div class="welcome-box">
+            <div>
+            Role:
+            <b id="userRole">
+            Admin
+            </b>
+            </div>
 
-
-<span>
-Welcome:
-</span>
-
-<b id="userName">
-Admin
-</b>
-
-
-<br>
-
-
-<span>
-Role:
-</span>
-
-<b id="userRole">
-admin
-</b>
-
-
-</div>
+        </div>
 
 
 
 
 
-<div class="attendance-box">
+        <div class="attendance-box">
 
 
-<button id="checkInBtn">
-Check In
-</button>
+            <button id="checkInBtn">
+            Check In
+            </button>
+
+
+            <button id="checkOutBtn">
+            Check Out
+            </button>
+
+
+        </div>
 
 
 
-<button id="checkOutBtn">
-Check Out
-</button>
-
-
-</div>
+    </div>
 
 
 
@@ -105,33 +98,27 @@ Check Out
 
 
 
-<div class="action-box">
+    <!-- RIGHT ACTION -->
+
+    <div class="action-box">
 
 
-<button id="logoutBtn">
-Logout
-</button>
+        <button id="refreshBtn">
+        🔄 Refresh
+        </button>
 
 
-<button id="refreshBtn">
-🔄
-</button>
+        <button id="logoutBtn">
+        Logout
+        </button>
 
 
-
-<button onclick="history.back()">
-←
-</button>
-
-
-</div>
+        <button id="backBtn">
+        ← Back
+        </button>
 
 
-
-</div>
-
-
-
+    </div>
 
 
 </header>
@@ -142,27 +129,19 @@ Logout
 
 
 
-
-
-<!-- STATUS BUTTON -->
+<!-- STATUS BUTTONS -->
 
 <div class="status-buttons">
 
 
 <button id="readyBtn">
-
-Ready
-
+READY
 </button>
-
 
 
 <button id="completedBtn">
-
-Completed
-
+COMPLETED
 </button>
-
 
 
 </div>
@@ -174,19 +153,15 @@ Completed
 
 
 
-
 <!-- SECTION SELECT -->
 
-<div class="section-control">
+<div class="section-select-box">
 
 
 <select id="sectionSelect">
 
-
 <option value="">
-
 Select Section
-
 </option>
 
 
@@ -202,18 +177,14 @@ Select Section
 
 
 
+<!-- DEFAULT NEW ORDER -->
 
-<!-- NEW ORDER AREA -->
-
-<main class="order-area">
+<section id="newOrderView">
 
 
 <h2>
-New Orders
+NEW ORDERS
 </h2>
-
-
-
 
 
 <div 
@@ -221,14 +192,10 @@ id="newOrders"
 class="order-grid">
 
 
-
 </div>
 
 
-
-
-
-</main>
+</section>
 
 
 
@@ -238,7 +205,7 @@ class="order-grid">
 
 
 
-<!-- READY ORDERS -->
+<!-- READY VIEW -->
 
 
 <section 
@@ -246,19 +213,17 @@ id="readyView"
 class="hidden-view">
 
 
-
 <h2>
-Ready Orders
+READY ORDERS
 </h2>
 
 
-
-<div 
+<div
 id="readyOrders"
 class="order-grid">
 
-</div>
 
+</div>
 
 
 </section>
@@ -271,7 +236,7 @@ class="order-grid">
 
 
 
-<!-- COMPLETED ORDERS -->
+<!-- COMPLETED VIEW -->
 
 
 <section 
@@ -279,19 +244,17 @@ id="completedView"
 class="hidden-view">
 
 
-
 <h2>
-Completed Orders
+COMPLETED ORDERS
 </h2>
 
 
-
-<div 
+<div
 id="completedOrders"
 class="order-grid">
 
-</div>
 
+</div>
 
 
 </section>
@@ -304,12 +267,14 @@ class="order-grid">
 
 
 
+
+<!-- JS -->
+
 <script type="module" src="../js/kitchen-auth.js"></script>
 
 <script type="module" src="../js/kitchen-attendance.js"></script>
 
 <script type="module" src="../js/kitchen.js"></script>
-
 
 
 </body>
