@@ -1,343 +1,200 @@
+```javascript
 // js/login.js
 
-
-import { supabase } from "./supabase.js";
-
-import { saveLocalUser } from "./auth.js";
-
+import {
+    loginUser
+} from "./auth.js";
 
 
+// =====================================
+// ELEMENTS
+// =====================================
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const emailInput =
+    document.getElementById(
+        "email"
+    );
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+const messageBox =
+    document.getElementById(
+        "loginMessage"
+    );
 
 
+// =====================================
+// LOGIN FORM
+// =====================================
 
-// ===============================
-// LOGIN BUTTON
-// ===============================
+loginForm?.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
 
 
-const loginBtn =
+        const email =
+            emailInput?.value
+                ?.trim()
+                .toLowerCase();
 
-document.getElementById(
-"loginBtn"
+
+        const password =
+            passwordInput?.value || "";
+
+
+        if (!email || !password) {
+
+            showMessage(
+                "Please enter email and password."
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+            "Logging in..."
+        );
+
+
+        const result =
+            await loginUser(
+                email,
+                password
+            );
+
+
+        if (!result?.success) {
+
+            showMessage(
+                result?.message ||
+                "Login failed."
+            );
+
+            return;
+
+        }
+
+
+        // =================================
+        // USER PROFILE
+        // =================================
+
+        const user =
+            result.user;
+
+
+        if (!user) {
+
+            showMessage(
+                "User profile not found."
+            );
+
+            return;
+
+        }
+
+
+        // =================================
+        // ROLE
+        // =================================
+
+        const role =
+            String(
+                user.role || ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        // =================================
+        // REDIRECT
+        // =================================
+
+        switch (role) {
+
+
+            case "admin":
+
+                window.location.href =
+                    "admin.html";
+
+                break;
+
+
+            case "manager":
+
+                window.location.href =
+                    "admin.html";
+
+                break;
+
+
+            case "cashier":
+
+                window.location.href =
+                    "cashier.html";
+
+                break;
+
+
+            case "waiter":
+
+                window.location.href =
+                    "waiter.html";
+
+                break;
+
+
+            case "cook":
+
+                window.location.href =
+                    "kitchen.html";
+
+                break;
+
+
+            default:
+
+                showMessage(
+                    "Unknown user role: " +
+                    role
+                );
+
+        }
+
+    }
 );
 
 
+// =====================================
+// MESSAGE
+// =====================================
+
+function showMessage(message) {
+
+    if (messageBox) {
+
+        messageBox.textContent =
+            message;
+
+        return;
+
+    }
 
 
-
-
-
-loginBtn?.addEventListener(
-
-"click",
-
-async()=>{
-
-
-
-
-
-const email =
-
-document.getElementById(
-"email"
-).value.trim();
-
-
-
-
-
-const password =
-
-document.getElementById(
-"password"
-).value.trim();
-
-
-
-
-
-
-const message =
-
-document.getElementById(
-"message"
-);
-
-
-
-
-
-
-if(!email || !password){
-
-
-message.innerText =
-"Enter email and password";
-
-
-return;
-
+    alert(message);
 
 }
-
-
-
-
-
-
-
-message.innerText =
-"Logging in...";
-
-
-
-
-
-
-
-
-
-// ===============================
-// SUPABASE AUTH LOGIN
-// ===============================
-
-
-const {
-
-data,
-
-error
-
-}=await supabase.auth.signInWithPassword({
-
-
-email,
-
-
-password
-
-
-});
-
-
-
-
-
-
-
-
-if(error){
-
-
-message.innerText =
-"Login failed";
-
-
-console.log(error);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-
-
-const authUser =
-data.user;
-
-
-
-
-
-
-
-
-
-// ===============================
-// GET USER PROFILE
-// ===============================
-
-
-const {
-
-data:user,
-
-error:userError
-
-}=await supabase
-
-.from("users")
-
-.select("*")
-
-.eq(
-
-"id",
-
-authUser.id
-
-)
-
-.single();
-
-
-
-
-
-
-
-
-if(userError || !user){
-
-
-message.innerText =
-"User profile not found";
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-
-
-if(user.status !== "active"){
-
-
-message.innerText =
-"Account inactive";
-
-
-await supabase.auth.signOut();
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-
-
-// SAVE USER
-
-
-saveLocalUser(user);
-
-
-
-
-
-
-
-
-
-// ===============================
-// ROLE REDIRECT
-// ===============================
-
-
-
-switch(user.role){
-
-
-
-case "admin":
-
-
-case "manager":
-
-
-window.location.href =
-"admin.html";
-
-
-break;
-
-
-
-
-
-
-case "cashier":
-
-
-window.location.href =
-"cashier.html";
-
-
-break;
-
-
-
-
-
-
-
-case "waiter":
-
-
-window.location.href =
-"waiter.html";
-
-
-break;
-
-
-
-
-
-
-
-case "cook":
-
-
-window.location.href =
-"kitchen.html";
-
-
-break;
-
-
-
-
-
-
-default:
-
-
-message.innerText =
-"Invalid Role";
-
-
-}
-
-
-
-
-
-
-
-
-}
-
-);
+```
