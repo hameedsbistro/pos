@@ -1,27 +1,42 @@
+// js/cashier-invoice.js
+
+
 import { supabase } from "./supabase.js";
 
-
-
-let orderId =
-localStorage.getItem("paymentOrder");
+import { requireRole, logout } from "./auth.js";
 
 
 
-let invoiceData = null;
 
+let user = null;
 
 
 
 
 
+// ===============================
+// START
+// ===============================
 
-async function loadInvoice(){
+
+async function start(){
 
 
 
-if(!orderId){
+user = await requireRole(
 
-alert("No Invoice Found");
+[
+"cashier",
+"manager",
+"admin"
+]
+
+);
+
+
+
+
+if(!user){
 
 return;
 
@@ -30,6 +45,27 @@ return;
 
 
 
+
+loadInvoices();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// LOAD INVOICES
+// ===============================
+
+
+async function loadInvoices(){
 
 
 
@@ -43,14 +79,33 @@ error
 
 .from("orders")
 
-.select("*")
+.select(`
+
+*,
+
+order_items(*)
+
+`)
 
 .eq(
-"id",
-orderId
+
+"payment_status",
+
+"Paid"
+
 )
 
-.single();
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
+
+);
 
 
 
@@ -69,12 +124,7 @@ return;
 
 
 
-
-invoiceData=data;
-
-
-
-showInvoice();
+showInvoices(data);
 
 
 
@@ -88,148 +138,147 @@ showInvoice();
 
 
 
-function showInvoice(){
+// ===============================
+// SHOW INVOICES
+// ===============================
+
+
+function showInvoices(list){
 
 
 
-document.getElementById(
-"invoiceNo"
-).innerText =
-
-"INV-" +
-
-invoiceData.id.slice(0,8).toUpperCase();
-
-
-
-
-
-
+const box =
 
 document.getElementById(
-"invoiceDate"
-).innerText =
 
-new Date(
-invoiceData.paid_at || Date.now()
-)
+"invoiceList"
 
-.toLocaleString();
-
-
-
-
-
-
-
-
-document.getElementById(
-"tableNo"
-).innerText =
-
-invoiceData.table_number || "Take Away";
-
-
-
-
-
-
-
-document.getElementById(
-"paymentMethod"
-).innerText =
-
-invoiceData.payment_method || "---";
-
-
-
-
-
-
-
-
-let itemsBox =
-
-document.getElementById(
-"invoiceItems"
 );
 
 
 
-itemsBox.innerHTML="";
+
+
+if(!box){
+
+return;
+
+}
 
 
 
 
 
-let total=0;
+box.innerHTML="";
 
 
 
 
 
-
-
-(invoiceData.order_items || [])
-
-.forEach(item=>{
+list.forEach(order=>{
 
 
 
 
 
-let amount =
-
-Number(item.price || 0)
-
-*
-
-Number(item.quantity || 1);
+box.innerHTML += `
 
 
+<div class="invoice-card">
 
 
+<h3>
 
-total += amount;
+Invoice:
 
+${order.order_number}
 
+</h3>
 
 
 
+<p>
+
+Date:
+
+${new Date(order.created_at)
+.toLocaleString()}
+
+</p>
 
 
-itemsBox.innerHTML +=`
+
+<p>
+
+Table:
+
+${order.table_number || "-"}
+
+</p>
 
 
 
-<tr>
 
+<div>
 
-<td>
+${order.order_items.map(item=>`
+
+<p>
 
 ${item.item_name}
 
-</td>
-
-
-
-<td>
+×
 
 ${item.quantity}
 
-</td>
+&nbsp;
+
+RM ${(item.price * item.quantity)
+.toFixed(2)}
+
+</p>
+
+`).join("")}
+
+</div>
 
 
 
-<td>
-
-RM ${amount.toFixed(2)}
-
-</td>
 
 
+<h3>
 
-</tr>
+Total:
+
+RM ${Number(order.total_amount)
+.toFixed(2)}
+
+</h3>
+
+
+
+
+
+<p>
+
+Payment:
+
+${order.payment_method}
+
+</p>
+
+
+
+
+<button onclick="printInvoice(${order.id})">
+
+Print
+
+</button>
+
+
+
+</div>
 
 
 
@@ -237,6 +286,198 @@ RM ${amount.toFixed(2)}
 
 
 
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// PRINT
+// ===============================
+
+
+window.printInvoice = async function(id){
+
+
+
+const {
+
+data,
+
+error
+
+}=await supabase
+
+.from("orders")
+
+.select(`
+
+*,
+
+order_items(*)
+
+`)
+
+.eq(
+
+"id",
+
+id
+
+)
+
+.single();
+
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+
+let content = `
+
+<h1>
+
+Hameed's Bistro
+
+</h1>
+
+
+<h3>
+
+Invoice ${data.order_number}
+
+</h3>
+
+
+<hr>
+
+`;
+
+
+
+
+
+
+data.order_items.forEach(item=>{
+
+
+content += `
+
+<p>
+
+${item.item_name}
+
+×
+
+${item.quantity}
+
+RM ${(item.price * item.quantity).toFixed(2)}
+
+</p>
+
+`;
+
+
+
+});
+
+
+
+
+
+
+content += `
+
+<hr>
+
+<h2>
+
+Total RM ${Number(data.total_amount).toFixed(2)}
+
+</h2>
+
+`;
+
+
+
+
+
+
+
+const win =
+
+window.open(
+
+"",
+
+"_blank"
+
+);
+
+
+
+
+
+win.document.write(content);
+
+
+win.print();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// REFRESH
+// ===============================
+
+
+document
+
+.getElementById(
+
+"refreshBtn"
+
+)
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+loadInvoices();
 
 
 });
@@ -248,80 +489,31 @@ RM ${amount.toFixed(2)}
 
 
 
-document.getElementById(
-"invoiceTotal"
-).innerText =
 
-total.toFixed(2);
-
+// ===============================
+// LOGOUT
+// ===============================
 
 
+document
 
+.getElementById(
 
+"logoutBtn"
 
-
-
-if(invoiceData.customer_name){
-
-
-
-document.getElementById(
-"customerName"
-).innerText =
-
-invoiceData.customer_name;
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// PRINT
-
-
-document.getElementById(
-"printBtn"
 )
 
-.onclick=()=>{
+?.addEventListener(
+
+"click",
+
+()=>{
 
 
-window.print();
+logout();
 
 
-};
-
-
-
-
-
-
-
-// BACK
-
-
-document.getElementById(
-"backBtn"
-)
-
-.onclick=()=>{
-
-
-history.back();
-
-
-};
+});
 
 
 
@@ -330,4 +522,5 @@ history.back();
 
 
 
-loadInvoice();
+
+start();
