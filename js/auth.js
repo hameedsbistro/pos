@@ -1,385 +1,490 @@
+```javascript
 // js/auth.js
-
 
 import { supabase } from "./supabase.js";
 
 
+// =====================================
+// LOCAL USER KEY
+// =====================================
+
+const LOCAL_USER_KEY = "hameed_logged_user";
 
 
+// =====================================
+// LOGIN
+// =====================================
 
-// =================================
-// GET AUTH SESSION
-// =================================
+export async function loginUser(email, password) {
 
-
-export async function getSessionUser(){
-
-
-
-const {
-
-data
-
-}=await supabase.auth.getSession();
+    const cleanEmail =
+        String(email || "")
+            .trim()
+            .toLowerCase();
 
 
+    if (!cleanEmail || !password) {
+
+        return {
+            success: false,
+            message: "Email and password are required."
+        };
+
+    }
 
 
+    // ---------------------------------
+    // SUPABASE AUTH LOGIN
+    // ---------------------------------
 
-if(!data.session){
+    const {
+        data: authData,
+        error: authError
+    } = await supabase.auth.signInWithPassword({
 
-return null;
+        email: cleanEmail,
+
+        password: password
+
+    });
+
+
+    if (authError) {
+
+        console.error(
+            "Supabase login error:",
+            authError
+        );
+
+        return {
+            success: false,
+            message: authError.message
+        };
+
+    }
+
+
+    if (!authData?.user) {
+
+        return {
+            success: false,
+            message: "Authentication failed."
+        };
+
+    }
+
+
+    // ---------------------------------
+    // LOAD USER PROFILE
+    // ---------------------------------
+
+    const {
+        data: profile,
+        error: profileError
+    } = await supabase
+        .from("users")
+        .select(`
+            id,
+            name,
+            email,
+            role,
+            status,
+            created_at
+        `)
+        .eq(
+            "email",
+            cleanEmail
+        )
+        .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Profile query error:",
+            profileError
+        );
+
+
+        await supabase.auth.signOut();
+
+
+        return {
+            success: false,
+            message: "Unable to load user profile."
+        };
+
+    }
+
+
+    if (!profile) {
+
+        console.error(
+            "No profile found for:",
+            cleanEmail
+        );
+
+
+        await supabase.auth.signOut();
+
+
+        return {
+            success: false,
+            message: "User profile not found."
+        };
+
+    }
+
+
+    // ---------------------------------
+    // CHECK STATUS
+    // ---------------------------------
+
+    if (
+        String(profile.status || "")
+            .toLowerCase()
+        !== "active"
+    ) {
+
+        await supabase.auth.signOut();
+
+
+        return {
+            success: false,
+            message: "Your account is inactive."
+        };
+
+    }
+
+
+    // ---------------------------------
+    // FINAL USER OBJECT
+    // ---------------------------------
+
+    const user = {
+
+        auth_id:
+            authData.user.id,
+
+        id:
+            profile.id,
+
+        name:
+            profile.name,
+
+        email:
+            profile.email,
+
+        role:
+            String(
+                profile.role || ""
+            ).toLowerCase(),
+
+        status:
+            profile.status,
+
+        created_at:
+            profile.created_at
+
+    };
+
+
+    // ---------------------------------
+    // SAVE LOCAL SESSION
+    // ---------------------------------
+
+    localStorage.setItem(
+
+        LOCAL_USER_KEY,
+
+        JSON.stringify(user)
+
+    );
+
+
+    return {
+
+        success: true,
+
+        user: user
+
+    };
 
 }
 
 
+// =====================================
+// GET CURRENT AUTH USER
+// =====================================
+
+export async function getCurrentUser() {
+
+    const {
+        data,
+        error
+    } = await supabase.auth.getUser();
 
 
+    if (error || !data?.user) {
 
-return data.session.user;
+        return null;
+
+    }
 
 
+    const authUser =
+        data.user;
+
+
+    // ---------------------------------
+    // LOAD PROFILE BY EMAIL
+    // ---------------------------------
+
+    const {
+        data: profile,
+        error: profileError
+    } = await supabase
+        .from("users")
+        .select(`
+            id,
+            name,
+            email,
+            role,
+            status,
+            created_at
+        `)
+        .eq(
+            "email",
+            String(
+                authUser.email || ""
+            )
+            .trim()
+            .toLowerCase()
+        )
+        .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Profile load error:",
+            profileError
+        );
+
+        return null;
+
+    }
+
+
+    if (!profile) {
+
+        return null;
+
+    }
+
+
+    if (
+        String(profile.status || "")
+            .toLowerCase()
+        !== "active"
+    ) {
+
+        return null;
+
+    }
+
+
+    const user = {
+
+        auth_id:
+            authUser.id,
+
+        id:
+            profile.id,
+
+        name:
+            profile.name,
+
+        email:
+            profile.email,
+
+        role:
+            String(
+                profile.role || ""
+            ).toLowerCase(),
+
+        status:
+            profile.status,
+
+        created_at:
+            profile.created_at
+
+    };
+
+
+    localStorage.setItem(
+
+        LOCAL_USER_KEY,
+
+        JSON.stringify(user)
+
+    );
+
+
+    return user;
 
 }
 
 
+// =====================================
+// LOCAL USER
+// =====================================
+
+export function getLocalUser() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                LOCAL_USER_KEY
+            );
 
 
+        if (!saved) {
+
+            return null;
+
+        }
 
 
+        return JSON.parse(saved);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Local user error:",
+            error
+        );
 
 
-
-// =================================
-// GET PROFILE FROM USERS TABLE
-// =================================
-
-
-export async function getUserProfile(){
+        localStorage.removeItem(
+            LOCAL_USER_KEY
+        );
 
 
+        return null;
 
-const authUser =
-
-await getSessionUser();
-
-
-
-
-
-if(!authUser){
-
-return null;
-
-}
-
-
-
-
-
-
-const {
-
-data,
-
-error
-
-}=await supabase
-
-.from("users")
-
-.select("*")
-
-.eq(
-
-"id",
-
-authUser.id
-
-)
-
-.single();
-
-
-
-
-
-
-
-if(error){
-
-
-console.log(
-"User profile error:",
-error.message
-);
-
-
-return null;
-
+    }
 
 }
 
 
+// =====================================
+// LOGOUT
+// =====================================
+
+export async function logout() {
+
+    try {
+
+        await supabase.auth.signOut();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
 
 
-
-return data;
-
-
-
-}
+    localStorage.removeItem(
+        LOCAL_USER_KEY
+    );
 
 
-
-
-
-
-
-
-
-// =================================
-// LOGIN CHECK
-// =================================
-
-
-export async function requireLogin(){
-
-
-
-const user =
-
-await getUserProfile();
-
-
-
-
-
-if(!user){
-
-
-window.location.href =
-"login.html";
-
-
-return null;
-
+    window.location.href =
+        "login.html";
 
 }
 
 
-
-
-
-
-if(user.status !== "active"){
-
-
-alert(
-"Account inactive"
-);
-
-
-await logout();
-
-
-return null;
-
-
-}
-
-
-
-
-
-
-
-return user;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
+// =====================================
 // ROLE CHECK
-// =================================
-
+// =====================================
 
 export async function requireRole(
-roles=[]
-){
+    allowedRoles = []
+) {
+
+    const user =
+        await getCurrentUser();
 
 
+    if (!user) {
 
-const user =
+        window.location.href =
+            "login.html";
 
-await requireLogin();
+        return null;
 
-
-
-
-
-if(!user){
-
-return null;
-
-}
+    }
 
 
+    if (
+        Array.isArray(allowedRoles) &&
+        allowedRoles.length > 0 &&
+        !allowedRoles.includes(
+            user.role
+        )
+    ) {
+
+        alert(
+            "You do not have permission to access this page."
+        );
 
 
+        window.location.href =
+            "index.html";
 
 
-if(
-!roles.includes(
-user.role
-)
+        return null;
 
-){
+    }
 
 
-
-alert(
-"You don't have permission"
-);
-
-
-
-window.history.back();
-
-
-
-return null;
-
-
+    return user;
 
 }
 
 
+// =====================================
+// AUTH STATE LISTENER
+// =====================================
 
+supabase.auth.onAuthStateChange(
 
+    async (
+        event,
+        session
+    ) => {
 
+        if (
+            event === "SIGNED_OUT"
+        ) {
 
-return user;
+            localStorage.removeItem(
+                LOCAL_USER_KEY
+            );
 
+        }
 
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
-// SAVE LOCAL USER
-// =================================
-
-
-export function saveLocalUser(user){
-
-
-
-localStorage.setItem(
-
-"user",
-
-JSON.stringify(user)
+    }
 
 );
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
-// GET LOCAL USER
-// =================================
-
-
-export function getLocalUser(){
-
-
-
-const user =
-
-localStorage.getItem(
-"user"
-);
-
-
-
-
-
-if(!user){
-
-return null;
-
-}
-
-
-
-
-
-return JSON.parse(user);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
-// LOGOUT
-// =================================
-
-
-export async function logout(){
-
-
-
-await supabase.auth.signOut();
-
-
-
-
-
-localStorage.removeItem(
-"user"
-);
-
-
-
-
-
-window.location.href =
-"login.html";
-
-
-
-}
+```
