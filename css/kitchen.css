@@ -1,9 +1,3 @@
-/* =====================================
-   HAMEED'S BISTRO
-   KITCHEN DISPLAY TV CSS
-===================================== */
-
-
 *{
     box-sizing:border-box;
 }
@@ -15,34 +9,27 @@ body{
 
     padding:0;
 
-    width:100%;
-
-    height:100vh;
-
-    overflow:hidden;
-
     font-family:Arial, sans-serif;
 
-    background:#f1f3f5;
+    background:#eef2f5;
 
     color:#222;
+
+    overflow:hidden;
 
 }
 
 
-
-/* ===============================
-   HEADER PANEL
-================================ */
+/* ================= HEADER ================= */
 
 
 .kitchen-header{
 
+    height:110px;
+
     width:100%;
 
     background:white;
-
-    padding:15px 25px;
 
     display:flex;
 
@@ -50,44 +37,42 @@ body{
 
     justify-content:space-between;
 
-    border-bottom:3px solid #ddd;
+    padding:10px 20px;
 
-    min-height:120px;
+    border-bottom:2px solid #ddd;
 
 }
 
 
 
 
-/* LEFT BRAND */
+
+/* BRAND */
+
 
 .brand-area{
 
-    text-align:left;
-
-    min-width:300px;
+    width:30%;
 
 }
-
 
 
 .brand-area h1{
 
     margin:0;
 
-    font-size:38px;
+    font-size:34px;
 
     font-weight:800;
 
 }
 
 
+.brand-area h2{
 
-.brand-area h3{
+    margin:5px 0 0;
 
-    margin:8px 0 0;
-
-    font-size:24px;
+    font-size:20px;
 
     color:#555;
 
@@ -100,21 +85,22 @@ body{
 
 /* USER */
 
-.user-info{
+
+.user-area{
 
     display:flex;
 
     align-items:center;
 
-    gap:35px;
+    gap:25px;
 
 }
 
 
 
-.welcome-box{
+.welcome-area{
 
-    font-size:20px;
+    font-size:17px;
 
     line-height:1.8;
 
@@ -122,11 +108,12 @@ body{
 
 
 
-.welcome-box b{
+.welcome-area strong{
 
-    font-size:22px;
+    font-size:18px;
 
 }
+
 
 
 
@@ -134,35 +121,33 @@ body{
 
 /* CHECK IN OUT */
 
-.attendance-box{
+
+.attendance-area{
 
     display:flex;
 
     flex-direction:column;
 
-    gap:10px;
+    gap:6px;
 
 }
 
 
+.attendance-area button{
 
-.attendance-box button{
+    width:95px;
 
-    width:130px;
-
-    height:42px;
+    height:30px;
 
     border:none;
 
-    border-radius:8px;
+    border-radius:5px;
 
     background:#1976d2;
 
     color:white;
 
-    font-size:17px;
-
-    cursor:pointer;
+    font-size:13px;
 
 }
 
@@ -171,46 +156,42 @@ body{
 
 
 
+/* RIGHT CONTROL */
 
-/* RIGHT BUTTONS */
 
-.action-box{
+.control-area{
 
     display:flex;
 
     flex-direction:column;
 
-    gap:10px;
+    gap:6px;
 
 }
 
 
+.control-area button{
 
-.action-box button{
+    width:90px;
 
-    width:140px;
-
-    height:40px;
+    height:30px;
 
     border:none;
 
-    border-radius:8px;
+    border-radius:5px;
 
     background:#37474f;
 
     color:white;
 
-    font-size:16px;
-
-    cursor:pointer;
+    font-size:13px;
 
 }
-
 
 
 #logoutBtn{
 
-    background:#c62828;
+    background:#d32f2f;
 
 }
 
@@ -220,71 +201,33 @@ body{
 
 
 
-/* ===============================
-   READY COMPLETED
-================================ */
+
+/* ================= READY COMPLETED ================= */
 
 
-.status-buttons{
+.status-area{
+
+    width:100%;
 
     display:flex;
 
     justify-content:center;
 
-    gap:30px;
+    gap:25px;
 
-    margin:20px 0;
+    margin:15px 0;
 
 }
 
 
+.status-area button{
 
-.status-buttons button{
+    width:150px;
 
-    width:180px;
-
-    height:55px;
+    height:45px;
 
     border:none;
 
-    border-radius:10px;
+    border-radius:8px;
 
-    background:#00897b;
-
-    color:white;
-
-    font-size:22px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-}
-
-
-
-
-
-
-
-
-/* ===============================
-   SECTION
-================================ */
-
-
-.section-select-box{
-
-    text-align:center;
-
-    margin-bottom:15px;
-
-}
-
-
-
-.section-select-box select{
-
-    width:300px;
-
-    height
+    background
