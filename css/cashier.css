@@ -1,44 +1,57 @@
-*{
-box-sizing:border-box;
-font-family:Arial, sans-serif;
-}
+/* cashier.css */
 
 
 body{
 
 margin:0;
-background:#f2f4f7;
+
+font-family:Arial, sans-serif;
+
+background:#f5f5f5;
 
 }
+
 
 
 /* HEADER */
 
 .cashier-header{
 
-display:flex;
-align-items:center;
-justify-content:space-between;
 
-background:#0b4f8a;
+height:80px;
+
+background:#0b3d91;
+
 color:white;
 
-padding:15px 25px;
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 25px;
+
 
 }
+
 
 
 .brand h1{
 
 margin:0;
+
 font-size:28px;
 
 }
 
 
+
 .brand h3{
 
-margin:5px 0 0;
+margin:5px 0;
+
+font-weight:normal;
 
 }
 
@@ -48,27 +61,49 @@ margin:5px 0 0;
 
 margin:5px;
 
-font-size:16px;
-
 }
+
+
+
 
 
 
 .controls button{
 
-padding:10px 18px;
 
-margin-left:8px;
+background:white;
+
+color:#0b3d91;
 
 border:none;
 
+padding:10px 15px;
+
 border-radius:6px;
+
+margin-left:8px;
 
 cursor:pointer;
 
-font-size:15px;
+font-weight:bold;
+
 
 }
+
+
+
+
+
+/* MAIN */
+
+.cashier-container{
+
+
+padding:25px;
+
+
+}
+
 
 
 
@@ -76,18 +111,17 @@ font-size:15px;
 
 /* CURRENT ORDER */
 
+.current-order{
 
-.current-order-panel{
-
-margin:20px;
 
 background:white;
 
-border-radius:12px;
-
 padding:20px;
 
-box-shadow:0 2px 10px #ccc;
+border-radius:12px;
+
+box-shadow:0 3px 10px #ddd;
+
 
 }
 
@@ -95,33 +129,46 @@ box-shadow:0 2px 10px #ccc;
 
 .panel-header{
 
+
 display:flex;
 
 justify-content:space-between;
 
 align-items:center;
 
+
 }
 
 
 
-.panel-buttons button{
+.panel-header h2{
 
-padding:12px 20px;
+color:#0b3d91;
 
-margin-left:8px;
+}
 
-border:none;
 
-border-radius:8px;
 
-background:#0b4f8a;
+
+.panel-header button{
+
+
+background:#0b3d91;
 
 color:white;
 
+border:none;
+
+padding:12px 20px;
+
+border-radius:8px;
+
 cursor:pointer;
 
+
 }
+
+
 
 
 
@@ -132,35 +179,50 @@ cursor:pointer;
 
 .order-grid{
 
+
 display:grid;
 
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+grid-template-columns:
+
+repeat(auto-fit,minmax(220px,1fr));
+
 
 gap:20px;
 
-margin-top:25px;
+
+margin-top:20px;
+
 
 }
 
 
 
+
+
+/* ORDER CARD */
 
 
 .order-card{
 
 
-background:white;
+background:#fff;
 
-border-radius:10px;
+border-radius:12px;
 
 padding:20px;
 
-border-left:6px solid #0b4f8a;
+box-shadow:
 
-box-shadow:0 2px 8px #ddd;
+0 3px 10px rgba(0,0,0,.15);
+
+
+cursor:pointer;
+
+border-left:8px solid #ff9800;
 
 
 }
+
 
 
 
@@ -168,27 +230,99 @@ box-shadow:0 2px 8px #ddd;
 
 margin-top:0;
 
+color:#0b3d91;
+
 }
 
 
 
-.order-card button{
 
 
-padding:10px 15px;
+/* STATUS COLORS */
 
-background:#198754;
 
-color:white;
+.order-new{
+
+
+border-left-color:#ff9800;
+
+}
+
+
+
+.order-accepted{
+
+
+border-left-color:#2196f3;
+
+}
+
+
+
+.order-ready{
+
+
+border-left-color:#4caf50;
+
+}
+
+
+
+.order-completed{
+
+
+border-left-color:#777;
+
+}
+
+
+
+
+
+
+
+/* ACTION BUTTONS */
+
+
+.cashier-actions{
+
+
+display:flex;
+
+gap:20px;
+
+margin-top:25px;
+
+
+}
+
+
+
+
+
+.cashier-actions button{
+
+
+flex:1;
+
+padding:18px;
+
+font-size:18px;
 
 border:none;
 
-border-radius:5px;
+border-radius:10px;
+
+background:#0b3d91;
+
+color:white;
 
 cursor:pointer;
 
 
 }
+
+
 
 
 
@@ -212,14 +346,15 @@ width:100%;
 
 height:100%;
 
-background:rgba(0,0,0,.5);
+background:rgba(0,0,0,.6);
 
-align-items:center;
 
-justify-content:center;
+z-index:1000;
 
 
 }
+
+
 
 
 
@@ -232,37 +367,48 @@ width:90%;
 
 max-width:600px;
 
+margin:50px auto;
+
 padding:25px;
 
 border-radius:12px;
 
+max-height:80vh;
+
+overflow:auto;
+
 
 }
 
 
 
 
-.modal-buttons{
 
-margin-top:20px;
+
+
+.modal-header{
+
 
 display:flex;
 
-gap:10px;
+justify-content:space-between;
+
+align-items:center;
 
 
 }
 
 
 
-.modal-buttons button{
+
+.modal-header button{
 
 
-padding:12px 18px;
+font-size:25px;
 
 border:none;
 
-border-radius:6px;
+background:none;
 
 cursor:pointer;
 
@@ -274,25 +420,140 @@ cursor:pointer;
 
 
 
-@media(max-width:700px){
+/* ORDER DETAILS */
+
+
+.order-item{
+
+
+background:#eee;
+
+padding:12px;
+
+margin:10px 0;
+
+border-radius:8px;
+
+
+}
+
+
+
+
+
+
+/* PAYMENT */
+
+
+#paymentTable{
+
+
+width:100%;
+
+padding:12px;
+
+font-size:16px;
+
+margin:15px 0;
+
+
+}
+
+
+
+#openPaymentBtn,
+
+
+#addItemBtn,
+
+
+#sendOrderBtn{
+
+
+width:100%;
+
+padding:14px;
+
+margin-top:12px;
+
+background:#0b3d91;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+font-size:16px;
+
+cursor:pointer;
+
+
+}
+
+
+
+
+
+
+/* INVOICE */
+
+
+.invoice-item{
+
+
+background:#f1f1f1;
+
+padding:15px;
+
+margin-bottom:10px;
+
+border-radius:8px;
+
+
+}
+
+
+
+
+
+/* MOBILE */
+
+@media(max-width:768px){
 
 
 .cashier-header{
 
+
 flex-direction:column;
 
-gap:15px;
+height:auto;
+
+padding:15px;
+
 
 }
 
 
-.panel-header{
+
+.cashier-actions{
+
 
 flex-direction:column;
 
-gap:15px;
 
 }
+
+
+
+.order-grid{
+
+
+grid-template-columns:1fr;
+
+
+}
+
 
 
 }
