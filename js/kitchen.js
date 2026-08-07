@@ -1,7 +1,7 @@
 import { supabase } from "./supabase.js";
 
 
-const orderContainer =
+const orderContainer = 
 document.getElementById("orderContainer");
 
 
@@ -13,42 +13,38 @@ document.getElementById("orderTitle");
 async function loadOrders(){
 
 
-try{
-
-
-const {data,error}=await supabase
+const { data, error } = await supabase
 
 .from("orders")
 
 .select(`
 
 id,
-
 orderNumber,
-
 tableNumber,
-
 ordered_by_type,
-
 ordered_by_name,
-
 created_at,
-
 status,
 
 order_items(
 
 "itemName",
-
 quantity,
-
 item_note
 
 )
 
 `)
 
-.eq("status","New");
+.eq("status","New")
+
+.order(
+"created_at",
+{
+ascending:false
+}
+);
 
 
 
@@ -56,13 +52,13 @@ item_note
 
 if(error){
 
-orderContainer.innerHTML=`
+orderContainer.innerHTML = `
 
 <div class="order-card">
 
-<h2>
+<h3>
 Database Error
-</h2>
+</h3>
 
 <p>
 ${error.message}
@@ -83,13 +79,13 @@ return;
 if(!data || data.length===0){
 
 
-orderContainer.innerHTML=`
+orderContainer.innerHTML = `
 
 <div class="order-card">
 
-<h2>
-No New Orders Found
-</h2>
+<h3>
+No New Orders
+</h3>
 
 </div>
 
@@ -104,7 +100,6 @@ return;
 
 
 
-
 orderContainer.innerHTML="";
 
 
@@ -114,43 +109,43 @@ orderContainer.innerHTML="";
 data.forEach(order=>{
 
 
-
-let items="";
-
+let itemsHTML="";
 
 
-if(order.order_items){
+
+order.order_items?.forEach(item=>{
 
 
-order.order_items.forEach(item=>{
-
-
-items += `
+itemsHTML += `
 
 <div class="item-row">
 
+<strong>
 ${item.quantity} × ${item."itemName"}
+</strong>
 
 
+${
+item.item_note
+?
+`
 <div class="item-note">
 
-${item.item_note || ""}
+Note:
+${item.item_note}
 
 </div>
+`
+:
+""
+}
 
 
 </div>
 
 `;
 
-
-
 });
-
-
-}
-
-
 
 
 
@@ -162,15 +157,16 @@ orderContainer.innerHTML += `
 <div class="order-card">
 
 
-<h3>
+<h2>
 
-Order No: ${order.orderNumber}
+Order No:
+${order.orderNumber}
 
-</h3>
+</h2>
 
 
 
-<div class="order-info">
+<div>
 
 Table:
 ${order.tableNumber || "-"}
@@ -179,30 +175,38 @@ ${order.tableNumber || "-"}
 
 
 
-<div class="order-info">
+<div>
 
 Ordered By:
 
-${order.ordered_by_name || order.ordered_by_type}
+${
+order.ordered_by_name
+?
+order.ordered_by_name
+:
+order.ordered_by_type
+}
 
 </div>
+
+
+<hr>
+
+
+${itemsHTML}
 
 
 
 <hr>
 
 
-${items}
 
-
-
-<div class="order-time">
+<div>
 
 ${new Date(order.created_at)
 .toLocaleString()}
 
 </div>
-
 
 
 </div>
@@ -215,40 +219,9 @@ ${new Date(order.created_at)
 });
 
 
-
-
-}
-
-catch(err){
-
-
-orderContainer.innerHTML=`
-
-<div class="order-card">
-
-<h2>
-JavaScript Error
-</h2>
-
-<p>
-${err.message}
-</p>
-
-</div>
-
-`;
-
-
 }
 
 
-
-}
-
-
-
-
-orderTitle.innerText="NEW ORDERS";
 
 
 loadOrders();
@@ -256,25 +229,20 @@ loadOrders();
 
 
 
-// LIVE UPDATE
-
+// Live New Order Update
 
 supabase
 
-.channel("debug-kitchen")
+.channel("kitchen-orders")
 
 .on(
 
 "postgres_changes",
 
 {
-
 event:"*",
-
 schema:"public",
-
 table:"orders"
-
 },
 
 ()=>{
