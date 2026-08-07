@@ -2,81 +2,31 @@ import { supabase } from "./supabase.js";
 
 
 
-let selectedTable="";
-
-let orderItems=[];
-
-
-
-// USER
-
-const user =
-JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(
+localStorage.getItem("user")
+);
 
 
 
 if(!user){
 
-location.href="login.html";
+window.location.href="login.html";
 
 }
+
+
 
 
 
 if(
-user.role!=="waiter" &&
-user.role!=="admin" &&
-user.role!=="manager"
+user.role !== "waiter" &&
+user.role !== "manager" &&
+user.role !== "admin"
 ){
 
 alert("Access Denied");
 
-location.href="login.html";
-
-}
-
-
-
-userName.innerText=user.name;
-
-userRole.innerText=user.role;
-
-
-
-
-
-
-
-
-// CREATE TABLE
-
-
-function createTables(){
-
-
-createGroup(
-"indoorTables",
-"Indoor",
-"A",
-30
-);
-
-
-createGroup(
-"outdoorTables",
-"Outdoor",
-"B",
-30
-);
-
-
-createGroup(
-"floorTables",
-"First Floor",
-"C",
-30
-);
-
+window.location.href="login.html";
 
 }
 
@@ -84,44 +34,21 @@ createGroup(
 
 
 
-function createGroup(id,title,prefix,total){
+document.getElementById("userName").innerText =
+user.name || "---";
+
+
+document.getElementById("userRole").innerText =
+user.role || "---";
 
 
 
-let box=document.getElementById(id);
 
 
 
-for(let i=1;i<=total;i++){
+let selectedTable = "";
 
-
-
-let btn=document.createElement("button");
-
-
-btn.className="table-btn";
-
-
-btn.innerText=
-title+" "+prefix+i;
-
-
-
-btn.onclick=()=>openTable(
-title+" "+prefix+i
-);
-
-
-
-box.appendChild(btn);
-
-
-
-}
-
-
-
-}
+let cart = [];
 
 
 
@@ -129,52 +56,30 @@ box.appendChild(btn);
 
 
 
+// TABLE SELECT
 
 
-// OPEN TABLE
-
-
-function openTable(table){
-
-
-selectedTable=table;
-
-
+const tableSelect =
 document.getElementById(
-"selectedTable"
-).innerText=table;
+"tableSelect"
+);
 
 
 
-document.getElementById(
-"orderModal"
-).style.display="block";
+if(tableSelect){
 
 
-
-loadMenu();
-
-
-}
+tableSelect.onchange=()=>{
 
 
-
-
-
-
-
-
-
-// CLOSE
-
-
-closeBtn.onclick=()=>{
-
-
-orderModal.style.display="none";
+selectedTable =
+tableSelect.value;
 
 
 };
+
+
+}
 
 
 
@@ -193,167 +98,20 @@ async function loadMenu(){
 
 const {
 
-data
-
-}=await supabase
-
-.from("menu")
-
-.select("*");
-
-
-
-
-
-menuItems.innerHTML="";
-
-
-
-data.forEach(item=>{
-
-
-menuItems.innerHTML += `
-
-
-<div class="menu-item">
-
-
-<span>
-
-${item.item_name}
-
-</span>
-
-
-<button onclick='addItem(${JSON.stringify(item)})'>
-
-+
-
-</button>
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-window.addItem=(item)=>{
-
-
-orderItems.push({
-
-item_name:item.item_name,
-
-quantity:1,
-
-note:""
-
-
-});
-
-
-showItems();
-
-
-};
-
-
-
-
-
-
-
-
-function showItems(){
-
-
-orderItemsDiv=document.getElementById(
-"orderItems"
-);
-
-
-orderItemsDiv.innerHTML="";
-
-
-
-orderItems.forEach(i=>{
-
-
-orderItemsDiv.innerHTML +=`
-
-<div class="order-item">
-
-${i.item_name}
-
-</div>
-
-`;
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-// SEND ORDER
-
-
-sendOrderBtn.onclick=async()=>{
-
-
-if(orderItems.length===0){
-
-alert("Add Item");
-
-return;
-
-}
-
-
-
-
-
-const {
+data,
 
 error
 
 }=await supabase
 
-.from("orders")
+.from("menu")
 
-.insert({
+.select("*")
 
-table_number:selectedTable,
-
-status:"Accepted",
-
-order_items:orderItems
-
-
-});
-
+.eq(
+"status",
+"active"
+);
 
 
 
@@ -371,17 +129,253 @@ return;
 
 
 
-alert("Order Sent To Kitchen");
+const box =
+document.getElementById(
+"menuContainer"
+);
 
 
 
-orderModal.style.display="none";
+if(!box)
+return;
 
 
-orderItems=[];
+
+
+
+box.innerHTML="";
+
+
+
+
+
+data.forEach(item=>{
+
+
+
+box.innerHTML +=`
+
+
+
+<div class="menu-item">
+
+
+
+<h3>
+
+${item.item_name}
+
+</h3>
+
+
+
+<p>
+
+RM ${Number(item.dine_in_price).toFixed(2)}
+
+</p>
+
+
+
+
+<button onclick="addItem('${item.id}')">
+
+Add
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ADD ITEM
+
+
+window.addItem=function(id){
+
+
+
+alert(
+"Item Added"
+);
+
 
 
 };
+
+
+
+
+
+
+
+
+
+// SEND ORDER
+
+
+document.getElementById(
+"sendOrderBtn"
+)
+
+?.addEventListener(
+"click",
+
+async()=>{
+
+
+
+if(!selectedTable){
+
+
+alert(
+"Select Table"
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+if(cart.length===0){
+
+
+alert(
+"Add Item First"
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+
+
+const {
+
+error
+
+}=await supabase
+
+.from("orders")
+
+.insert({
+
+
+customer_name:
+
+user.name,
+
+
+table_number:
+
+selectedTable,
+
+
+order_type:
+
+"Dine In",
+
+
+order_items:
+
+cart,
+
+
+status:
+
+"New",
+
+
+payment_status:
+
+"Pending",
+
+
+created_by:
+
+user.id
+
+
+});
+
+
+
+
+
+
+
+if(error){
+
+
+console.log(error);
+
+
+alert(
+"Order Failed"
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+
+alert(
+"Order Sent To Cashier"
+);
+
+
+
+
+
+cart=[];
+
+
+
+});
 
 
 
@@ -394,12 +388,20 @@ orderItems=[];
 // REFRESH
 
 
-refreshBtn.onclick=()=>{
+document.getElementById(
+"refreshBtn"
+)
+
+?.addEventListener(
+"click",
+
+()=>{
 
 location.reload();
 
-};
+}
 
+);
 
 
 
@@ -410,16 +412,28 @@ location.reload();
 // LOGOUT
 
 
-logoutBtn.onclick=()=>{
+document.getElementById(
+"logoutBtn"
+)
+
+?.addEventListener(
+"click",
+
+()=>{
 
 
-localStorage.removeItem("user");
+localStorage.removeItem(
+"user"
+);
 
 
-location.href="login.html";
+window.location.href=
+"login.html";
 
 
-};
+}
+
+);
 
 
 
@@ -427,4 +441,5 @@ location.href="login.html";
 
 
 
-createTables();
+
+loadMenu();
