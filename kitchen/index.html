@@ -7,9 +7,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <title>
-Hameed's Bistro - Kitchen Display
+Hameed's Bistro Kitchen Display
 </title>
 
 
@@ -22,22 +21,23 @@ Hameed's Bistro - Kitchen Display
 <body>
 
 
-<!-- HEADER PANEL -->
+<!-- ================= HEADER ================= -->
+
 
 <header class="kitchen-header">
 
 
-    <!-- LEFT BRAND -->
+    <!-- BRAND LEFT -->
 
     <div class="brand-area">
 
         <h1>
-        Hameed's Bistro
+            Hameed's Bistro
         </h1>
 
-        <h3>
-        Kitchen Display
-        </h3>
+        <h2>
+            Kitchen Display
+        </h2>
 
     </div>
 
@@ -45,26 +45,26 @@ Hameed's Bistro - Kitchen Display
 
 
 
-    <!-- USER INFO -->
+    <!-- USER AREA -->
 
-    <div class="user-info">
+    <div class="user-area">
 
 
-        <div class="welcome-box">
+        <div class="welcome-area">
 
             <div>
-            Welcome:
-            <b id="userName">
-            Admin
-            </b>
+                Welcome:
+                <strong id="userName">
+                -
+                </strong>
             </div>
 
 
             <div>
-            Role:
-            <b id="userRole">
-            Admin
-            </b>
+                Role:
+                <strong id="userRole">
+                -
+                </strong>
             </div>
 
         </div>
@@ -73,16 +73,16 @@ Hameed's Bistro - Kitchen Display
 
 
 
-        <div class="attendance-box">
+        <div class="attendance-area">
 
 
             <button id="checkInBtn">
-            Check In
+                Check In
             </button>
 
 
             <button id="checkOutBtn">
-            Check Out
+                Check Out
             </button>
 
 
@@ -98,27 +98,29 @@ Hameed's Bistro - Kitchen Display
 
 
 
-    <!-- RIGHT ACTION -->
+    <!-- RIGHT CONTROL -->
 
-    <div class="action-box">
+
+    <div class="control-area">
 
 
         <button id="refreshBtn">
-        🔄 Refresh
+            Refresh
         </button>
 
 
         <button id="logoutBtn">
-        Logout
+            Logout
         </button>
 
 
         <button id="backBtn">
-        ← Back
+            Back
         </button>
 
 
     </div>
+
 
 
 </header>
@@ -129,9 +131,11 @@ Hameed's Bistro - Kitchen Display
 
 
 
-<!-- STATUS BUTTONS -->
 
-<div class="status-buttons">
+<!-- ================= STATUS BUTTON ================= -->
+
+
+<div class="status-area">
 
 
 <button id="readyBtn">
@@ -153,14 +157,15 @@ COMPLETED
 
 
 
-<!-- SECTION SELECT -->
+<!-- ================= SECTION ================= -->
 
-<div class="section-select-box">
+
+<div class="section-area">
 
 
 <select id="sectionSelect">
 
-<option value="">
+<option>
 Select Section
 </option>
 
@@ -177,7 +182,8 @@ Select Section
 
 
 
-<!-- DEFAULT NEW ORDER -->
+<!-- ================= NEW ORDER DEFAULT ================= -->
+
 
 <section id="newOrderView">
 
@@ -187,10 +193,10 @@ NEW ORDERS
 </h2>
 
 
+
 <div 
 id="newOrders"
 class="order-grid">
-
 
 </div>
 
@@ -205,12 +211,12 @@ class="order-grid">
 
 
 
-<!-- READY VIEW -->
+<!-- ================= READY VIEW ================= -->
 
 
 <section 
 id="readyView"
-class="hidden-view">
+class="hidden">
 
 
 <h2>
@@ -218,10 +224,10 @@ READY ORDERS
 </h2>
 
 
+
 <div
 id="readyOrders"
 class="order-grid">
-
 
 </div>
 
@@ -236,12 +242,12 @@ class="order-grid">
 
 
 
-<!-- COMPLETED VIEW -->
+<!-- ================= COMPLETED VIEW ================= -->
 
 
-<section 
+<section
 id="completedView"
-class="hidden-view">
+class="hidden">
 
 
 <h2>
@@ -249,10 +255,10 @@ COMPLETED ORDERS
 </h2>
 
 
+
 <div
 id="completedOrders"
 class="order-grid">
-
 
 </div>
 
@@ -267,8 +273,6 @@ class="order-grid">
 
 
 
-
-<!-- JS -->
 
 <script type="module" src="../js/kitchen-auth.js"></script>
 
