@@ -1,35 +1,55 @@
 import { supabase } from "./supabase.js";
 
 
+// ===============================
+// CHECK KITCHEN AUTH
+// ===============================
 
-async function kitchenAuth(){
 
+async function checkKitchenAuth(){
 
 
 const {
 data:{
-user
+session
 }
 
-}=await supabase.auth.getUser();
+}=
+
+await supabase.auth.getSession();
 
 
 
+if(!session){
 
 
-if(!user){
+localStorage.removeItem(
+"kitchenUser"
+);
 
-window.location.href="/kitchen-login.html";
+
+window.location.href=
+"/kitchen-login.html";
+
+
 return;
 
+
 }
 
 
 
 
 
+const email =
+session.user.email;
 
-const {data:userData,error}=
+
+
+const {
+data:user,
+error
+}=
 
 await supabase
 
@@ -39,7 +59,7 @@ await supabase
 
 .eq(
 "email",
-user.email
+email
 )
 
 .single();
@@ -49,14 +69,18 @@ user.email
 
 
 
+if(error || !user){
 
-if(error || !userData){
 
 await supabase.auth.signOut();
 
-window.location.href="/kitchen-login.html";
+
+window.location.href=
+"/kitchen-login.html";
+
 
 return;
+
 
 }
 
@@ -64,20 +88,26 @@ return;
 
 
 
+// ONLY ADMIN + COOK
 
 
 if(
 
-userData.role!=="admin" &&
+user.role !== "admin"
 
-userData.role!=="cook"
+&&
+
+user.role !== "cook"
 
 ){
 
 
 await supabase.auth.signOut();
 
-window.location.href="/kitchen-login.html";
+
+window.location.href=
+"/kitchen-login.html";
+
 
 return;
 
@@ -89,47 +119,14 @@ return;
 
 
 
-
-// USER NAME
-
-
-const name =
-document.getElementById("userName");
-
-
-const role =
-document.getElementById("userRole");
-
-
-
-
-
-if(name){
-
-name.innerText =
-userData.name || "User";
-
-}
-
-
-
-
-if(role){
-
-role.innerText =
-userData.role;
-
-}
-
-
-
+// SAVE USER
 
 
 localStorage.setItem(
 
 "kitchenUser",
 
-JSON.stringify(userData)
+JSON.stringify(user)
 
 );
 
@@ -141,17 +138,31 @@ JSON.stringify(userData)
 
 
 
+// RUN
+
+checkKitchenAuth();
 
 
 
+
+
+
+
+// ===============================
 // LOGOUT
+// ===============================
 
 
-document
+const logoutBtn =
+document.getElementById("logoutBtn");
 
-.getElementById("logoutBtn")
 
-?.addEventListener("click",async()=>{
+
+logoutBtn?.addEventListener(
+
+"click",
+
+async()=>{
 
 
 await supabase.auth.signOut();
@@ -163,16 +174,11 @@ localStorage.removeItem(
 
 
 
-window.location.href="/kitchen-login.html";
+window.location.href=
+"/kitchen-login.html";
 
 
 
-});
+}
 
-
-
-
-
-
-
-kitchenAuth();
+);
