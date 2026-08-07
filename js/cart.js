@@ -1,47 +1,68 @@
-// pos/js/cart.js
+// js/cart.js
+
 
 import { changeLanguage } from "./language.js";
 
 
+
+
+
 let cart =
-JSON.parse(localStorage.getItem("cart"))
+
+JSON.parse(
+
+localStorage.getItem("cart")
+
+)
+
 ||
+
 [];
 
 
 
-const cartItems =
-document.getElementById("cartItems");
-
-
-const cartTotal =
-document.getElementById("cartTotal");
 
 
 
+
+
+// ===============================
+// ELEMENTS
+// ===============================
+
+
+const cartItemsBox =
+
+document.getElementById(
+"cartItems"
+);
+
+
+
+const cartTotalBox =
+
+document.getElementById(
+"cartTotal"
+);
+
+
+
+
+
+
+
+
+
+// ===============================
+// SHOW CART
+// ===============================
 
 
 function showCart(){
 
 
-cartItems.innerHTML="";
 
-
-let total=0;
-
-
-
-if(cart.length===0){
-
-
-cartItems.innerHTML=
-`
-<p>Your cart is empty</p>
-`;
-
-cartTotal.innerText="0.00";
-
-updateCartCount();
+if(!cartItemsBox){
 
 return;
 
@@ -51,11 +72,75 @@ return;
 
 
 
-cart.forEach((item,index)=>{
+cartItemsBox.innerHTML="";
+
+
+
+
+
+
+let total = 0;
+
+
+
+
+
+
+
+if(cart.length===0){
+
+
+cartItemsBox.innerHTML =
+
+`
+
+<p class="empty-cart">
+
+Your cart is empty
+
+</p>
+
+`;
+
+
+
+
+
+cartTotalBox.innerText =
+"RM 0.00";
+
+
+
+updateCartCount();
+
+
+return;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+cart.forEach(
+
+(item,index)=>{
+
 
 
 let itemTotal =
-Number(item.price) * Number(item.quantity);
+
+item.price *
+
+item.quantity;
+
+
 
 
 
@@ -63,55 +148,91 @@ total += itemTotal;
 
 
 
-let div =
-document.createElement("div");
 
 
 
-div.className="cart-item";
+
+cartItemsBox.innerHTML += `
 
 
 
-div.innerHTML=`
+<div class="cart-item">
+
+
+
+<div>
+
 
 <h3>
+
 ${item.itemName}
+
 </h3>
 
 
 <p>
-RM ${Number(item.price).toFixed(2)}
+
+RM ${item.price.toFixed(2)}
+
 </p>
 
 
+</div>
 
-<button class="minus">
+
+
+
+
+
+<div class="quantity-box">
+
+
+<button onclick="minusItem(${index})">
+
 -
+
 </button>
 
 
 
 <span>
+
 ${item.quantity}
+
 </span>
 
 
 
-<button class="plus">
+
+<button onclick="plusItem(${index})">
+
 +
+
 </button>
 
 
 
-<button class="remove-btn">
-Remove
+</div>
+
+
+
+
+
+
+
+<button
+
+class="remove-btn"
+
+onclick="removeItem(${index})">
+
+✕
+
 </button>
 
 
 
-<textarea 
-class="item-note"
-placeholder="Order Note">${item.note || ""}</textarea>
+</div>
 
 
 
@@ -121,8 +242,48 @@ placeholder="Order Note">${item.note || ""}</textarea>
 
 
 
-div.querySelector(".plus")
-.onclick=()=>{
+});
+
+
+
+
+
+
+
+
+
+cartTotalBox.innerText =
+
+"RM " +
+
+total.toFixed(2);
+
+
+
+
+
+
+
+updateCartCount();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// PLUS
+// ===============================
+
+
+window.plusItem = function(index){
 
 
 cart[index].quantity++;
@@ -131,82 +292,46 @@ cart[index].quantity++;
 saveCart();
 
 
-};
+}
 
 
 
 
 
-div.querySelector(".minus")
-.onclick=()=>{
 
 
-if(cart[index].quantity>1){
+
+
+// ===============================
+// MINUS
+// ===============================
+
+
+window.minusItem = function(index){
+
+
+
+if(cart[index].quantity > 1){
+
 
 cart[index].quantity--;
 
+
 }
+
 else{
 
+
 cart.splice(index,1);
+
 
 }
 
 
-saveCart();
 
-
-};
-
-
-
-
-
-div.querySelector(".remove-btn")
-.onclick=()=>{
-
-
-cart.splice(index,1);
 
 
 saveCart();
-
-
-};
-
-
-
-
-
-div.querySelector(".item-note")
-.onchange=(e)=>{
-
-
-cart[index].note=e.target.value;
-
-
-saveCart();
-
-
-};
-
-
-
-
-cartItems.appendChild(div);
-
-
-
-});
-
-
-
-cartTotal.innerText=
-total.toFixed(2);
-
-
-
-updateCartCount();
 
 
 
@@ -216,18 +341,56 @@ updateCartCount();
 
 
 
+
+
+
+
+// ===============================
+// REMOVE
+// ===============================
+
+
+window.removeItem = function(index){
+
+
+cart.splice(index,1);
+
+
+
+saveCart();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// SAVE CART
+// ===============================
 
 
 function saveCart(){
 
 
 localStorage.setItem(
+
 "cart",
+
 JSON.stringify(cart)
+
 );
 
 
+
 showCart();
+
 
 
 }
@@ -239,17 +402,25 @@ showCart();
 
 
 
+
+// ===============================
+// CART COUNT
+// ===============================
+
+
 function updateCartCount(){
+
 
 
 let count=0;
 
 
 
+
 cart.forEach(item=>{
 
 
-count += Number(item.quantity);
+count += item.quantity;
 
 
 });
@@ -257,13 +428,26 @@ count += Number(item.quantity);
 
 
 
-document.getElementById("cartCount")
-?.innerText=count;
+
+const box =
+
+document.getElementById(
+"cartCount"
+);
 
 
 
-document.getElementById("floatingCartCount")
-?.innerText=count;
+
+
+if(box){
+
+
+box.innerText=count;
+
+
+}
+
+
 
 
 
@@ -275,17 +459,32 @@ document.getElementById("floatingCartCount")
 
 
 
+
+
+// ===============================
 // CHECKOUT
+// ===============================
 
 
-document.getElementById("checkoutBtn")
-?.addEventListener("click",()=>{
+document
+
+.getElementById("checkoutBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
 
 
 if(cart.length===0){
 
 
-alert("Cart is empty");
+alert(
+"Cart is empty"
+);
+
 
 return;
 
@@ -294,9 +493,10 @@ return;
 
 
 
-// go checkout
 
-window.location.href=
+
+window.location.href =
+
 "checkout.html";
 
 
@@ -309,28 +509,26 @@ window.location.href=
 
 
 
+
+
+// ===============================
 // HEADER
+// ===============================
 
 
-document.getElementById("homeBtn")
+document
+
+.getElementById("homeBtn")
+
 ?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 window.location.href="index.html";
 
-});
-
-
-
-
-
-document.getElementById("backBtn")
-?.addEventListener(
-"click",
-()=>{
-
-history.back();
 
 });
 
@@ -338,13 +536,22 @@ history.back();
 
 
 
-document.getElementById("refreshBtn")
+
+
+document
+
+.getElementById("refreshBtn")
+
 ?.addEventListener(
+
 "click",
+
 ()=>{
+
 
 location.reload();
 
+
 });
 
 
@@ -353,6 +560,35 @@ location.reload();
 
 
 
+document
+
+.getElementById("backBtn")
+
+?.addEventListener(
+
+"click",
+
+()=>{
+
+
+history.back();
+
+
+});
+
+
+
+
+
+
+
+
+
+// START
+
+
 showCart();
+
+updateCartCount();
 
 changeLanguage();
