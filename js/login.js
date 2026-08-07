@@ -7,26 +7,32 @@ import { loginUser } from "./auth.js";
 // ELEMENTS
 // ========================================
 
-const form = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const messageBox = document.getElementById("loginMessage");
+const emailInput =
+    document.getElementById("email");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const message =
+    document.getElementById("message");
 
 
 // ========================================
 // MESSAGE
 // ========================================
 
-function showMessage(message) {
+function showMessage(text) {
 
-    if (messageBox) {
+    if (message) {
 
-        messageBox.textContent = message;
-        messageBox.style.display = "block";
+        message.textContent = text;
 
     } else {
 
-        alert(message);
+        console.log(text);
 
     }
 
@@ -34,27 +40,27 @@ function showMessage(message) {
 
 
 // ========================================
-// BUTTON LOADING
+// BUTTON STATE
 // ========================================
 
-function setLoading(isLoading) {
+function setLoading(loading) {
 
-    const button =
-        form?.querySelector(
-            'button[type="submit"]'
-        );
+    if (!loginBtn) return;
 
-    if (!button) return;
 
-    if (isLoading) {
+    if (loading) {
 
-        button.disabled = true;
-        button.textContent = "Logging in...";
+        loginBtn.disabled = true;
+
+        loginBtn.textContent =
+            "Logging in...";
 
     } else {
 
-        button.disabled = false;
-        button.textContent = "Login";
+        loginBtn.disabled = false;
+
+        loginBtn.textContent =
+            "Login";
 
     }
 
@@ -62,10 +68,10 @@ function setLoading(isLoading) {
 
 
 // ========================================
-// REDIRECT
+// REDIRECT BY ROLE
 // ========================================
 
-function redirectUser(user) {
+function redirectByRole(user) {
 
     const role =
         String(user?.role || "")
@@ -73,45 +79,73 @@ function redirectUser(user) {
             .toLowerCase();
 
 
-    console.log("Logged user:", user);
-    console.log("Role:", role);
+    console.log(
+        "Logged user:",
+        user
+    );
 
+
+    console.log(
+        "User role:",
+        role
+    );
+
+
+    // ADMIN
 
     if (role === "admin") {
 
-        window.location.href = "admin.html";
+        window.location.href =
+            "admin.html";
+
         return;
 
     }
 
+
+    // MANAGER
 
     if (role === "manager") {
 
-        window.location.href = "admin.html";
+        window.location.href =
+            "admin.html";
+
         return;
 
     }
 
+
+    // CASHIER
 
     if (role === "cashier") {
 
-        window.location.href = "cashier.html";
+        window.location.href =
+            "cashier.html";
+
         return;
 
     }
 
+
+    // WAITER
 
     if (role === "waiter") {
 
-        window.location.href = "waiter.html";
+        window.location.href =
+            "waiter.html";
+
         return;
 
     }
 
 
+    // COOK
+
     if (role === "cook") {
 
-        window.location.href = "kitchen.html";
+        window.location.href =
+            "kitchen.html";
+
         return;
 
     }
@@ -125,12 +159,10 @@ function redirectUser(user) {
 
 
 // ========================================
-// LOGIN
+// LOGIN FUNCTION
 // ========================================
 
-async function handleLogin(event) {
-
-    event.preventDefault();
+async function handleLogin() {
 
 
     const email =
@@ -143,11 +175,17 @@ async function handleLogin(event) {
         passwordInput?.value || "";
 
 
+    // ------------------------------------
+    // VALIDATION
+    // ------------------------------------
+
     if (!email) {
 
         showMessage(
             "Please enter your email."
         );
+
+        emailInput?.focus();
 
         return;
 
@@ -160,17 +198,30 @@ async function handleLogin(event) {
             "Please enter your password."
         );
 
+        passwordInput?.focus();
+
         return;
 
     }
 
 
+    // ------------------------------------
+    // LOADING
+    // ------------------------------------
+
     setLoading(true);
 
-    showMessage("Logging in...");
+    showMessage(
+        "Logging in..."
+    );
 
 
     try {
+
+
+        // --------------------------------
+        // LOGIN
+        // --------------------------------
 
         const result =
             await loginUser(
@@ -185,7 +236,14 @@ async function handleLogin(event) {
         );
 
 
-        if (!result?.success) {
+        // --------------------------------
+        // FAILED
+        // --------------------------------
+
+        if (
+            !result ||
+            result.success !== true
+        ) {
 
             showMessage(
                 result?.message ||
@@ -198,6 +256,10 @@ async function handleLogin(event) {
 
         }
 
+
+        // --------------------------------
+        // USER PROFILE
+        // --------------------------------
 
         if (!result.user) {
 
@@ -212,12 +274,20 @@ async function handleLogin(event) {
         }
 
 
+        // --------------------------------
+        // SUCCESS
+        // --------------------------------
+
         showMessage(
             "Login successful."
         );
 
 
-        redirectUser(
+        // --------------------------------
+        // REDIRECT
+        // --------------------------------
+
+        redirectByRole(
             result.user
         );
 
@@ -232,7 +302,7 @@ async function handleLogin(event) {
 
         showMessage(
             error?.message ||
-            "Unexpected login error."
+            "Login failed."
         );
 
 
@@ -244,20 +314,20 @@ async function handleLogin(event) {
 
 
 // ========================================
-// FORM EVENT
+// LOGIN BUTTON
 // ========================================
 
-if (form) {
+if (loginBtn) {
 
-    form.addEventListener(
-        "submit",
+    loginBtn.addEventListener(
+        "click",
         handleLogin
     );
 
 } else {
 
     console.error(
-        "loginForm not found."
+        "loginBtn not found."
     );
 
 }
@@ -269,11 +339,47 @@ if (form) {
 
 passwordInput?.addEventListener(
     "keydown",
-    function(event) {
+    (event) => {
 
-        if (event.key === "Enter") {
+        if (
+            event.key === "Enter"
+        ) {
 
-            form?.requestSubmit();
+            handleLogin();
+
+        }
+
+    }
+);
+
+
+// ========================================
+// CLEAR MESSAGE
+// ========================================
+
+emailInput?.addEventListener(
+    "input",
+    () => {
+
+        if (message) {
+
+            message.textContent =
+                "";
+
+        }
+
+    }
+);
+
+
+passwordInput?.addEventListener(
+    "input",
+    () => {
+
+        if (message) {
+
+            message.textContent =
+                "";
 
         }
 
@@ -286,5 +392,5 @@ passwordInput?.addEventListener(
 // ========================================
 
 console.log(
-    "Hameed's Bistro login.js loaded."
+    "Hameed's Bistro login.js loaded successfully."
 );
