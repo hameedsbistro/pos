@@ -2,158 +2,94 @@ import { supabase } from "./supabase.js";
 
 
 
-const user = 
-JSON.parse(
-localStorage.getItem("kitchenUser")
-);
+let currentUser = null;
 
 
 
-const checkInBtn =
-document.getElementById("checkInBtn");
+async function getCurrentUser(){
 
 
-const checkOutBtn =
-document.getElementById("checkOutBtn");
+    const email = localStorage.getItem("userEmail");
 
 
-
-
-
-// ===========================
-// CURRENT DATE
-// ===========================
-
-
-function today(){
-
-    return new Date()
-    .toISOString()
-    .split("T")[0];
-
-}
+    if(!email){
+        return;
+    }
 
 
 
-// ===========================
-// CURRENT TIME
-// ===========================
-
-
-function currentTime(){
-
-    return new Date()
-    .toLocaleTimeString(
-        "en-GB",
-        {
-            hour12:false
-        }
-    );
-
-}
+    const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .single();
 
 
 
+    if(error){
 
-
-// ===========================
-// CHECK IN
-// ===========================
-
-
-checkInBtn?.addEventListener(
-"click",
-async()=>{
-
-
-    const date =
-    today();
-
-
-
-    const {data:existing}=
-
-    await supabase
-
-    .from("attendance")
-
-    .select("*")
-
-    .eq(
-        "staff_id",
-        user.id
-    )
-
-    .eq(
-        "attendance_date",
-        date
-    )
-
-    .maybeSingle();
-
-
-
-
-
-    if(existing){
-
-        alert(
-        "Already Checked In"
-        );
-
+        console.log(error);
         return;
 
     }
 
 
+    currentUser = data;
+
+
+}
 
 
 
 
+// CHECK IN
 
-    const {error}=
+document
+.getElementById("checkInBtn")
+.addEventListener("click", async()=>{
 
-    await supabase
 
+    if(!currentUser){
+
+        await getCurrentUser();
+
+    }
+
+
+
+    const { error } = await supabase
     .from("attendance")
+    .insert([
 
-    .insert({
+        {
 
-        staff_id:user.id,
+        staff_id: currentUser.id,
 
-        staff_name:user.name,
+        staff_name: currentUser.name,
 
-        role:user.role,
+        role: currentUser.role,
 
-        attendance_date:date,
-
-        check_in:currentTime(),
+        check_in: new Date(),
 
         status:"Present"
 
-    });
+        }
 
-
+    ]);
 
 
 
     if(error){
 
-        console.log(error);
+        alert(error.message);
 
-        alert(
-        error.message
-        );
+    }
+    else{
 
-        return;
+        alert("Check In Successful");
 
     }
 
-
-
-    alert(
-    "Check In Successful"
-    );
 
 
 });
@@ -163,59 +99,35 @@ async()=>{
 
 
 
-
-
-
-// ===========================
 // CHECK OUT
-// ===========================
+
+document
+.getElementById("checkOutBtn")
+.addEventListener("click", async()=>{
 
 
-checkOutBtn?.addEventListener(
-"click",
-async()=>{
+    if(!currentUser){
 
+        await getCurrentUser();
 
-    const date =
-    today();
-
+    }
 
 
 
-
-    const {data:attendance}=
-
-    await supabase
-
+    const { data, error } = await supabase
     .from("attendance")
-
     .select("*")
-
-    .eq(
-        "staff_id",
-        user.id
-    )
-
-    .eq(
-        "attendance_date",
-        date
-    )
-
-    .maybeSingle();
+    .eq("staff_id", currentUser.id)
+    .is("check_out", null)
+    .order("created_at",{ascending:false})
+    .limit(1)
+    .single();
 
 
 
+    if(error){
 
-
-
-
-    if(!attendance){
-
-
-        alert(
-        "Check In First"
-        );
-
+        alert("No active check-in found");
 
         return;
 
@@ -224,52 +136,33 @@ async()=>{
 
 
 
-
-
-
-    const {error}=
-
-    await supabase
-
+    const { error:updateError } = await supabase
     .from("attendance")
-
     .update({
 
-        check_out:currentTime(),
-
-        status:"Completed"
+        check_out:new Date()
 
     })
-
-    .eq(
-        "id",
-        attendance.id
-    );
+    .eq("id", data.id);
 
 
 
 
+    if(updateError){
 
+        alert(updateError.message);
 
+    }
+    else{
 
-    if(error){
-
-        console.log(error);
-
-        alert(
-        error.message
-        );
-
-        return;
+        alert("Check Out Successful");
 
     }
 
 
 
-    alert(
-    "Check Out Successful"
-    );
-
-
-
 });
+
+
+
+getCurrentUser();
