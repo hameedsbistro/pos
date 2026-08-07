@@ -1,72 +1,280 @@
 ```javascript
 // js/login.js
 
-import {
-    loginUser
-} from "./auth.js";
+import { loginUser } from "./auth.js";
 
 
-// =====================================
-// ELEMENTS
-// =====================================
+// ==========================================
+// GET ELEMENTS
+// ==========================================
 
-const loginForm =
-    document.getElementById(
-        "loginForm"
-    );
-
-const emailInput =
-    document.getElementById(
-        "email"
-    );
-
-const passwordInput =
-    document.getElementById(
-        "password"
-    );
-
-const messageBox =
-    document.getElementById(
-        "loginMessage"
-    );
+const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const messageBox = document.getElementById("loginMessage");
 
 
-// =====================================
-// LOGIN FORM
-// =====================================
+// ==========================================
+// MESSAGE
+// ==========================================
 
-loginForm?.addEventListener(
-    "submit",
-    async (event) => {
+function showMessage(message, type = "error") {
 
-        event.preventDefault();
+    if (messageBox) {
 
+        messageBox.textContent = message;
 
-        const email =
-            emailInput?.value
-                ?.trim()
-                .toLowerCase();
+        messageBox.className = `login-message ${type}`;
 
+        messageBox.style.display = "block";
 
-        const password =
-            passwordInput?.value || "";
+    } else {
 
+        alert(message);
 
-        if (!email || !password) {
+    }
 
-            showMessage(
-                "Please enter email and password."
-            );
-
-            return;
-
-        }
+}
 
 
-        showMessage(
-            "Logging in..."
+// ==========================================
+// DISABLE / ENABLE LOGIN BUTTON
+// ==========================================
+
+function setLoading(loading) {
+
+    const button =
+        loginForm?.querySelector(
+            'button[type="submit"]'
         );
 
+    if (!button) return;
+
+
+    if (loading) {
+
+        button.disabled = true;
+
+        button.dataset.originalText =
+            button.textContent;
+
+        button.textContent =
+            "Logging in...";
+
+    } else {
+
+        button.disabled = false;
+
+        button.textContent =
+            button.dataset.originalText ||
+            "Login";
+
+    }
+
+}
+
+
+// ==========================================
+// REDIRECT BY ROLE
+// ==========================================
+
+function redirectByRole(user) {
+
+    if (!user) {
+
+        showMessage(
+            "User profile not found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const role =
+        String(user.role || "")
+            .trim()
+            .toLowerCase();
+
+
+    console.log(
+        "Logged in user:",
+        user
+    );
+
+
+    console.log(
+        "User role:",
+        role
+    );
+
+
+    switch (role) {
+
+
+        // ==================================
+        // ADMIN
+        // ==================================
+
+        case "admin":
+
+            window.location.replace(
+                "admin.html"
+            );
+
+            break;
+
+
+        // ==================================
+        // MANAGER
+        // ==================================
+
+        case "manager":
+
+            window.location.replace(
+                "admin.html"
+            );
+
+            break;
+
+
+        // ==================================
+        // CASHIER
+        // ==================================
+
+        case "cashier":
+
+            window.location.replace(
+                "cashier.html"
+            );
+
+            break;
+
+
+        // ==================================
+        // WAITER
+        // ==================================
+
+        case "waiter":
+
+            window.location.replace(
+                "waiter.html"
+            );
+
+            break;
+
+
+        // ==================================
+        // COOK
+        // ==================================
+
+        case "cook":
+
+            window.location.replace(
+                "kitchen.html"
+            );
+
+            break;
+
+
+        // ==================================
+        // UNKNOWN ROLE
+        // ==================================
+
+        default:
+
+            showMessage(
+                `Unknown user role: ${role || "not assigned"}`,
+                "error"
+            );
+
+            console.error(
+                "Unknown role:",
+                user
+            );
+
+            break;
+
+    }
+
+}
+
+
+// ==========================================
+// LOGIN
+// ==========================================
+
+async function handleLogin(event) {
+
+    event.preventDefault();
+
+
+    // --------------------------------------
+    // GET VALUES
+    // --------------------------------------
+
+    const email =
+        emailInput?.value
+            ?.trim()
+            .toLowerCase();
+
+
+    const password =
+        passwordInput?.value || "";
+
+
+    // --------------------------------------
+    // VALIDATION
+    // --------------------------------------
+
+    if (!email) {
+
+        showMessage(
+            "Please enter your email.",
+            "error"
+        );
+
+        emailInput?.focus();
+
+        return;
+
+    }
+
+
+    if (!password) {
+
+        showMessage(
+            "Please enter your password.",
+            "error"
+        );
+
+        passwordInput?.focus();
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // LOADING
+    // --------------------------------------
+
+    setLoading(true);
+
+
+    showMessage(
+        "Checking login...",
+        "loading"
+    );
+
+
+    try {
+
+
+        // ==================================
+        // LOGIN THROUGH AUTH.JS
+        // ==================================
 
         const result =
             await loginUser(
@@ -75,21 +283,37 @@ loginForm?.addEventListener(
             );
 
 
-        if (!result?.success) {
+        console.log(
+            "Login result:",
+            result
+        );
+
+
+        // ==================================
+        // LOGIN FAILED
+        // ==================================
+
+        if (
+            !result ||
+            result.success !== true
+        ) {
 
             showMessage(
                 result?.message ||
-                "Login failed."
+                "Login failed.",
+                "error"
             );
+
+            setLoading(false);
 
             return;
 
         }
 
 
-        // =================================
+        // ==================================
         // USER PROFILE
-        // =================================
+        // ==================================
 
         const user =
             result.user;
@@ -98,79 +322,96 @@ loginForm?.addEventListener(
         if (!user) {
 
             showMessage(
-                "User profile not found."
+                "User profile not found.",
+                "error"
             );
+
+            setLoading(false);
 
             return;
 
         }
 
 
-        // =================================
-        // ROLE
-        // =================================
+        // ==================================
+        // SUCCESS
+        // ==================================
 
-        const role =
-            String(
-                user.role || ""
-            )
-            .trim()
-            .toLowerCase();
+        showMessage(
+            `Welcome ${user.name || ""}`,
+            "success"
+        );
 
 
-        // =================================
-        // REDIRECT
-        // =================================
+        // ==================================
+        // ROLE REDIRECT
+        // ==================================
 
-        switch (role) {
+        setTimeout(
+            () => {
 
+                redirectByRole(user);
 
-            case "admin":
-
-                window.location.href =
-                    "admin.html";
-
-                break;
-
-
-            case "manager":
-
-                window.location.href =
-                    "admin.html";
-
-                break;
+            },
+            300
+        );
 
 
-            case "cashier":
+    } catch (error) {
 
-                window.location.href =
-                    "cashier.html";
-
-                break;
-
-
-            case "waiter":
-
-                window.location.href =
-                    "waiter.html";
-
-                break;
+        console.error(
+            "Login error:",
+            error
+        );
 
 
-            case "cook":
+        showMessage(
+            error?.message ||
+            "Unexpected login error.",
+            "error"
+        );
 
-                window.location.href =
-                    "kitchen.html";
 
-                break;
+        setLoading(false);
+
+    }
+
+}
 
 
-            default:
+// ==========================================
+// FORM EVENT
+// ==========================================
 
-                showMessage(
-                    "Unknown user role: " +
-                    role
-                );
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        handleLogin
+    );
+
+} else {
+
+    console.error(
+        "loginForm element not found."
+    );
+
+}
+
+
+// ==========================================
+// ENTER KEY SUPPORT
+// ==========================================
+
+passwordInput?.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            loginForm?.requestSubmit();
 
         }
 
@@ -178,23 +419,65 @@ loginForm?.addEventListener(
 );
 
 
-// =====================================
-// MESSAGE
-// =====================================
+// ==========================================
+// EMAIL ENTER SUPPORT
+// ==========================================
 
-function showMessage(message) {
+emailInput?.addEventListener(
+    "keydown",
+    (event) => {
 
-    if (messageBox) {
+        if (
+            event.key === "Enter"
+        ) {
 
-        messageBox.textContent =
-            message;
+            passwordInput?.focus();
 
-        return;
+        }
 
     }
+);
 
 
-    alert(message);
+// ==========================================
+// CLEAR MESSAGE WHEN USER TYPES
+// ==========================================
 
-}
+emailInput?.addEventListener(
+    "input",
+    () => {
+
+        if (messageBox) {
+
+            messageBox.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+passwordInput?.addEventListener(
+    "input",
+    () => {
+
+        if (messageBox) {
+
+            messageBox.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// PAGE READY
+// ==========================================
+
+console.log(
+    "Hameed's Bistro login.js loaded successfully."
+);
 ```
