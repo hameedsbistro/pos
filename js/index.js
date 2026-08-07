@@ -1,104 +1,46 @@
-// pos/js/index.js
+// js/index.js
 
 
-// MENU SYSTEM
+import { changeLanguage } from "./language.js";
 
+import { getLocalUser } from "./auth.js";
 
-const menuBtn = document.getElementById("menuBtn");
 
-const sideMenu = document.getElementById("sideMenu");
 
-const closeMenu = document.getElementById("closeMenu");
 
+// ===============================
+// CART COUNT
+// ===============================
 
 
-if(menuBtn){
+function updateCartCount(){
 
-    menuBtn.addEventListener("click",()=>{
 
-        sideMenu.classList.add("active");
 
-    });
+const cart =
 
-}
+JSON.parse(
 
+localStorage.getItem("cart")
 
+)
 
-if(closeMenu){
+||
 
-    closeMenu.addEventListener("click",()=>{
+[];
 
-        sideMenu.classList.remove("active");
 
-    });
 
-}
 
 
+let count = 0;
 
 
 
+cart.forEach(item=>{
 
 
-// LANGUAGE SYSTEM
-
-
-const languageBtn = document.getElementById("languageBtn");
-
-const languageBox = document.getElementById("languageBox");
-
-
-
-if(languageBtn){
-
-
-    languageBtn.addEventListener("click",()=>{
-
-
-        languageBox.classList.toggle("active");
-
-
-    });
-
-
-}
-
-
-
-
-
-
-// LANGUAGE SELECT
-
-
-const languageButtons = document.querySelectorAll(
-    "[data-lang]"
-);
-
-
-
-languageButtons.forEach(button=>{
-
-
-    button.addEventListener("click",()=>{
-
-
-        let lang = button.dataset.lang;
-
-
-
-        localStorage.setItem(
-            "language",
-            lang
-        );
-
-
-
-        location.reload();
-
-
-
-    });
+count += item.quantity;
 
 
 });
@@ -109,207 +51,25 @@ languageButtons.forEach(button=>{
 
 
 
-// REFRESH BUTTON
+const cartCount =
 
-
-const refreshBtn = document.getElementById("refreshBtn");
-
-
-if(refreshBtn){
-
-
-    refreshBtn.addEventListener("click",()=>{
-
-
-        location.reload();
-
-
-    });
-
-
-}
-
-
-
-
-
-
-
-// LOGIN BUTTON
-
-
-const loginBtn = document.getElementById("loginBtn");
-
-
-const menuLoginBtn = document.getElementById(
-    "menuLoginBtn"
-);
-
-
-
-function openLogin(){
-
-
-    window.location.href =
-    "login.html";
-
-
-}
-
-
-
-
-if(loginBtn){
-
-
-    loginBtn.addEventListener(
-        "click",
-        openLogin
-    );
-
-
-}
-
-
-
-if(menuLoginBtn){
-
-
-    menuLoginBtn.addEventListener(
-        "click",
-        openLogin
-    );
-
-
-}
-
-
-
-
-
-
-
-// CART BUTTON
-
-
-const cartBtn = document.getElementById(
-    "cartBtn"
-);
-
-
-
-if(cartBtn){
-
-
-    cartBtn.addEventListener("click",()=>{
-
-
-        window.location.href =
-        "customer/cart.html";
-
-
-    });
-
-
-}
-
-
-
-
-
-
-
-
-// CART COUNT
-
-
-function loadCartCount(){
-
-
-    let cart =
-    JSON.parse(
-        localStorage.getItem("cart")
-    )
-    ||
-    [];
-
-
-
-    let count = 0;
-
-
-
-    cart.forEach(item=>{
-
-
-        count += item.quantity;
-
-
-    });
-
-
-
-    let cartCount =
-    document.getElementById(
-        "cartCount"
-    );
-
-
-
-    if(cartCount){
-
-
-        cartCount.innerText =
-        count;
-
-
-    }
-
-
-
-}
-
-
-
-loadCartCount();
-
-
-
-
-
-
-
-// DINE IN BUTTON
-
-
-const dineInBtn =
 document.getElementById(
-    "dineInBtn"
+"cartCount"
 );
 
 
 
-if(dineInBtn){
 
 
-    dineInBtn.addEventListener(
-        "click",
-        ()=>{
+if(cartCount){
 
 
-            localStorage.setItem(
-                "orderType",
-                "Dine In"
-            );
+cartCount.innerText =
+count;
 
 
+}
 
-            window.location.href =
-            "customer/menu.html";
-
-
-        }
-    );
 
 
 }
@@ -321,37 +81,201 @@ if(dineInBtn){
 
 
 
-// TAKE AWAY BUTTON
+
+// ===============================
+// BUTTON EVENTS
+// ===============================
 
 
-const takeAwayBtn =
-document.getElementById(
-    "takeAwayBtn"
+
+document
+.getElementById("menuBtn")
+?.addEventListener(
+"click",
+()=>{
+
+
+window.location.href =
+"menu.html";
+
+
+});
+
+
+
+
+
+
+
+
+document
+.getElementById("cartBtn")
+?.addEventListener(
+"click",
+()=>{
+
+
+window.location.href =
+"cart.html";
+
+
+});
+
+
+
+
+
+
+
+
+
+document
+.getElementById("loginBtn")
+?.addEventListener(
+"click",
+()=>{
+
+
+const user =
+getLocalUser();
+
+
+
+if(user){
+
+
+
+switch(user.role){
+
+
+case "admin":
+
+case "manager":
+
+window.location.href =
+"admin.html";
+
+break;
+
+
+
+case "cashier":
+
+window.location.href =
+"cashier.html";
+
+break;
+
+
+
+case "waiter":
+
+window.location.href =
+"waiter.html";
+
+break;
+
+
+
+case "cook":
+
+window.location.href =
+"kitchen.html";
+
+break;
+
+
+
+default:
+
+window.location.href =
+"profile.html";
+
+
+}
+
+
+
+}
+
+else{
+
+
+window.location.href =
+"login.html";
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+
+
+document
+.getElementById("refreshBtn")
+?.addEventListener(
+"click",
+()=>{
+
+
+location.reload();
+
+
+});
+
+
+
+
+
+
+
+
+
+document
+.getElementById("languageBtn")
+?.addEventListener(
+"click",
+()=>{
+
+
+const lang =
+
+prompt(
+"Language: en / ms / bn / hi / ta / zh"
 );
 
 
 
-if(takeAwayBtn){
+if(lang){
 
 
-    takeAwayBtn.addEventListener(
-        "click",
-        ()=>{
-
-
-            localStorage.setItem(
-                "orderType",
-                "Take Away"
-            );
-
-
-
-            window.location.href =
-            "customer/menu.html";
-
-
-        }
-    );
+changeLanguage(lang);
 
 
 }
+
+
+
+});
+
+
+
+
+
+
+
+
+// ===============================
+// START
+// ===============================
+
+
+updateCartCount();
