@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Invoice - Hameed's Bistro
+</title>
+
+
+<link rel="stylesheet" href="css/invoice.css">
+
+</head>
+
+
+<body>
+
+
+<div class="invoice-container">
+
+
+<header class="invoice-header">
+
+
+<img 
+src="images/logo.png"
+class="invoice-logo">
+
+
+
+<h1>
+Hameed's Bistro
+</h1>
+
+
+<h3>
+Payment Invoice
+</h3>
+
+
+
+</header>
+
+
+
+
+
+
+
+<div class="invoice-info">
+
+
+<p>
+Invoice No:
+<span id="invoiceNo">
+---
+</span>
+</p>
+
+
+
+<p>
+Date:
+<span id="invoiceDate">
+---
+</span>
+</p>
+
+
+
+<p>
+Customer:
+<span id="customerName">
+Walk In Customer
+</span>
+</p>
+
+
+
+
+<p>
+Table:
+<span id="tableNo">
+---
+</span>
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Item
+</th>
+
+
+<th>
+Qty
+</th>
+
+
+<th>
+Amount
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody id="invoiceItems">
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+
+
+
+
+
+
+<h2 class="total">
+
+
+Total:
+
+RM
+
+<span id="invoiceTotal">
+0.00
+</span>
+
+
+</h2>
+
+
+
+
+
+
+
+<p>
+
+Payment Method:
+
+<span id="paymentMethod">
+---
+</span>
+
+</p>
+
+
+
+
+
+
+<button id="printBtn">
+
+🖨 Print Invoice
+
+</button>
+
+
+
+<button id="backBtn">
+
+← Back
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<script type="module" src="js/invoice.js"></script>
+
+
+</body>
+
+
+</html>
