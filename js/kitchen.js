@@ -1,28 +1,9 @@
-// root/js/kitchen.js
-
 import { supabase } from "./supabase.js";
 
 
 
-let currentStatus = "Accepted";
-
-let currentSection = "";
-
-
-
-
-
-
-
-// ===============================
-// CHECK USER
-// ===============================
-
-
-function checkUser(){
-
-
-const user = JSON.parse(
+const user =
+JSON.parse(
 localStorage.getItem("user")
 );
 
@@ -30,9 +11,7 @@ localStorage.getItem("user")
 
 if(!user){
 
-window.location.href="../login.html";
-
-return;
+window.location.href="kitchen-login.html";
 
 }
 
@@ -40,55 +19,13 @@ return;
 
 
 
-if(
-user.role !== "cook" &&
-user.role !== "admin" &&
-user.role !== "manager"
-){
 
-
-alert("Access Denied");
-
-window.location.href="../login.html";
-
-return;
-
-
-}
-
-
-
-
-
-const name =
-document.getElementById("userName");
-
-
-const role =
-document.getElementById("userRole");
-
-
-
-
-if(name){
-
-name.innerText =
+document.getElementById("userName").innerText =
 user.name || "---";
 
-}
 
-
-
-if(role){
-
-role.innerText =
-user.role || "---";
-
-}
-
-
-
-}
+document.getElementById("userRole").innerText =
+user.role || "cook";
 
 
 
@@ -96,11 +33,19 @@ user.role || "---";
 
 
 
+let selectedSection="";
+
+let currentStatus="Accepted";
 
 
-// ===============================
+
+
+
+
+
+
+
 // LOAD KITCHEN SECTIONS
-// ===============================
 
 
 async function loadSections(){
@@ -108,23 +53,21 @@ async function loadSections(){
 
 
 const {
+
 data,
+
 error
 
-}= await supabase
-
+}=await supabase
 
 .from("kitchen_sections")
 
-
 .select("*")
-
 
 .eq(
 "status",
 "active"
 );
-
 
 
 
@@ -149,40 +92,18 @@ document.getElementById(
 
 
 
-
-
-if(!select)
-return;
-
-
-
-
-
-select.innerHTML = `
-
-<option value="">
-
-All Stations
-
-</option>
-
-`;
-
-
-
-
-
-
 data.forEach(section=>{
 
 
-select.innerHTML += `
+select.innerHTML +=`
+
 
 <option value="${section.section_name}">
 
 ${section.section_name}
 
 </option>
+
 
 `;
 
@@ -192,26 +113,6 @@ ${section.section_name}
 
 
 
-
-
-
-
-select.onchange = ()=>{
-
-
-currentSection =
-select.value;
-
-
-
-loadOrders();
-
-
-
-};
-
-
-
 }
 
 
@@ -222,15 +123,57 @@ loadOrders();
 
 
 
+document
+
+.getElementById("sectionSelect")
+
+.onchange=(e)=>{
+
+
+selectedSection=e.target.value;
+
+
+loadOrders();
+
+
+};
 
 
 
-// ===============================
+
+
+
+
+
+
 // LOAD ORDERS
-// ===============================
 
 
 async function loadOrders(){
+
+
+
+let query =
+supabase
+
+.from("orders")
+
+.select("*")
+
+.eq(
+"status",
+currentStatus
+)
+
+.order(
+"created_at",
+{
+ascending:true
+}
+);
+
+
+
 
 
 
@@ -240,43 +183,7 @@ data,
 
 error
 
-}= await supabase
-
-
-.from("orders")
-
-
-.select(`
-
-*,
-
-order_items(*)
-
-`)
-
-
-.eq(
-
-"status",
-
-currentStatus
-
-)
-
-
-.order(
-
-"created_at",
-
-{
-
-ascending:false
-
-}
-
-);
-
-
+}=await query;
 
 
 
@@ -294,31 +201,35 @@ return;
 
 
 
+showOrders(data);
 
 
 
-const container =
+}
+
+
+
+
+
+
+
+
+
+// SHOW ORDERS
+
+
+function showOrders(data){
+
+
+
+const box =
 document.getElementById(
 "orderContainer"
 );
 
 
 
-
-
-if(!container)
-return;
-
-
-
-
-
-
-container.innerHTML="";
-
-
-
-
+box.innerHTML="";
 
 
 
@@ -336,36 +247,23 @@ order.order_items || [];
 
 
 
-
-// STATION FILTER
-
-
-if(currentSection){
+// station filter
 
 
-items = items.filter(item=>{
+if(selectedSection){
 
 
-return (
+items = items.filter(item=>
 
-item.section_name === currentSection
+item.section === selectedSection
 
 );
 
 
-});
 
-
-
-
-
-if(items.length===0){
-
+if(items.length===0)
 return;
 
-}
-
-
 
 }
 
@@ -377,101 +275,88 @@ return;
 
 
 
-const card =
-document.createElement(
-"div"
-);
+box.innerHTML +=`
 
 
-
-card.className =
-"order-card";
-
-
-
-
-
-
-
-
-card.innerHTML = `
-
-
-<div class="order-header">
+<div class="kitchen-order">
 
 
 <h2>
 
-Order #${order.order_number || order.id}
+Table:
+
+${order.table_number}
 
 </h2>
 
 
+
 <p>
 
-Table:
+Order Time:
 
-${order.table_number || "Take Away"}
+${new Date(
+order.created_at
+)
+.toLocaleTimeString()}
 
 </p>
 
 
 
-</div>
 
 
-
-<hr>
-
-
-`;
+<div>
 
 
-
-
-
-
-
-
-
-items.forEach(item=>{
-
-
-card.innerHTML += `
+${items.map(item=>`
 
 
 <div class="kitchen-item">
 
 
-<h3>
-
 ${item.item_name}
 
-</h3>
-
-
-
-<p>
-
-Quantity:
+×
 
 ${item.quantity}
 
-</p>
+
+</div>
 
 
 
-<p>
+`).join("")}
 
-Note:
 
-${item.item_note || "-"}
+</div>
 
-</p>
+
+
+
+
+<button onclick="updateStatus('${order.id}','Preparing')">
+
+Preparing
+
+</button>
+
+
+
+
+
+<button onclick="updateStatus('${order.id}','Ready')">
+
+Ready
+
+</button>
+
+
 
 
 
 </div>
+
 
 
 `;
@@ -482,53 +367,6 @@ ${item.item_note || "-"}
 
 
 
-
-
-
-
-
-
-
-// BUTTON
-
-
-if(currentStatus==="Accepted"){
-
-
-const btn =
-document.createElement(
-"button"
-);
-
-
-
-btn.innerText =
-"START PREPARING";
-
-
-
-
-btn.onclick = ()=>{
-
-
-updateStatus(
-
-order.id,
-
-"Preparing"
-
-);
-
-
-
-};
-
-
-
-card.appendChild(btn);
-
-
-
 }
 
 
@@ -539,128 +377,10 @@ card.appendChild(btn);
 
 
 
-if(currentStatus==="Preparing"){
-
-
-const btn =
-document.createElement(
-"button"
-);
-
-
-
-btn.innerText =
-"READY";
-
-
-
-
-btn.onclick = ()=>{
-
-
-updateStatus(
-
-order.id,
-
-"Ready"
-
-);
-
-
-
-};
-
-
-
-card.appendChild(btn);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-if(currentStatus==="Ready"){
-
-
-const btn =
-document.createElement(
-"button"
-);
-
-
-
-btn.innerText =
-"COMPLETED";
-
-
-
-
-btn.onclick = ()=>{
-
-
-updateStatus(
-
-order.id,
-
-"Completed"
-
-);
-
-
-
-};
-
-
-
-card.appendChild(btn);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-container.appendChild(card);
-
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-// ===============================
 // UPDATE STATUS
-// ===============================
 
 
-async function updateStatus(
+window.updateStatus = async function(
 id,
 status
 ){
@@ -671,11 +391,9 @@ const {
 
 error
 
-}= await supabase
-
+}=await supabase
 
 .from("orders")
-
 
 .update({
 
@@ -683,14 +401,11 @@ status:status
 
 })
 
-
 .eq(
-
 "id",
-
 id
-
 );
+
 
 
 
@@ -706,13 +421,11 @@ return;
 
 
 
-
-
 loadOrders();
 
 
 
-}
+};
 
 
 
@@ -722,31 +435,22 @@ loadOrders();
 
 
 
-
-
-
-// ===============================
 // STATUS BUTTONS
-// ===============================
 
 
 document.getElementById(
 "newBtn"
 )
-?.addEventListener(
-"click",
-()=>{
+
+.onclick=()=>{
 
 
 currentStatus="Accepted";
 
-
 loadOrders();
 
 
-
-});
-
+};
 
 
 
@@ -755,21 +459,16 @@ loadOrders();
 document.getElementById(
 "readyBtn"
 )
-?.addEventListener(
-"click",
-()=>{
+
+.onclick=()=>{
 
 
 currentStatus="Ready";
 
-
 loadOrders();
 
 
-
-});
-
-
+};
 
 
 
@@ -778,20 +477,16 @@ loadOrders();
 document.getElementById(
 "completedBtn"
 )
-?.addEventListener(
-"click",
-()=>{
+
+.onclick=()=>{
 
 
 currentStatus="Completed";
 
-
 loadOrders();
 
 
-
-});
-
+};
 
 
 
@@ -801,27 +496,20 @@ loadOrders();
 
 
 
-
-
-// ===============================
 // REFRESH
-// ===============================
 
 
 document.getElementById(
 "refreshBtn"
 )
-?.addEventListener(
-"click",
-()=>{
+
+.onclick=()=>{
 
 
-location.reload();
+loadOrders();
 
 
-
-});
-
+};
 
 
 
@@ -830,20 +518,14 @@ location.reload();
 
 
 
-
-
-
-// ===============================
 // LOGOUT
-// ===============================
 
 
 document.getElementById(
 "logoutBtn"
 )
-?.addEventListener(
-"click",
-()=>{
+
+.onclick=()=>{
 
 
 localStorage.removeItem(
@@ -851,13 +533,11 @@ localStorage.removeItem(
 );
 
 
+window.location.href=
+"kitchen-login.html";
 
-window.location.href="../login.html";
 
-
-
-});
-
+};
 
 
 
@@ -867,19 +547,40 @@ window.location.href="../login.html";
 
 
 
-
-// ===============================
-// LIVE UPDATE
-// ===============================
+// REALTIME
 
 
-setInterval(()=>{
+supabase
+
+.channel(
+"kitchen-orders"
+)
+
+.on(
+
+"postgres_changes",
+
+{
+
+event:"*",
+
+schema:"public",
+
+table:"orders"
+
+},
+
+()=>{
 
 
 loadOrders();
 
 
-},5000);
+}
+
+)
+
+.subscribe();
 
 
 
@@ -887,14 +588,6 @@ loadOrders();
 
 
 
-
-
-
-
-// START
-
-
-checkUser();
 
 loadSections();
 
