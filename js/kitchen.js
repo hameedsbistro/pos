@@ -1,166 +1,160 @@
 import { supabase } from "./supabase.js";
 
 
-// ===============================
-// ELEMENTS
-// ===============================
-
-const userName =
-document.getElementById("userName");
-
-const userRole =
-document.getElementById("userRole");
-
-
-const newOrders =
-document.getElementById("newOrders");
-
-const readyOrders =
-document.getElementById("readyOrders");
-
-const completedOrders =
-document.getElementById("completedOrders");
-
-
-const newOrderView =
-document.getElementById("newOrderView");
-
-const readyView =
-document.getElementById("readyView");
-
-const completedView =
-document.getElementById("completedView");
-
-
-const readyBtn =
-document.getElementById("readyBtn");
-
-const completedBtn =
-document.getElementById("completedBtn");
-
-const refreshBtn =
-document.getElementById("refreshBtn");
-
-
-
-// ===============================
 // USER
-// ===============================
 
-const kitchenUser =
+const user =
 JSON.parse(
 localStorage.getItem("kitchenUser")
 );
 
 
-if(!kitchenUser){
+if(!user){
 
 window.location.href="/kitchen-login.html";
 
 }
 
 
-userName.innerText =
-kitchenUser.name || kitchenUser.email;
+
+// ELEMENTS
+
+const orderContainer =
+document.getElementById("orderContainer");
 
 
-userRole.innerText =
-kitchenUser.role;
+const orderTitle =
+document.getElementById("orderTitle");
 
 
+const sectionSelect =
+document.getElementById("sectionSelect");
 
 
+const readyBtn =
+document.getElementById("readyBtn");
 
 
-// ===============================
-// VIEW CONTROL
-// ===============================
+const completedBtn =
+document.getElementById("completedBtn");
 
 
-function showNew(){
-
-newOrderView.classList.remove("hidden");
-
-readyView.classList.add("hidden");
-
-completedView.classList.add("hidden");
-
-loadOrders("New",newOrders);
-
-}
+const refreshBtn =
+document.getElementById("refreshBtn");
 
 
 
-function showReady(){
+let currentStatus = "New";
 
-newOrderView.classList.add("hidden");
-
-readyView.classList.remove("hidden");
-
-completedView.classList.add("hidden");
-
-loadOrders("Ready",readyOrders);
-
-}
-
-
-
-function showCompleted(){
-
-newOrderView.classList.add("hidden");
-
-readyView.classList.add("hidden");
-
-completedView.classList.remove("hidden");
-
-loadOrders("Completed",completedOrders);
-
-}
+let currentSection = "";
 
 
 
 
 
+// =========================
+// LOAD KITCHEN SECTIONS
+// =========================
 
 
-// ===============================
-// LOAD ORDERS
-// ===============================
+async function loadSections(){
 
 
-async function loadOrders(status,container){
-
-
-const {
-
-data,
-error
-
-}=
+const {data,error}=
 
 await supabase
+
+.from("kitchen_sections")
+
+.select("*")
+
+.eq(
+"status",
+"active"
+);
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+sectionSelect.innerHTML =
+
+`
+<option value="">
+All Stations
+</option>
+`;
+
+
+
+data.forEach(section=>{
+
+
+let option =
+document.createElement("option");
+
+
+option.value =
+section.section_name;
+
+
+option.textContent =
+section.section_name;
+
+
+
+sectionSelect.appendChild(option);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+// =========================
+// LOAD ORDERS
+// =========================
+
+
+async function loadOrders(){
+
+
+
+let query =
+
+supabase
 
 .from("orders")
 
 .select(`
 
-*
+*,
 
-,
-
-order_items (
+order_items(
 
 id,
 
-"itemName",
+itemName,
 
 quantity,
 
-price,
+item_note,
 
-total,
-
-item_note
+item_id
 
 )
 
@@ -168,7 +162,7 @@ item_note
 
 .eq(
 "status",
-status
+currentStatus
 )
 
 .order(
@@ -179,6 +173,12 @@ ascending:false
 );
 
 
+
+
+
+const {data,error}=
+
+await query;
 
 
 
@@ -193,10 +193,22 @@ return;
 
 
 
-renderOrders(
-data,
-container
+
+if(currentSection){
+
+
+data = await filterByKitchen(
+data
 );
+
+
+}
+
+
+
+
+
+displayOrders(data);
 
 
 
@@ -206,33 +218,120 @@ container
 
 
 
+// =========================
+// FILTER BY SECTION
+// =========================
+
+
+async function filterByKitchen(orders){
 
 
 
-// ===============================
-// RENDER ORDER CARD
-// ===============================
+const {data:mappings}=
+
+await supabase
+
+.from("kitchen_mapping")
+
+.select("*")
+
+.eq(
+"section",
+currentSection
+);
 
 
-function renderOrders(
-orders,
-container
-){
 
 
-container.innerHTML="";
+if(!mappings)
+return [];
+
+
+
+
+const categories =
+
+mappings.map(
+m=>m.category
+);
+
+
+
+
+
+const result=[];
+
+
+
+
+
+orders.forEach(order=>{
+
+
+let keep=false;
+
+
+
+order.order_items.forEach(item=>{
+
+
+if(categories.includes(item.category)){
+
+keep=true;
+
+}
+
+
+});
+
+
+
+
+if(keep){
+
+result.push(order);
+
+}
+
+
+
+});
+
+
+
+
+return result;
+
+
+
+}
+
+
+
+
+
+// =========================
+// DISPLAY ORDERS
+// =========================
+
+
+function displayOrders(orders){
+
+
+
+orderContainer.innerHTML="";
 
 
 
 if(!orders.length){
 
 
-container.innerHTML=
+orderContainer.innerHTML=
 
 `
-<h3>
+<h2>
 No Orders
-</h3>
+</h2>
 `;
 
 return;
@@ -242,25 +341,26 @@ return;
 
 
 
+
 orders.forEach(order=>{
+
 
 
 let items="";
 
 
 
-order.order_items?.forEach(item=>{
+order.order_items.forEach(item=>{
+
 
 
 items +=
 
 `
 
-<div class="order-item">
+<div class="item-row">
 
-<b>
 ${item.quantity} × ${item.itemName}
-</b>
 
 
 ${
@@ -300,6 +400,7 @@ ${item.item_note}
 
 
 
+
 const card =
 document.createElement("div");
 
@@ -309,65 +410,41 @@ card.className =
 
 
 
+card.innerHTML =
 
-card.innerHTML=
 
 `
 
-<div class="order-meta">
-
-Order No:
-<b>
-${order.orderNumber}
-</b>
-
-</div>
+<h3>
+Order No: ${order.orderNumber}
+</h3>
 
 
-<div class="order-meta">
+<div class="order-info">
 
 Table:
-<b>
 ${order.tableNumber || "-"}
-
-</b>
 
 </div>
 
 
-
-<div class="order-meta">
+<div class="order-info">
 
 Ordered By:
 
-<b>
-
 ${
-
-order.ordered_by_type === "Customer"
-
+order.ordered_by_name
 ?
-
-"Customer"
-
+order.ordered_by_name
 :
-
-order.ordered_by_name || "-"
-
+order.ordered_by_type
 }
-
-</b>
 
 </div>
 
 
 
 <hr>
-
-
-<h3>
-Items
-</h3>
 
 
 ${items}
@@ -377,31 +454,13 @@ ${items}
 <hr>
 
 
-<div class="order-meta">
-
-Date:
+<div class="order-time">
 
 ${
 
 new Date(order.created_at)
 
-.toLocaleDateString()
-
-}
-
-</div>
-
-
-
-<div class="order-meta">
-
-Time:
-
-${
-
-new Date(order.created_at)
-
-.toLocaleTimeString()
+.toLocaleString()
 
 }
 
@@ -413,7 +472,7 @@ new Date(order.created_at)
 
 
 
-container.appendChild(card);
+orderContainer.appendChild(card);
 
 
 
@@ -428,81 +487,85 @@ container.appendChild(card);
 
 
 
-
-// ===============================
-// STATUS UPDATE
-// ===============================
-
-
-async function updateStatus(id,status){
-
-
-
-const {error}=
-
-await supabase
-
-.from("orders")
-
-.update({
-
-status:status
-
-})
-
-.eq(
-"id",
-id
-);
-
-
-
-if(error){
-
-console.log(error);
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-// ===============================
+// =========================
 // BUTTONS
-// ===============================
+// =========================
 
 
-readyBtn.onclick =
-showReady;
+readyBtn.onclick=()=>{
 
 
-completedBtn.onclick =
-showCompleted;
+currentStatus="Ready";
+
+orderTitle.innerText="READY";
+
+loadOrders();
+
+
+};
 
 
 
-refreshBtn.onclick =
-showNew;
+
+
+completedBtn.onclick=()=>{
+
+
+currentStatus="Completed";
+
+orderTitle.innerText="COMPLETED";
+
+loadOrders();
+
+
+};
 
 
 
 
 
-// ===============================
+refreshBtn.onclick=()=>{
+
+
+currentStatus="New";
+
+orderTitle.innerText="NEW ORDERS";
+
+loadOrders();
+
+
+};
+
+
+
+
+
+
+sectionSelect.onchange=(e)=>{
+
+
+currentSection =
+e.target.value;
+
+
+loadOrders();
+
+
+
+};
+
+
+
+
+
+
+
 // REALTIME
-// ===============================
 
 
 supabase
 
-.channel("kitchen-orders-live")
+.channel("kitchen-live")
 
 .on(
 
@@ -521,10 +584,7 @@ table:"orders"
 ()=>{
 
 
-loadOrders(
-"New",
-newOrders
-);
+loadOrders();
 
 
 }
@@ -537,6 +597,11 @@ newOrders
 
 
 
+
+
 // START
 
-showNew();
+
+loadSections();
+
+loadOrders();
