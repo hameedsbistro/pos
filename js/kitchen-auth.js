@@ -7,7 +7,9 @@ async function checkKitchenAccess(){
 
 
 const {
-data:{user}
+data:{
+user
+}
 
 }= await supabase.auth.getUser();
 
@@ -15,12 +17,10 @@ data:{user}
 
 
 
-// NO LOGIN
-
 if(!user){
 
 
-window.location.href="../kitchen-login.html";
+window.location.href="/kitchen-login.html";
 
 
 return;
@@ -32,10 +32,6 @@ return;
 
 
 
-
-
-
-// GET USER ROLE
 
 
 const {
@@ -51,12 +47,14 @@ error
 .select("*")
 
 .eq(
+
 "email",
+
 user.email
+
 )
 
 .single();
-
 
 
 
@@ -69,13 +67,15 @@ if(error || !userData){
 await supabase.auth.signOut();
 
 
-window.location.href="../kitchen-login.html";
+window.location.href="/kitchen-login.html";
 
 
 return;
 
 
 }
+
+
 
 
 
@@ -100,12 +100,8 @@ userData.role !== "cook"
 await supabase.auth.signOut();
 
 
-alert(
-"Kitchen access denied"
-);
 
-
-window.location.href="../kitchen-login.html";
+window.location.href="/kitchen-login.html";
 
 
 return;
@@ -119,48 +115,41 @@ return;
 
 
 
-// SHOW USER
 
 
-const nameElement =
-
-document.getElementById(
-"userName"
-);
+// SHOW USER NAME
 
 
 
-const roleElement =
+const name =
+document.getElementById("userName");
 
-document.getElementById(
-"userRole"
-);
+
+const role =
+document.getElementById("userRole");
 
 
 
 
 
-if(nameElement)
+if(name){
 
-nameElement.innerText =
-userData.name;
+name.innerText=userData.name;
 
-
-
+}
 
 
-if(roleElement)
 
-roleElement.innerText =
-userData.role;
+if(role){
 
+role.innerText=userData.role;
 
+}
 
 
 
 
 
-// SAVE CURRENT USER
 
 
 localStorage.setItem(
@@ -170,6 +159,7 @@ localStorage.setItem(
 JSON.stringify(userData)
 
 );
+
 
 
 
@@ -187,7 +177,9 @@ JSON.stringify(userData)
 
 
 document
+
 .getElementById("logoutBtn")
+
 ?.addEventListener(
 
 "click",
@@ -195,9 +187,7 @@ document
 async()=>{
 
 
-
 await supabase.auth.signOut();
-
 
 
 localStorage.removeItem(
@@ -206,14 +196,13 @@ localStorage.removeItem(
 
 
 
-window.location.href="../kitchen-login.html";
+window.location.href="/kitchen-login.html";
+
 
 
 }
 
 );
-
-
 
 
 
