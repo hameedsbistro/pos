@@ -1,185 +1,123 @@
-// js/waiter.js
-
-
 import { supabase } from "./supabase.js";
 
 
 
-let currentTable = null;
+let selectedTable="";
 
-let cart = [];
-
-
+let orderItems=[];
 
 
 
+// USER
 
-// USER CHECK
-
-
-async function checkUser(){
-
-
-const user = JSON.parse(
-
-localStorage.getItem("user")
-
-);
+const user =
+JSON.parse(localStorage.getItem("user"));
 
 
 
 if(!user){
 
-window.location.href="login.html";
-
-return;
+location.href="login.html";
 
 }
-
 
 
 
 if(
-user.role !== "waiter" &&
-user.role !== "manager" &&
-user.role !== "admin"
-
+user.role!=="waiter" &&
+user.role!=="admin" &&
+user.role!=="manager"
 ){
 
 alert("Access Denied");
 
-window.location.href="login.html";
-
-return;
+location.href="login.html";
 
 }
 
 
 
-document.getElementById("userName").innerText =
-user.name;
+userName.innerText=user.name;
 
-
-document.getElementById("userRole").innerText =
-user.role;
-
-
-
-}
+userRole.innerText=user.role;
 
 
 
 
 
-// LOAD TABLES
-
-
-async function loadTables(){
-
-
-const {data,error}=await supabase
-
-.from("tables")
-
-.select("*")
-
-.order("table_number");
 
 
 
-if(error){
-
-console.log(error);
-
-return;
-
-}
+// CREATE TABLE
 
 
+function createTables(){
 
 
-const grid=document.getElementById(
-"tableGrid"
+createGroup(
+"indoorTables",
+"Indoor",
+"A",
+30
 );
 
 
-grid.innerHTML="";
-
-
-
-data.forEach(table=>{
-
-
-let div=document.createElement("div");
-
-
-div.className="table-card";
-
-
-
-if(table.status==="pending"){
-
-div.classList.add(
-"table-pending"
+createGroup(
+"outdoorTables",
+"Outdoor",
+"B",
+30
 );
 
-}
 
-else if(table.status==="ready"){
-
-div.classList.add(
-"table-ready"
+createGroup(
+"floorTables",
+"First Floor",
+"C",
+30
 );
 
+
 }
 
-else if(table.status==="completed"){
 
-div.classList.add(
-"table-completed"
+
+
+
+function createGroup(id,title,prefix,total){
+
+
+
+let box=document.getElementById(id);
+
+
+
+for(let i=1;i<=total;i++){
+
+
+
+let btn=document.createElement("button");
+
+
+btn.className="table-btn";
+
+
+btn.innerText=
+title+" "+prefix+i;
+
+
+
+btn.onclick=()=>openTable(
+title+" "+prefix+i
 );
 
-}
 
-else{
 
-div.classList.add(
-"table-empty"
-);
+box.appendChild(btn);
+
+
 
 }
-
-
-
-
-div.innerHTML=`
-
-<h3>${table.table_number}</h3>
-
-<p>
-${table.status}
-</p>
-
-`;
-
-
-
-
-div.onclick=()=>{
-
-
-openOrder(table);
-
-
-};
-
-
-
-grid.appendChild(div);
-
-
-
-});
 
 
 
@@ -192,21 +130,24 @@ grid.appendChild(div);
 
 
 
-// OPEN ORDER
+
+// OPEN TABLE
 
 
-function openOrder(table){
+function openTable(table){
 
 
-currentTable = table;
+selectedTable=table;
 
 
-cart=[];
+document.getElementById(
+"selectedTable"
+).innerText=table;
 
 
 
 document.getElementById(
-"orderPanel"
+"orderModal"
 ).style.display="block";
 
 
@@ -223,22 +164,17 @@ loadMenu();
 
 
 
+
 // CLOSE
 
 
-document.getElementById(
-"closeOrderBtn"
-)
-.onclick=()=>{
+closeBtn.onclick=()=>{
 
 
-document.getElementById(
-"orderPanel"
-).style.display="none";
+orderModal.style.display="none";
 
 
 };
-
 
 
 
@@ -254,48 +190,33 @@ document.getElementById(
 async function loadMenu(){
 
 
-const {data,error}=await supabase
 
-.from("menu_items")
+const {
 
-.select("*")
+data
 
-.eq("status","active");
+}=await supabase
 
+.from("menu")
 
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
+.select("*");
 
 
 
-const box=document.getElementById(
-"menuItems"
-);
 
 
-box.innerHTML="";
+menuItems.innerHTML="";
 
 
 
 data.forEach(item=>{
 
 
-let div=document.createElement(
-"div"
-);
+menuItems.innerHTML += `
 
 
-div.className="menu-item";
+<div class="menu-item">
 
-
-
-div.innerHTML=`
 
 <span>
 
@@ -304,30 +225,17 @@ ${item.item_name}
 </span>
 
 
-<button>
+<button onclick='addItem(${JSON.stringify(item)})'>
 
-Add
++
 
 </button>
 
+
+</div>
+
+
 `;
-
-
-
-
-div.querySelector("button")
-
-.onclick=()=>{
-
-
-addItem(item);
-
-
-};
-
-
-
-box.appendChild(div);
 
 
 
@@ -343,33 +251,11 @@ box.appendChild(div);
 
 
 
-// ADD ITEM
+
+window.addItem=(item)=>{
 
 
-function addItem(item){
-
-
-
-let exist = cart.find(
-
-x=>x.id===item.id
-
-);
-
-
-
-if(exist){
-
-exist.quantity++;
-
-}
-
-else{
-
-
-cart.push({
-
-id:item.id,
+orderItems.push({
 
 item_name:item.item_name,
 
@@ -381,15 +267,10 @@ note:""
 });
 
 
-}
+showItems();
 
 
-
-showCart();
-
-
-
-}
+};
 
 
 
@@ -398,107 +279,32 @@ showCart();
 
 
 
-// SHOW CART
+function showItems(){
 
 
-function showCart(){
-
-
-const box=document.getElementById(
+orderItemsDiv=document.getElementById(
 "orderItems"
 );
 
 
-box.innerHTML="";
+orderItemsDiv.innerHTML="";
 
 
 
-cart.forEach((item,index)=>{
+orderItems.forEach(i=>{
 
 
-let div=document.createElement(
-"div"
-);
+orderItemsDiv.innerHTML +=`
 
+<div class="order-item">
 
-div.className="order-item";
+${i.item_name}
 
-
-
-div.innerHTML=`
-
-<b>
-${item.item_name}
-</b>
-
-<br>
-
-Quantity:
-${item.quantity}
-
-
-<button class="plus">
-+
-</button>
-
-
-<button class="minus">
--
-</button>
-
+</div>
 
 `;
 
-
-
-
-
-div.querySelector(".plus")
-
-.onclick=()=>{
-
-item.quantity++;
-
-showCart();
-
-};
-
-
-
-
-div.querySelector(".minus")
-
-.onclick=()=>{
-
-
-if(item.quantity>1){
-
-item.quantity--;
-
-}
-
-else{
-
-cart.splice(index,1);
-
-}
-
-
-showCart();
-
-
-};
-
-
-
-
-
-box.appendChild(div);
-
-
-
 });
-
 
 
 }
@@ -514,19 +320,12 @@ box.appendChild(div);
 // SEND ORDER
 
 
-document.getElementById(
-"sendOrderBtn"
-)
-
-.onclick=async()=>{
+sendOrderBtn.onclick=async()=>{
 
 
+if(orderItems.length===0){
 
-if(cart.length===0){
-
-alert(
-"Please add item"
-);
+alert("Add Item");
 
 return;
 
@@ -534,39 +333,28 @@ return;
 
 
 
-let user =
-JSON.parse(
-localStorage.getItem("user")
-);
 
 
+const {
 
+error
 
-
-// CREATE ORDER
-
-
-const {data:order,error}=await supabase
+}=await supabase
 
 .from("orders")
 
 .insert({
 
-table_number:
-currentTable.table_number,
+table_number:selectedTable,
+
+status:"Accepted",
+
+order_items:orderItems
 
 
-status:"New",
+});
 
 
-created_by:user.id
-
-
-})
-
-.select()
-
-.single();
 
 
 
@@ -583,55 +371,14 @@ return;
 
 
 
-// INSERT ITEMS
-
-
-let items=cart.map(item=>({
-
-
-order_id:order.id,
-
-
-item_name:item.item_name,
-
-
-quantity:item.quantity,
-
-
-item_note:item.note
-
-
-}));
+alert("Order Sent To Kitchen");
 
 
 
+orderModal.style.display="none";
 
 
-await supabase
-
-.from("order_items")
-
-.insert(items);
-
-
-
-
-
-
-alert(
-"Order Sent"
-);
-
-
-
-document.getElementById(
-"orderPanel"
-).style.display="none";
-
-
-
-loadTables();
-
+orderItems=[];
 
 
 };
@@ -647,17 +394,12 @@ loadTables();
 // REFRESH
 
 
-document.getElementById(
-"refreshBtn"
-)
-
-.onclick=()=>{
-
+refreshBtn.onclick=()=>{
 
 location.reload();
 
-
 };
+
 
 
 
@@ -668,19 +410,13 @@ location.reload();
 // LOGOUT
 
 
-document.getElementById(
-"logoutBtn"
-)
-
-.onclick=()=>{
+logoutBtn.onclick=()=>{
 
 
-localStorage.removeItem(
-"user"
-);
+localStorage.removeItem("user");
 
 
-window.location.href="login.html";
+location.href="login.html";
 
 
 };
@@ -691,7 +427,4 @@ window.location.href="login.html";
 
 
 
-
-checkUser();
-
-loadTables();
+createTables();
