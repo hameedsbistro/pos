@@ -1,114 +1,51 @@
 // pos/js/cart.js
 
-
 import { changeLanguage } from "./language.js";
 
 
-
 let cart =
-
-JSON.parse(
-
-localStorage.getItem("cart")
-
-)
-
+JSON.parse(localStorage.getItem("cart"))
 ||
-
 [];
 
 
 
-
-
-
-
-
-
 const cartItems =
-
-document.getElementById(
-
-"cartItems"
-
-);
-
-
-
-
+document.getElementById("cartItems");
 
 
 const cartTotal =
-
-document.getElementById(
-
-"cartTotal"
-
-);
+document.getElementById("cartTotal");
 
 
 
-
-
-
-
-
-
-// SHOW CART
 
 
 function showCart(){
 
 
-
-cartItems.innerHTML = "";
-
+cartItems.innerHTML="";
 
 
-let total = 0;
+let total=0;
 
 
 
+if(cart.length===0){
 
 
-
-
-if(cart.length === 0){
-
-
-
-cartItems.innerHTML = `
-
-
-<h3 style="text-align:center">
-
-Your cart is empty
-
-</h3>
-
-
+cartItems.innerHTML=
+`
+<p>Your cart is empty</p>
 `;
 
-
-
-cartTotal.innerText =
-
-"0.00";
-
-
+cartTotal.innerText="0.00";
 
 updateCartCount();
 
-
-
 return;
 
-
 }
-
-
-
-
 
 
 
@@ -117,128 +54,64 @@ return;
 cart.forEach((item,index)=>{
 
 
+let itemTotal =
+Number(item.price) * Number(item.quantity);
 
 
 
-total +=
-
-Number(item.price)
-
-*
-
-item.quantity;
-
-
-
-
-
+total += itemTotal;
 
 
 
 let div =
-
 document.createElement("div");
 
 
 
-
-
-div.className =
-
-"cart-item";
+div.className="cart-item";
 
 
 
-
-
-
-
-
-div.innerHTML = `
-
-
-
-<img src="${item.image || 'images/menu/default.jpg'}">
-
-
-
-
-
-
-<div class="cart-item-info">
-
-
+div.innerHTML=`
 
 <h3>
-
 ${item.itemName}
-
 </h3>
 
 
-
-
 <p>
-
 RM ${Number(item.price).toFixed(2)}
-
 </p>
 
 
 
-</div>
-
-
-
-
-
-
-
-<div class="quantity-box">
-
-
-
 <button class="minus">
-
 -
-
 </button>
-
-
 
 
 
 <span>
-
 ${item.quantity}
-
 </span>
 
 
 
-
-
 <button class="plus">
-
 +
-
 </button>
-
-
-
-</div>
-
-
-
-
 
 
 
 <button class="remove-btn">
-
 Remove
-
 </button>
+
+
+
+<textarea 
+class="item-note"
+placeholder="Order Note">${item.note || ""}</textarea>
 
 
 
@@ -248,22 +121,8 @@ Remove
 
 
 
-
-
-
-
-
-
-// PLUS
-
-
-div.querySelector(
-
-".plus"
-
-)
-
-.onclick = ()=>{
+div.querySelector(".plus")
+.onclick=()=>{
 
 
 cart[index].quantity++;
@@ -272,50 +131,29 @@ cart[index].quantity++;
 saveCart();
 
 
-
 };
 
 
 
 
 
+div.querySelector(".minus")
+.onclick=()=>{
 
 
-
-
-// MINUS
-
-
-div.querySelector(
-
-".minus"
-
-)
-
-.onclick = ()=>{
-
-
-
-if(cart[index].quantity > 1){
-
+if(cart[index].quantity>1){
 
 cart[index].quantity--;
 
-
 }
-
 else{
 
-
 cart.splice(index,1);
-
 
 }
 
 
-
 saveCart();
-
 
 
 };
@@ -324,29 +162,14 @@ saveCart();
 
 
 
-
-
-
-
-// REMOVE
-
-
-div.querySelector(
-
-".remove-btn"
-
-)
-
-.onclick = ()=>{
-
+div.querySelector(".remove-btn")
+.onclick=()=>{
 
 
 cart.splice(index,1);
 
 
-
 saveCart();
-
 
 
 };
@@ -354,6 +177,18 @@ saveCart();
 
 
 
+
+div.querySelector(".item-note")
+.onchange=(e)=>{
+
+
+cart[index].note=e.target.value;
+
+
+saveCart();
+
+
+};
 
 
 
@@ -366,14 +201,7 @@ cartItems.appendChild(div);
 
 
 
-
-
-
-
-
-
-cartTotal.innerText =
-
+cartTotal.innerText=
 total.toFixed(2);
 
 
@@ -390,29 +218,16 @@ updateCartCount();
 
 
 
-
-
-
-
-// SAVE CART
-
-
 function saveCart(){
 
 
-
 localStorage.setItem(
-
 "cart",
-
 JSON.stringify(cart)
-
 );
 
 
-
 showCart();
-
 
 
 }
@@ -424,28 +239,65 @@ showCart();
 
 
 
-
-
-
-// UPDATE CART COUNT
-
-
 function updateCartCount(){
 
 
-
-let count = 0;
-
-
-
+let count=0;
 
 
 
 cart.forEach(item=>{
 
 
+count += Number(item.quantity);
 
-count += item.quantity;
+
+});
+
+
+
+
+document.getElementById("cartCount")
+?.innerText=count;
+
+
+
+document.getElementById("floatingCartCount")
+?.innerText=count;
+
+
+
+}
+
+
+
+
+
+
+
+// CHECKOUT
+
+
+document.getElementById("checkoutBtn")
+?.addEventListener("click",()=>{
+
+
+if(cart.length===0){
+
+
+alert("Cart is empty");
+
+return;
+
+
+}
+
+
+
+// go checkout
+
+window.location.href=
+"checkout.html";
 
 
 
@@ -457,249 +309,50 @@ count += item.quantity;
 
 
 
+// HEADER
 
-const cartCount =
 
-document.getElementById(
-
-"cartCount"
-
-);
-
-
-
-
-
-
-const floatingCartCount =
-
-document.getElementById(
-
-"floatingCartCount"
-
-);
-
-
-
-
-
-
-
-
-if(cartCount){
-
-
-
-cartCount.innerText = count;
-
-
-
-}
-
-
-
-
-
-
-
-if(floatingCartCount){
-
-
-
-floatingCartCount.innerText = count;
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-// CHECKOUT
-
-
-const checkoutBtn =
-
-document.getElementById(
-
-"checkoutBtn"
-
-);
-
-
-
-
-
-
-
-
-if(checkoutBtn){
-
-
-
-checkoutBtn.onclick = ()=>{
-
-
-
-if(cart.length === 0){
-
-
-
-alert(
-
-"Cart is empty"
-
-);
-
-
-
-return;
-
-
-
-}
-
-
-
-
-
-
-window.location.href =
-
-"checkout.html";
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-// HEADER BUTTONS
-
-
-document.getElementById(
-
-"homeBtn"
-
-)
-
+document.getElementById("homeBtn")
 ?.addEventListener(
-
 "click",
-
 ()=>{
 
+window.location.href="index.html";
 
-
-window.location.href =
-
-"index.html";
-
-
-
-}
-
-);
+});
 
 
 
 
 
-
-
-
-
-document.getElementById(
-
-"backBtn"
-
-)
-
+document.getElementById("backBtn")
 ?.addEventListener(
-
 "click",
-
 ()=>{
-
-
 
 history.back();
 
-
-
-}
-
-);
+});
 
 
 
 
 
-
-
-
-
-document.getElementById(
-
-"refreshBtn"
-
-)
-
+document.getElementById("refreshBtn")
 ?.addEventListener(
-
 "click",
-
 ()=>{
-
-
 
 location.reload();
 
-
-
-}
-
-);
+});
 
 
 
 
 
-
-
-
-
-
-
-
-// START
 
 
 showCart();
-
 
 changeLanguage();
