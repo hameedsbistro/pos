@@ -1,29 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
 
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 
 <title>
 Waiter Panel - Hameed's Bistro
 </title>
 
-
-<link rel="stylesheet" href="../css/waiter.css">
-
+<link rel="stylesheet" href="css/waiter.css">
 
 </head>
 
 
-
 <body>
-
 
 
 <header class="waiter-header">
@@ -31,45 +23,31 @@ Waiter Panel - Hameed's Bistro
 
 <div class="brand">
 
-
 <h1>
 Hameed's Bistro
 </h1>
-
 
 <h3>
 Waiter Panel
 </h3>
 
-
 </div>
-
-
 
 
 
 <div class="user-info">
 
-
 <p>
 Welcome:
-<span id="userName">
----
-</span>
+<span id="userName">---</span>
 </p>
-
 
 <p>
 Role:
-<span id="userRole">
----
-</span>
+<span id="userRole">---</span>
 </p>
 
-
 </div>
-
-
 
 
 
@@ -77,22 +55,16 @@ Role:
 
 
 <button id="refreshBtn">
-
 🔄 Refresh
-
 </button>
 
 
-
 <button id="logoutBtn">
-
 Logout
-
 </button>
 
 
 </div>
-
 
 
 </header>
@@ -101,41 +73,35 @@ Logout
 
 
 
+<main class="waiter-container">
 
-
-
-
-<section class="table-container">
 
 
 <h2>
-Tables
+Table Status
 </h2>
 
 
-<div id="tableGrid"
-class="table-grid">
 
+
+<div id="tableGrid" class="table-grid">
+
+<!-- Tables Load Here -->
 
 </div>
 
 
-</section>
+
+</main>
 
 
 
 
 
+<!-- ORDER PANEL -->
 
 
-
-
-
-<div id="menuModal"
-class="modal">
-
-
-<div class="modal-content">
+<div id="orderPanel" class="order-panel">
 
 
 <h2>
@@ -143,9 +109,13 @@ Create Order
 </h2>
 
 
+<h3 id="selectedTable">
+Table:
+</h3>
+
+
 
 <div id="menuItems">
-
 
 </div>
 
@@ -153,14 +123,11 @@ Create Order
 
 <div id="cartItems">
 
-
 </div>
 
 
 
-
-
-<textarea
+<textarea 
 id="itemNote"
 placeholder="Order Note">
 </textarea>
@@ -168,28 +135,18 @@ placeholder="Order Note">
 
 
 
-
-
 <button id="sendOrderBtn">
-
 Send Order
-
 </button>
 
 
 
-
-<button id="closeModalBtn">
-
+<button id="closeOrderBtn">
 Close
-
 </button>
 
 
 
-
-</div>
-
 </div>
 
 
@@ -197,14 +154,9 @@ Close
 
 
 
-
-
-
-
-<script type="module" src="../js/waiter.js"></script>
+<script type="module" src="js/waiter.js"></script>
 
 
 </body>
-
 
 </html>
