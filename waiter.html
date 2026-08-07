@@ -7,6 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>
 Waiter Panel - Hameed's Bistro
 </title>
@@ -18,6 +19,9 @@ Waiter Panel - Hameed's Bistro
 
 
 <body>
+
+
+
 
 
 <header class="waiter-header">
@@ -38,18 +42,24 @@ Waiter Panel
 
 
 
-<div class="user-box">
+
+<div class="user-info">
 
 <p>
 Welcome:
-<span id="userName">---</span>
+<span id="userName">
+---
+</span>
 </p>
 
 
 <p>
 Role:
-<span id="userRole">---</span>
+<span id="userRole">
+---
+</span>
 </p>
+
 
 </div>
 
@@ -57,16 +67,22 @@ Role:
 
 
 
-<div class="header-btns">
+
+<div class="controls">
 
 
 <button id="refreshBtn">
+
 🔄 Refresh
+
 </button>
 
 
+
 <button id="logoutBtn">
+
 Logout
+
 </button>
 
 
@@ -81,67 +97,59 @@ Logout
 
 
 
-<main>
+
+<!-- TABLE SELECT -->
+
+
+<section class="table-section">
 
 
 <h2>
-Tables
+Select Table
 </h2>
 
 
-<section class="table-section">
+<select id="tableSelect">
 
 
-<h3>
-Indoor
-</h3>
+<option value="">
+
+Select Table
+
+</option>
 
 
-<div id="indoorTables"
-class="table-grid">
-</div>
+<option>
+Indoor A1
+</option>
 
 
-</section>
+<option>
+Indoor A2
+</option>
 
 
+<option>
+Indoor A3
+</option>
 
 
+<option>
+Outdoor B1
+</option>
 
 
-
-<section class="table-section">
-
-
-<h3>
-Outdoor
-</h3>
+<option>
+Outdoor B2
+</option>
 
 
-<div id="outdoorTables"
-class="table-grid">
-</div>
+<option>
+First Floor C1
+</option>
 
 
-</section>
-
-
-
-
-
-
-
-<section class="table-section">
-
-
-<h3>
-First Floor
-</h3>
-
-
-<div id="floorTables"
-class="table-grid">
-</div>
+</select>
 
 
 </section>
@@ -149,109 +157,88 @@ class="table-grid">
 
 
 
-</main>
 
 
 
 
 
 
+<!-- MENU -->
 
 
-
-<!-- ORDER MODAL -->
-
-
-<div id="orderModal"
-class="modal">
+<section>
 
 
-<div class="modal-box">
+<h2 style="padding-left:20px">
 
-
-<button id="closeBtn"
-class="close">
-✕
-</button>
-
-
-<h2>
-Table:
-<span id="selectedTable">
----
-</span>
-
-</h2>
-
-
-
-
-
-<div class="menu-area">
-
-<h3>
 Menu
-</h3>
 
-
-<div id="menuItems">
-
-</div>
-
-
-</div>
+</h2>
 
 
 
+<div id="menuContainer"
+class="menu-container">
 
 
-
-
-<div class="cart-area">
-
-
-<h3>
-Order Items
-</h3>
-
-
-<div id="orderItems">
-
-</div>
+<!-- Menu Load Here -->
 
 
 </div>
 
 
 
-
-
-
-
-<textarea
-
-id="orderNote"
-
-placeholder="Item Note">
-
-</textarea>
+</section>
 
 
 
 
 
-<button id="sendOrderBtn">
 
-Send Order
+
+
+
+<!-- CART -->
+
+
+<section class="cart-section">
+
+
+<h2>
+
+Current Order
+
+</h2>
+
+
+
+<div id="cartContainer">
+
+
+<!-- Cart Items -->
+
+</div>
+
+
+
+
+
+
+<button id="sendOrderBtn"
+class="send-btn">
+
+
+Send Order To Cashier
+
 
 </button>
 
 
 
-</div>
+</section>
 
 
-</div>
+
 
 
 
@@ -262,5 +249,6 @@ Send Order
 
 
 </body>
+
 
 </html>
