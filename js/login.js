@@ -1,32 +1,69 @@
-// pos/js/login.js
+// js/login.js
 
 
 import { supabase } from "./supabase.js";
 
+import { saveLocalUser } from "./auth.js";
+
+
+
+
+
+
+// ===============================
+// LOGIN BUTTON
+// ===============================
 
 
 const loginBtn =
-document.getElementById("loginBtn");
 
-
-const message =
-document.getElementById("message");
-
-
+document.getElementById(
+"loginBtn"
+);
 
 
 
 
-loginBtn.onclick = async()=>{
+
+
+
+loginBtn?.addEventListener(
+
+"click",
+
+async()=>{
+
+
+
 
 
 const email =
-document.getElementById("email").value.trim();
+
+document.getElementById(
+"email"
+).value.trim();
+
+
 
 
 
 const password =
-document.getElementById("password").value;
+
+document.getElementById(
+"password"
+).value.trim();
+
+
+
+
+
+
+const message =
+
+document.getElementById(
+"message"
+);
+
 
 
 
@@ -50,11 +87,21 @@ return;
 
 
 
-try{
+message.innerText =
+"Logging in...";
 
 
 
-// AUTH LOGIN
+
+
+
+
+
+
+// ===============================
+// SUPABASE AUTH LOGIN
+// ===============================
+
 
 const {
 
@@ -62,13 +109,19 @@ data,
 
 error
 
-} = await supabase.auth.signInWithPassword({
+}=await supabase.auth.signInWithPassword({
+
 
 email,
 
+
 password
 
+
 });
+
+
+
 
 
 
@@ -77,7 +130,14 @@ password
 if(error){
 
 
-throw error;
+message.innerText =
+"Login failed";
+
+
+console.log(error);
+
+
+return;
 
 
 }
@@ -88,18 +148,43 @@ throw error;
 
 
 
+
+
+const authUser =
+data.user;
+
+
+
+
+
+
+
+
+
+// ===============================
 // GET USER PROFILE
+// ===============================
 
 
-const {data:userData,error:userError}=
+const {
 
-await supabase
+data:user,
+
+error:userError
+
+}=await supabase
 
 .from("users")
 
 .select("*")
 
-.eq("email",email)
+.eq(
+
+"id",
+
+authUser.id
+
+)
 
 .single();
 
@@ -108,10 +193,16 @@ await supabase
 
 
 
-if(userError){
 
 
-throw userError;
+if(userError || !user){
+
+
+message.innerText =
+"User profile not found";
+
+
+return;
 
 
 }
@@ -122,7 +213,9 @@ throw userError;
 
 
 
-if(userData.status !== "active"){
+
+
+if(user.status !== "active"){
 
 
 message.innerText =
@@ -144,70 +237,92 @@ return;
 
 
 
-// ROLE CHECK
+
+// SAVE USER
 
 
-if(userData.role==="admin"){
-
-
-
-window.location.href =
-
-"admin/index.html";
+saveLocalUser(user);
 
 
 
-}
-
-else if(userData.role==="manager"){
 
 
 
-window.location.href =
-
-"admin/index.html";
 
 
 
-}
-
-else if(userData.role==="cashier"){
-
-
-
-window.location.href =
-
-"cashier/index.html";
+// ===============================
+// ROLE REDIRECT
+// ===============================
 
 
 
-}
+switch(user.role){
 
-else if(userData.role==="waiter"){
 
+
+case "admin":
+
+
+case "manager":
 
 
 window.location.href =
-
-"waiter/index.html";
-
+"admin.html";
 
 
-}
+break;
 
-else if(userData.role==="cook"){
 
+
+
+
+
+case "cashier":
 
 
 window.location.href =
-
-"admin/kitchen.html";
-
+"cashier.html";
 
 
-}
+break;
 
-else{
+
+
+
+
+
+
+case "waiter":
+
+
+window.location.href =
+"waiter.html";
+
+
+break;
+
+
+
+
+
+
+
+case "cook":
+
+
+window.location.href =
+"kitchen.html";
+
+
+break;
+
+
+
+
+
+
+default:
 
 
 message.innerText =
@@ -220,23 +335,9 @@ message.innerText =
 
 
 
-}
-
-catch(error){
-
-
-
-console.log(error);
-
-
-
-message.innerText =
-error.message;
 
 
 
 }
 
-
-
-};
+);
