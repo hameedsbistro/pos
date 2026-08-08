@@ -1,88 +1,81 @@
-/* ALL-IN-ONE COMPLETE CSS */
-
+/* ==========================================
+   GLOBAL RESET & BASE STYLES
+   ========================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background: #004c99;
-    min-height: 100vh;
-    color: white;
-    position: relative;
-    overflow-x: hidden;
+    background-color: #003366; /* ডিপ ব্লু ব্যাকগ্রাউন্ড */
+    color: #333333;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-/* HELPER CLASS */
-.hidden {
-    display: none !important;
-}
-
-/* TOP HEADER */
+/* ==========================================
+   TOP HEADER & NAVIGATION
+   ========================================== */
 .customer-header {
-    height: 70px;
+    background-color: #002244;
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.header-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .header-actions {
     display: flex;
-    gap: 12px;
-}
-
-.header-btn {
-    position: relative;
-    width: 45px;
-    height: 45px;
-    border: none;
-    border-radius: 50%;
-    background: white;
-    color: #003366;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
+    gap: 8px;
     align-items: center;
-    transition: transform 0.2s ease;
 }
 
-.header-btn:hover {
-    transform: scale(1.1);
-}
-
-/* CART BADGE */
 #cartCount {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #ff3333;
+    background: #ff4d4d;
     color: white;
     font-size: 12px;
     font-weight: bold;
-    border-radius: 50%;
-    padding: 3px 7px;
-    border: 2px solid #004c99;
+    padding: 2px 6px;
+    border-radius: 10px;
+    vertical-align: top;
 }
 
-/* SIDE MENU */
+/* ==========================================
+   SIDE MENU (DRAWER)
+   ========================================== */
 .side-menu {
     position: fixed;
     top: 0;
-    left: -300px;
+    left: -280px;
     width: 280px;
     height: 100%;
-    background: #00264d;
-    color: white;
-    padding: 25px 20px;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+    background-color: #ffffff;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.4);
     transition: left 0.3s ease;
     z-index: 1000;
+    padding: 20px;
     display: flex;
     flex-direction: column;
 }
@@ -95,59 +88,58 @@ body {
     align-self: flex-end;
     background: none;
     border: none;
-    color: white;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
+    color: #555;
 }
 
 .side-menu h3 {
-    margin: 20px 0 15px 0;
-    font-size: 22px;
-    border-bottom: 1px solid #004080;
-    padding-bottom: 8px;
+    margin: 15px 0 10px 0;
+    color: #003366;
+    border-bottom: 2px solid #003366;
+    padding-bottom: 5px;
 }
 
 .side-menu a {
     text-decoration: none;
-    color: #e6f2ff;
+    color: #333;
     padding: 12px 0;
     font-size: 16px;
-    border-bottom: 1px solid #003366;
+    border-bottom: 1px solid #eee;
     display: block;
-    transition: color 0.2s;
-}
-
-.side-menu a:hover {
-    color: #ffcc00;
 }
 
 .side-btn {
     width: 100%;
-    padding: 12px;
-    background: #ffcc00;
-    color: #00264d;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+    padding: 10px;
     margin-top: 15px;
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .logout-bg {
-    background: #ff4d4d;
-    color: white;
+    background: #d9534f !important;
 }
 
-/* LANGUAGE DROPDOWN BOX */
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   LANGUAGE DROPDOWN BOX
+   ========================================== */
 .language-box {
     display: none;
-    position: absolute;
-    top: 65px;
-    right: 70px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 999;
     overflow: hidden;
     flex-direction: column;
@@ -160,32 +152,31 @@ body {
 .language-box button {
     background: none;
     border: none;
-    padding: 12px 25px;
+    padding: 12px 20px;
     text-align: left;
-    color: #003366;
-    font-size: 15px;
-    font-weight: bold;
     cursor: pointer;
+    font-size: 14px;
     border-bottom: 1px solid #f0f0f0;
 }
 
 .language-box button:hover {
-    background: #e6f2ff;
+    background-color: #f5f5f5;
+    color: #003366;
 }
 
-/* HOME & WELCOME CONTAINER */
+/* ==========================================
+   HOME PAGE (INDEX.HTML) STYLES
+   ========================================== */
 .home-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    padding-bottom: 60px; /* ফুটারের জন্য গ্যাপ */
+    padding: 30px 20px 80px 20px;
     text-align: center;
 }
 
-/* LOGO AREA WITH ROUND RADIUS */
 .logo-area {
     margin-top: 10px;
     display: flex;
@@ -200,72 +191,186 @@ body {
     object-fit: cover;
     background: #ffffff;
     padding: 8px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     border: 3px solid #ffffff;
     margin-bottom: 20px;
 }
 
 .logo-area h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
+    font-size: 38px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .logo-area h2 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: normal;
+    color: #e6f2ff;
 }
 
-/* BUTTON AREA */
 .home-order-buttons {
-    margin-top: 40px;
+    margin-top: 35px;
     display: grid;
-    grid-template-columns: repeat(2, 220px);
-    gap: 25px;
+    grid-template-columns: repeat(2, 200px);
+    gap: 20px;
 }
 
 .main-btn {
-    height: 80px;
+    height: 75px;
     border: none;
-    border-radius: 15px;
-    background: white;
+    border-radius: 12px;
+    background: #ffffff;
     color: #003366;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .main-btn:hover {
-    background: #f1f1f1;
+    background: #f0f7ff;
     transform: translateY(-3px);
 }
 
-/* GLOBAL FOOTER (ALL PAGES) */
-footer {
+/* ==========================================
+   MENU PAGE (MENU.HTML) STYLES
+   ========================================== */
+.menu-container {
+    flex: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
     width: 100%;
-    padding: 15px 10px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(0, 38, 77, 0.6); /* হালকা ড্রপডাউন ব্যাকগ্রাউন্ড */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: auto; /* যেকোনো পেজের সবসময় একদম নিচে থাকবে */
 }
 
-/* MOBILE RESPONSIVE */
-@media(max-width: 600px) {
+.order-type-bar {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.category-selection-area {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-dropdown {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.popular-section {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.section-title {
+    color: #003366;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #003366;
+    padding-bottom: 8px;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.food-card {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.food-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.food-card h4 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.price-tag {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.add-cart-btn {
+    background: #003366;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+.add-cart-btn:hover {
+    background: #002244;
+}
+
+/* ==========================================
+   FOOTER STYLES
+   ========================================== */
+footer {
+    background-color: #001f3f;
+    color: #cccccc;
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 14px;
+    margin-top: auto;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN (MOBILE ADAPTATION)
+   ========================================== */
+@media (max-width: 600px) {
+    .restaurant-logo {
+        width: 130px;
+        height: 130px;
+    }
+
     .logo-area h1 {
-        font-size: 30px;
+        font-size: 26px;
     }
 
     .logo-area h2 {
-        font-size: 20px;
-    }
-
-    .restaurant-logo {
-        width: 140px;
-        height: 140px;
+        font-size: 16px;
     }
 
     .home-order-buttons {
@@ -275,37 +380,12 @@ footer {
     }
 
     .main-btn {
-        width: 100%;
-        height: 70px;
+        height: 60px;
+        font-size: 18px;
     }
 
-    footer {
-        font-size: 12px;
-        padding: 12px 5px;
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
     }
 }
-
-/* LARGE SCREEN / TV */
-@media(min-width: 1200px) {
-    .restaurant-logo {
-        width: 240px;
-        height: 240px;
-    }
-
-    .logo-area h1 {
-        font-size: 52px;
-    }
-
-    .logo-area h2 {
-        font-size: 32px;
-    }
-
-    .home-order-buttons {
-        grid-template-columns: repeat(2, 280px);
-    }
-
-    .main-btn {
-        height: 100px;
-        font-size: 28px;
-    }
-        }
