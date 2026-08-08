@@ -5,15 +5,15 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>
 Payment - Hameed's Bistro
 </title>
 
-
-<link rel="stylesheet" href="css/payment.css">
+<link rel="stylesheet"
+      href="css/payment.css">
 
 </head>
 
@@ -21,224 +21,281 @@ Payment - Hameed's Bistro
 <body>
 
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header class="payment-header">
 
+    <div>
 
-<h1>
-Hameed's Bistro
-</h1>
+        <h1>
+            Hameed's Bistro
+        </h1>
+
+        <h3>
+            Payment
+        </h3>
+
+    </div>
 
 
-<h3>
-Payment Counter
-</h3>
-
+    <button id="backBtn">
+        ← Back
+    </button>
 
 </header>
 
 
 
-
-
-
+<!-- =========================
+     PAYMENT CONTAINER
+========================= -->
 
 <main class="payment-container">
 
 
+    <!-- ORDER INFORMATION -->
 
-<h2>
-Order Payment
-</h2>
+    <section class="payment-card">
 
+        <div class="order-info">
 
+            <div>
 
+                <span>
+                    Order
+                </span>
 
+                <strong id="orderNo">
+                    ---
+                </strong>
 
+            </div>
 
 
-<div class="order-summary">
+            <div>
 
+                <span>
+                    Table
+                </span>
 
-<h3>
-Order Details
-</h3>
+                <strong id="tableNo">
+                    ---
+                </strong>
 
+            </div>
 
-<p>
-Order No:
-<span id="orderNo">
----
-</span>
-</p>
+        </div>
 
+    </section>
 
-<p>
-Table:
-<span id="tableNo">
----
-</span>
-</p>
 
 
+    <!-- =========================
+         ITEMS
+    ========================== -->
 
-<div id="paymentItems">
+    <section class="payment-card">
 
-</div>
+        <h2>
+            Order Items
+        </h2>
 
 
+        <div id="paymentItems">
 
+            <p class="loading">
+                Loading...
+            </p>
 
+        </div>
 
-<h2>
+    </section>
 
-Total:
 
-RM
 
-<span id="totalAmount">
-0.00
-</span>
+    <!-- =========================
+         BILL
+    ========================== -->
 
+    <section class="payment-card">
 
-</h2>
 
+        <div class="payment-row">
 
-</div>
+            <span>
+                Subtotal
+            </span>
 
+            <strong id="subtotalAmount">
+                RM 0.00
+            </strong>
 
+        </div>
 
 
+        <div class="payment-row">
 
+            <span>
+                SST (6%)
+            </span>
 
+            <strong id="sstAmount">
+                RM 0.00
+            </strong>
 
+        </div>
 
 
-<div class="payment-method">
+        <div class="payment-total">
 
+            <span>
+                TOTAL
+            </span>
 
-<h3>
-Payment Method
-</h3>
+            <strong id="totalAmount">
+                RM 0.00
+            </strong>
 
+        </div>
 
 
-<button class="method-btn"
-data-method="Cash">
+    </section>
 
-💵 Cash
 
-</button>
 
+    <!-- =========================
+         ADD MORE ITEMS
+    ========================== -->
 
+    <section class="payment-card">
 
-<button class="method-btn"
-data-method="Card">
+        <button id="addMoreItemsBtn"
+                class="add-more-btn">
 
-💳 Card
+            + ADD MORE ITEMS
 
-</button>
+        </button>
 
+    </section>
 
 
 
-<button class="method-btn"
-data-method="DuitNow QR">
+    <!-- =========================
+         PAYMENT METHOD
+    ========================== -->
 
-📱 DuitNow QR
+    <section class="payment-card">
 
-</button>
+        <h2>
+            Payment Method
+        </h2>
 
 
+        <div class="payment-methods">
 
-</div>
 
+            <button
+                class="method-btn"
+                data-method="Cash">
 
+                💵 Cash
 
+            </button>
 
 
+            <button
+                class="method-btn"
+                data-method="DuitNow QR">
 
+                📱 DuitNow QR
 
+            </button>
 
 
-<div id="cashBox"
-class="cash-box">
+            <button
+                class="method-btn"
+                data-method="Card">
 
+                💳 Card
 
+            </button>
 
-<label>
 
-Enter Amount
+        </div>
 
-</label>
 
+        <!-- CASH -->
 
-<input
+        <div id="cashBox"
+             class="cash-box"
+             style="display:none;">
 
-type="number"
+            <label for="cashAmount">
 
-id="cashAmount"
+                Cash Received
 
-placeholder="RM 0.00">
+            </label>
 
 
+            <input
+                id="cashAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="RM 0.00"
+            >
 
 
+            <div class="change-row">
 
-<p>
+                <span>
+                    Change
+                </span>
 
-Change:
+                <strong id="changeAmount">
+                    RM 0.00
+                </strong>
 
-RM
+            </div>
 
-<span id="changeAmount">
-0.00
-</span>
+        </div>
 
 
-</p>
+    </section>
 
 
 
-</div>
+    <!-- =========================
+         PAY
+    ========================== -->
 
+    <section class="payment-card">
 
+        <button id="payBtn"
+                class="pay-btn">
 
+            PAY NOW
 
+        </button>
 
 
+        <p id="message"
+           class="payment-message">
+        </p>
 
-
-
-<button id="payBtn"
-class="pay-btn">
-
-PAY
-
-</button>
-
-
-
-
-
-
-
-<div id="message">
-
-</div>
-
+    </section>
 
 
 </main>
 
 
 
-
-
-
-
-<script type="module" src="js/payment.js"></script>
-
+<script type="module"
+        src="js/payment.js">
+</script>
 
 </body>
 
-</html>
+  </html>
