@@ -1,586 +1,702 @@
-import { supabase } from "./supabase.js";
+// pos/js/cashier.js
 
+import {
+getCurrentUser,
+logout
+} from "./auth.js";
 
+import {
+supabase
+} from "./supabase.js";
 
-const user =
-JSON.parse(
-localStorage.getItem("user")
+// ========================================
+// USER
+// ========================================
+
+let user = null;
+
+// ========================================
+// ELEMENTS
+// ========================================
+
+const userName =
+document.getElementById(
+"userName"
 );
 
-
-
-if(!user){
-
-window.location.href="login.html";
-
-}
-
-
-
-
-
-
-
-document.getElementById("userName").innerText =
-user.name || "---";
-
-
-document.getElementById("userRole").innerText =
-user.role || "cashier";
-
-
-
-
-
+const userRole =
+document.getElementById(
+"userRole"
+);
 
 const orderContainer =
 document.getElementById(
 "orderContainer"
 );
 
+const orderModal =
+document.getElementById(
+"orderModal"
+);
+
+const selectedOrderBox =
+document.getElementById(
+"selectedOrder"
+);
+
+const invoiceModal =
+document.getElementById(
+"invoiceModal"
+);
+
+// ========================================
+// DATA
+// ========================================
+
+let orders = [];
+
+let selectedOrder = null;
+
+// ========================================
+// AUTH CHECK
+// ========================================
+
+async function checkCashierAccess() {
+
+try {
+
+    user =
+        await getCurrentUser();
 
 
+    console.log(
+        "Cashier current user:",
+        user
+    );
 
 
+    if (!user) {
 
-let orders=[];
+        window.location.href =
+            "login.html";
 
-let selectedOrder=null;
+        return false;
 
-
-
-
-
-
+    }
 
 
+    const role =
+        String(
+            user.role || ""
+        )
+        .trim()
+        .toLowerCase();
 
+
+    if (
+        role !== "cashier" &&
+        role !== "admin" &&
+        role !== "manager"
+    ) {
+
+        alert(
+            "You do not have permission to access the Cashier Panel."
+        );
+
+
+        window.location.href =
+            "login.html";
+
+        return false;
+
+    }
+
+
+    if (userName) {
+
+        userName.innerText =
+            user.name || "---";
+
+    }
+
+
+    if (userRole) {
+
+        userRole.innerText =
+            role;
+
+    }
+
+
+    return true;
+
+
+} catch (error) {
+
+    console.error(
+        "Cashier authentication error:",
+        error
+    );
+
+
+    window.location.href =
+        "login.html";
+
+    return false;
+
+}
+
+}
+
+// ========================================
 // LOAD ORDERS
+// ========================================
 
+async function loadOrders() {
 
-async function loadOrders(){
-
+if (!orderContainer) {
+    return;
+}
 
 
 const {
+    data,
+    error
+} =
+    await supabase
+        .from("orders")
+        .select("*")
+        .in(
+            "status",
+            [
+                "New",
+                "Accepted",
+                "Ready"
+            ]
+        )
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
 
-data,
 
-error
+if (error) {
 
-}=await supabase
+    console.error(
+        "Load orders error:",
+        error
+    );
 
-.from("orders")
 
-.select("*")
+    orderContainer.innerHTML = `
 
-.in(
-"status",
-[
-"New",
-"Accepted",
-"Ready"
-]
-)
+        <div class="order-error">
 
-.order(
-"created_at",
-{
-ascending:false
+            Unable to load orders.
+
+        </div>
+
+    `;
+
+
+    return;
+
 }
-);
 
 
-
-
-
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
-
-
-
-
-
-orders=data;
+orders =
+    data || [];
 
 
 showOrders();
 
+}
 
+// ========================================
+// SHOW ORDERS
+// ========================================
+
+function showOrders() {
+
+if (!orderContainer) {
+    return;
+}
+
+
+orderContainer.innerHTML = "";
+
+
+if (orders.length === 0) {
+
+    orderContainer.innerHTML = `
+
+        <div class="no-orders">
+
+            No current orders.
+
+        </div>
+
+    `;
+
+
+    return;
 
 }
 
 
+orders.forEach(
+    order => {
+
+        const total =
+            Number(
+                order.total_amount || 0
+            );
 
 
+        const table =
+            order.table_number ||
+            "Take Away";
 
 
+        const status =
+            order.status ||
+            "New";
 
 
-
-// SHOW ORDERS
-
-
-function showOrders(){
-
+        const card =
+            document.createElement(
+                "div"
+            );
 
 
-orderContainer.innerHTML="";
+        card.className =
+            `order-card ${status}`;
 
 
+        card.innerHTML = `
+
+            <h3>
+                Table: ${table}
+            </h3>
+
+            <p>
+                Order:
+                ${order.order_number || order.id}
+            </p>
+
+            <p>
+                Status:
+                ${status}
+            </p>
+
+            <p>
+                Amount:
+                RM ${total.toFixed(2)}
+            </p>
+
+            <button
+                type="button"
+                class="view-order-btn">
+                View
+            </button>
+
+            ${
+                status === "New"
+                    ?
+                    `
+                    <button
+                        type="button"
+                        class="accept-order-btn">
+                        Accept
+                    </button>
+                    `
+                    :
+                    ""
+            }
+
+        `;
 
 
+        const viewBtn =
+            card.querySelector(
+                ".view-order-btn"
+            );
 
 
-orders.forEach(order=>{
+        viewBtn?.addEventListener(
+            "click",
+            () => {
+
+                openOrder(
+                    order.id
+                );
+
+            }
+        );
 
 
+        const acceptBtn =
+            card.querySelector(
+                ".accept-order-btn"
+            );
 
-let total =
-Number(
-order.total || 0
+
+        acceptBtn?.addEventListener(
+            "click",
+            () => {
+
+                acceptOrder(
+                    order.id
+                );
+
+            }
+        );
+
+
+        orderContainer.appendChild(
+            card
+        );
+
+    }
 );
 
-
-
-
-
-
-
-orderContainer.innerHTML += `
-
-
-
-<div class="order-card ${order.status}">
-
-
-
-<h3>
-
-Table:
-
-${order.table_number || "Take Away"}
-
-</h3>
-
-
-
-<p>
-
-Status:
-
-${order.status}
-
-</p>
-
-
-
-
-<p>
-
-Amount:
-
-RM ${total.toFixed(2)}
-
-</p>
-
-
-
-
-
-<button onclick="openOrder('${order.id}')">
-
-View
-
-</button>
-
-
-
-
-${
-order.status==="New"
-
-?
-
-`
-
-<button onclick="acceptOrder('${order.id}')">
-
-Accept
-
-</button>
-
-`
-
-:
-
-""
-
 }
 
-
-
-</div>
-
-
-
-`;
-
-
-
-});
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
+// ========================================
 // OPEN ORDER
+// ========================================
 
-
-window.openOrder=function(id){
-
-
+function openOrder(id) {
 
 selectedOrder =
-orders.find(
-x=>x.id===id
-);
+    orders.find(
+        order =>
+            String(order.id) ===
+            String(id)
+    );
 
+
+if (!selectedOrder) {
+
+    alert(
+        "Order not found."
+    );
+
+    return;
+
+}
 
 
 localStorage.setItem(
-"paymentOrder",
-id
+    "paymentOrder",
+    String(
+        selectedOrder.id
+    )
 );
 
 
+const total =
+    Number(
+        selectedOrder.total_amount ||
+        0
+    );
 
 
+if (selectedOrderBox) {
 
-document.getElementById(
-"selectedOrder"
-).innerHTML = `
+    selectedOrderBox.innerHTML = `
 
+        <h3>
+            Table:
+            ${
+                selectedOrder.table_number ||
+                "Take Away"
+            }
+        </h3>
 
+        <p>
+            Order:
+            ${
+                selectedOrder.order_number ||
+                selectedOrder.id
+            }
+        </p>
 
-<h3>
+        <p>
+            Status:
+            ${
+                selectedOrder.status ||
+                ""
+            }
+        </p>
 
-Table:
+        <p>
+            Amount:
+            RM ${total.toFixed(2)}
+        </p>
 
-${selectedOrder.table_number}
-
-</h3>
-
-
-<p>
-
-Status:
-
-${selectedOrder.status}
-
-</p>
-
-
-
-`;
-
-
-
-
-
-document.getElementById(
-"orderModal"
-)
-.style.display="flex";
-
-
+    `;
 
 }
 
 
+if (orderModal) {
 
+    orderModal.style.display =
+        "flex";
 
+}
 
+}
 
-
-
-
+// ========================================
 // ACCEPT ORDER
+// ========================================
+
+async function acceptOrder(id) {
+
+const {
+    error
+} =
+    await supabase
+        .from("orders")
+        .update({
+            status: "Accepted"
+        })
+        .eq(
+            "id",
+            id
+        );
 
 
-window.acceptOrder=async function(id){
+if (error) {
+
+    console.error(
+        "Accept order error:",
+        error
+    );
 
 
-
-await supabase
-
-.from("orders")
-
-.update({
-
-status:"Accepted"
-
-})
-
-.eq(
-"id",
-id
-);
+    alert(
+        error.message
+    );
 
 
-
-
-
-loadOrders();
-
-
+    return;
 
 }
 
 
+await loadOrders();
 
+}
 
-
-
-
-
-
+// ========================================
 // PAYMENT BUTTON
+// ========================================
 
-
-document.getElementById(
+document
+.getElementById(
 "paymentBtn"
 )
+?.addEventListener(
+"click",
+() => {
 
-.onclick=()=>{
+        if (!selectedOrder) {
+
+            alert(
+                "Select an order first."
+            );
+
+            return;
+
+        }
 
 
-if(!selectedOrder){
+        localStorage.setItem(
+            "paymentOrder",
+            String(
+                selectedOrder.id
+            )
+        );
 
 
-alert(
-"Select Order First"
+        window.location.href =
+            "payment.html";
+
+    }
 );
 
-
-return;
-
-
-}
-
-
-
-
-localStorage.setItem(
-"paymentOrder",
-selectedOrder.id
-);
-
-
-
-window.location.href=
-"payment.html";
-
-
-
-};
-
-
-
-
-
-
-
-
+// ========================================
 // INVOICE BUTTON
+// ========================================
 
-
-document.getElementById(
+document
+.getElementById(
 "invoiceBtn"
 )
+?.addEventListener(
+"click",
+() => {
 
-.onclick=()=>{
+        if (invoiceModal) {
 
+            invoiceModal.style.display =
+                "flex";
 
-document.getElementById(
-"invoiceModal"
-)
+        }
 
-.style.display="flex";
-
-
-
-};
-
-
-
-
-
-
-
-
-
-// CLOSE MODAL
-
-
-document.getElementById(
-"closeModalBtn"
-)
-
-.onclick=()=>{
-
-
-document.getElementById(
-"orderModal"
-)
-
-.style.display="none";
-
-
-};
-
-
-
-
-
-
-
-
-document.getElementById(
-"closeInvoiceBtn"
-)
-
-.onclick=()=>{
-
-
-document.getElementById(
-"invoiceModal"
-)
-
-.style.display="none";
-
-
-};
-
-
-
-
-
-
-
-
-
-// REFRESH
-
-
-document.getElementById(
-"refreshBtn"
-)
-
-.onclick=()=>{
-
-
-loadOrders();
-
-
-};
-
-
-
-
-
-
-
-
-
-// LOGOUT
-
-
-document.getElementById(
-"logoutBtn"
-)
-
-.onclick=()=>{
-
-
-localStorage.removeItem(
-"user"
+    }
 );
 
+// ========================================
+// NEW ORDER
+// ========================================
 
-window.location.href=
-"login.html";
-
-
-};
-
-
-
-
-
-
-
-
-
-// REALTIME
-
-
-supabase
-
-.channel(
-"orders-channel"
+document
+.getElementById(
+"newOrderBtn"
 )
+?.addEventListener(
+"click",
+() => {
 
+        window.location.href =
+            "menu.html";
+
+    }
+);
+
+// ========================================
+// CLOSE ORDER MODAL
+// ========================================
+
+document
+.getElementById(
+"closeModalBtn"
+)
+?.addEventListener(
+"click",
+() => {
+
+        if (orderModal) {
+
+            orderModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+// ========================================
+// CLOSE INVOICE MODAL
+// ========================================
+
+document
+.getElementById(
+"closeInvoiceBtn"
+)
+?.addEventListener(
+"click",
+() => {
+
+        if (invoiceModal) {
+
+            invoiceModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+// ========================================
+// REFRESH
+// ========================================
+
+document
+.getElementById(
+"refreshBtn"
+)
+?.addEventListener(
+"click",
+async () => {
+
+        await loadOrders();
+
+    }
+);
+
+// ========================================
+// LOGOUT
+// ========================================
+
+document
+.getElementById(
+"logoutBtn"
+)
+?.addEventListener(
+"click",
+async () => {
+
+        await logout();
+
+    }
+);
+
+// ========================================
+// REALTIME ORDERS
+// ========================================
+
+const ordersChannel =
+supabase
+.channel(
+"cashier-orders-channel"
+)
 .on(
-
 "postgres_changes",
-
 {
-
-event:"*",
-
-schema:"public",
-
-table:"orders"
-
+event: "*",
+schema: "public",
+table: "orders"
 },
+() => {
 
-()=>{
+            loadOrders();
+
+        }
+    )
+    .subscribe();
+
+// ========================================
+// INITIALIZE
+// ========================================
+
+async function initializeCashier() {
+
+const allowed =
+    await checkCashierAccess();
 
 
-loadOrders();
+if (!allowed) {
+    return;
+}
 
+
+await loadOrders();
 
 }
 
-)
+initializeCashier();
 
-.subscribe();
+// ========================================
+// READY
+// ========================================
 
-
-
-
-
-
-
-
-
-loadOrders();
+console.log(
+"Hameed's Bistro cashier.js loaded successfully."
+);
