@@ -1,4 +1,4 @@
-/* ALL-IN-ONE UPDATED CSS WITH ROUND LOGO */
+/* ALL-IN-ONE COMPLETE CSS */
 
 * {
     margin: 0;
@@ -15,6 +15,11 @@ body {
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+}
+
+/* HELPER CLASS */
+.hidden {
+    display: none !important;
 }
 
 /* TOP HEADER */
@@ -108,6 +113,7 @@ body {
     padding: 12px 0;
     font-size: 16px;
     border-bottom: 1px solid #003366;
+    display: block;
     transition: color 0.2s;
 }
 
@@ -115,8 +121,8 @@ body {
     color: #ffcc00;
 }
 
-#menuLoginBtn {
-    margin-top: auto;
+.side-btn {
+    width: 100%;
     padding: 12px;
     background: #ffcc00;
     color: #00264d;
@@ -125,7 +131,12 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    width: 100%;
+    margin-top: 15px;
+}
+
+.logout-bg {
+    background: #ff4d4d;
+    color: white;
 }
 
 /* LANGUAGE DROPDOWN BOX */
@@ -170,6 +181,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    padding-bottom: 60px; /* ফুটারের জন্য গ্যাপ */
     text-align: center;
 }
 
@@ -184,10 +196,10 @@ body {
 .restaurant-logo {
     width: 180px;
     height: 180px;
-    border-radius: 50%; /* পুরোপুরি গোল করার জন্য */
+    border-radius: 50%;
     object-fit: cover;
     background: #ffffff;
-    padding: 8px; /* ইমেজের চারপাশে গ্যাপ তৈরি করার জন্য */
+    padding: 8px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     border: 3px solid #ffffff;
     margin-bottom: 20px;
@@ -228,12 +240,17 @@ body {
     transform: translateY(-3px);
 }
 
-/* FOOTER */
+/* GLOBAL FOOTER (ALL PAGES) */
 footer {
-    padding: 15px;
+    width: 100%;
+    padding: 15px 10px;
     text-align: center;
     font-size: 14px;
-    opacity: 0.8;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 38, 77, 0.6); /* হালকা ড্রপডাউন ব্যাকগ্রাউন্ড */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto; /* যেকোনো পেজের সবসময় একদম নিচে থাকবে */
 }
 
 /* MOBILE RESPONSIVE */
@@ -261,6 +278,11 @@ footer {
         width: 100%;
         height: 70px;
     }
+
+    footer {
+        font-size: 12px;
+        padding: 12px 5px;
+    }
 }
 
 /* LARGE SCREEN / TV */
@@ -286,4 +308,4 @@ footer {
         height: 100px;
         font-size: 28px;
     }
-    }
+        }
