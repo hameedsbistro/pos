@@ -1,284 +1,491 @@
-// pos/js/cashier.js
+// js/cashier.js
 
-import {
-getCurrentUser,
-logout
-} from "./auth.js";
+import { supabase } from "./supabase.js";
 
-import {
-supabase
-} from "./supabase.js";
 
-// ========================================
-// USER
-// ========================================
+// =====================================================
+// AUTH / USER
+// =====================================================
 
-let user = null;
+const user = JSON.parse(
+    localStorage.getItem("user") || "null"
+);
 
-// ========================================
+if (!user) {
+    window.location.href = "login.html";
+    throw new Error("User not logged in");
+}
+
+
+// =====================================================
 // ELEMENTS
-// ========================================
+// =====================================================
 
-const userName =
-document.getElementById(
-"userName"
-);
+const userName = document.getElementById("userName");
+const userRole = document.getElementById("userRole");
 
-const userRole =
-document.getElementById(
-"userRole"
-);
+const tableSection =
+    document.getElementById("tableSection");
 
-const orderContainer =
-document.getElementById(
-"orderContainer"
-);
+const customerSection =
+    document.getElementById("customerSection");
 
-const orderModal =
-document.getElementById(
-"orderModal"
-);
+const orderSection =
+    document.getElementById("orderSection");
 
-const selectedOrderBox =
-document.getElementById(
-"selectedOrder"
-);
+const tableGrid =
+    document.getElementById("tableGrid");
 
-const invoiceModal =
-document.getElementById(
-"invoiceModal"
-);
+const customerOrders =
+    document.getElementById("customerOrders");
 
-// ========================================
-// DATA
-// ========================================
+const selectedTableNumber =
+    document.getElementById("selectedTableNumber");
 
-let orders = [];
+const orderTableNumber =
+    document.getElementById("orderTableNumber");
 
-let selectedOrder = null;
+const orderNumber =
+    document.getElementById("orderNumber");
 
-// ========================================
-// AUTH CHECK
-// ========================================
+const cashierMenuContainer =
+    document.getElementById("cashierMenuContainer");
 
-async function checkCashierAccess() {
+const categorySelect =
+    document.getElementById("categorySelect");
 
-try {
+const cashierCartItems =
+    document.getElementById("cashierCartItems");
 
-    user =
-        await getCurrentUser();
+const cashierSubtotal =
+    document.getElementById("cashierSubtotal");
+
+const cashierSst =
+    document.getElementById("cashierSst");
+
+const cashierTotal =
+    document.getElementById("cashierTotal");
 
 
-    console.log(
-        "Cashier current user:",
-        user
-    );
+// =====================================================
+// USER DISPLAY
+// =====================================================
+
+if (userName) {
+    userName.innerText =
+        user.name || "---";
+}
+
+if (userRole) {
+    userRole.innerText =
+        user.role || "cashier";
+}
 
 
-    if (!user) {
+// =====================================================
+// STATE
+// =====================================================
 
-        window.location.href =
-            "login.html";
+let tables = [];
+let menuItems = [];
+let selectedTable = null;
 
-        return false;
+let currentOrder = null;
+let currentCart = [];
 
+let currentOrderType = "Dine In";
+
+
+// =====================================================
+// SST
+// =====================================================
+
+const SST_RATE = 0.06;
+
+
+// =====================================================
+// FORMAT MONEY
+// =====================================================
+
+function money(value) {
+
+    return "RM " +
+        Number(value || 0).toFixed(2);
+
+}
+
+
+// =====================================================
+// CALCULATE BILL
+// =====================================================
+
+function calculateBill(cart) {
+
+    let subtotal = 0;
+
+    cart.forEach(item => {
+
+        subtotal +=
+            Number(item.price || 0) *
+            Number(item.quantity || 0);
+
+    });
+
+    const sst =
+        subtotal * SST_RATE;
+
+    const total =
+        subtotal + sst;
+
+    return {
+        subtotal,
+        sst,
+        total
+    };
+
+}
+
+
+// =====================================================
+// SHOW BILL
+// =====================================================
+
+function showBill() {
+
+    const bill =
+        calculateBill(currentCart);
+
+    if (cashierSubtotal) {
+        cashierSubtotal.innerText =
+            money(bill.subtotal);
+    }
+
+    if (cashierSst) {
+        cashierSst.innerText =
+            money(bill.sst);
+    }
+
+    if (cashierTotal) {
+        cashierTotal.innerText =
+            money(bill.total);
+    }
+
+}
+
+
+// =====================================================
+// LOAD TABLES
+// =====================================================
+
+async function loadTables() {
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("tables")
+        .select("*")
+        .order("table_number");
+
+    if (error) {
+
+        console.error(
+            "Table loading error:",
+            error
+        );
+
+        tableGrid.innerHTML = `
+            <div class="empty-message">
+                Unable to load tables.
+            </div>
+        `;
+
+        return;
+    }
+
+    tables = data || [];
+
+    await updateTableStatuses();
+
+}
+
+
+// =====================================================
+// UPDATE TABLE STATUS
+// =====================================================
+
+async function updateTableStatuses() {
+
+    const {
+        data: activeOrders,
+        error
+    } = await supabase
+        .from("orders")
+        .select(
+            "id, table_number, status, payment_status"
+        )
+        .neq(
+            "payment_status",
+            "Paid"
+        );
+
+    if (error) {
+
+        console.error(
+            "Order status error:",
+            error
+        );
+
+        showTables(tables);
+
+        return;
     }
 
 
-    const role =
-        String(
-            user.role || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    if (
-        role !== "cashier" &&
-        role !== "admin" &&
-        role !== "manager"
-    ) {
-
-        alert(
-            "You do not have permission to access the Cashier Panel."
+    const activeTableNumbers =
+        new Set(
+            (activeOrders || [])
+                .filter(order =>
+                    order.table_number &&
+                    order.payment_status !== "Paid"
+                )
+                .map(order =>
+                    String(order.table_number)
+                )
         );
 
 
-        window.location.href =
-            "login.html";
+    showTables(
+        tables.map(table => ({
 
-        return false;
+            ...table,
 
-    }
+            calculatedStatus:
+                activeTableNumbers.has(
+                    String(table.table_number)
+                )
+                    ? "Busy"
+                    : "Available"
 
-
-    if (userName) {
-
-        userName.innerText =
-            user.name || "---";
-
-    }
-
-
-    if (userRole) {
-
-        userRole.innerText =
-            role;
-
-    }
-
-
-    return true;
-
-
-} catch (error) {
-
-    console.error(
-        "Cashier authentication error:",
-        error
+        }))
     );
 
-
-    window.location.href =
-        "login.html";
-
-    return false;
-
-}
-
-}
-
-// ========================================
-// LOAD ORDERS
-// ========================================
-
-async function loadOrders() {
-
-if (!orderContainer) {
-    return;
 }
 
 
-const {
-    data,
-    error
-} =
-    await supabase
+// =====================================================
+// SHOW TABLE GRID
+// =====================================================
+
+function showTables(list) {
+
+    tableGrid.innerHTML = "";
+
+
+    if (!list.length) {
+
+        tableGrid.innerHTML = `
+            <div class="empty-message">
+                No tables found.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.forEach(table => {
+
+        const status =
+            table.calculatedStatus ||
+            table.status ||
+            "Available";
+
+
+        const card =
+            document.createElement("button");
+
+
+        card.type = "button";
+
+
+        card.className =
+            "table-card " +
+            (
+                status === "Busy"
+                    ? "busy"
+                    : "available"
+            );
+
+
+        card.innerHTML = `
+
+            <span class="table-number">
+                ${table.table_number}
+            </span>
+
+            <span class="table-status">
+                ${
+                    status === "Busy"
+                        ? "BUSY"
+                        : "AVAILABLE"
+                }
+            </span>
+
+        `;
+
+
+        card.onclick = () => {
+
+            selectTable(table);
+
+        };
+
+
+        tableGrid.appendChild(card);
+
+    });
+
+}
+
+
+// =====================================================
+// SELECT TABLE
+// =====================================================
+
+async function selectTable(table) {
+
+    selectedTable = table;
+
+
+    selectedTableNumber.innerText =
+        table.table_number;
+
+
+    tableSection.style.display =
+        "none";
+
+
+    customerSection.style.display =
+        "block";
+
+
+    orderSection.style.display =
+        "none";
+
+
+    await loadCustomerOrders();
+
+}
+
+
+// =====================================================
+// LOAD CUSTOMER ORDERS
+// =====================================================
+
+async function loadCustomerOrders() {
+
+    customerOrders.innerHTML = `
+
+        <div class="empty-message">
+            Loading orders...
+        </div>
+
+    `;
+
+
+    const {
+        data,
+        error
+    } = await supabase
         .from("orders")
         .select("*")
-        .in(
-            "status",
-            [
-                "New",
-                "Accepted",
-                "Ready"
-            ]
+        .eq(
+            "table_number",
+            selectedTable.table_number
+        )
+        .neq(
+            "payment_status",
+            "Paid"
         )
         .order(
             "created_at",
             {
-                ascending: false
+                ascending: true
             }
         );
 
 
-if (error) {
+    if (error) {
 
-    console.error(
-        "Load orders error:",
-        error
-    );
+        console.error(
+            "Customer orders error:",
+            error
+        );
 
+        customerOrders.innerHTML = `
 
-    orderContainer.innerHTML = `
+            <div class="empty-message">
+                Unable to load orders.
+            </div>
 
-        <div class="order-error">
+        `;
 
-            Unable to load orders.
-
-        </div>
-
-    `;
-
-
-    return;
-
-}
+        return;
+    }
 
 
-orders =
-    data || [];
+    const orders =
+        data || [];
 
 
-showOrders();
-
-}
-
-// ========================================
-// SHOW ORDERS
-// ========================================
-
-function showOrders() {
-
-if (!orderContainer) {
-    return;
-}
+    customerOrders.innerHTML = "";
 
 
-orderContainer.innerHTML = "";
+    if (!orders.length) {
+
+        customerOrders.innerHTML = `
+
+            <div class="empty-message">
+
+                No active customer orders.
+                <br>
+                Create a new customer below.
+
+            </div>
+
+        `;
+
+        return;
+    }
 
 
-if (orders.length === 0) {
+    orders.forEach(order => {
 
-    orderContainer.innerHTML = `
-
-        <div class="no-orders">
-
-            No current orders.
-
-        </div>
-
-    `;
+        const card =
+            document.createElement("div");
 
 
-    return;
+        card.className =
+            "customer-order-card";
 
-}
+
+        const customerName =
+            order.customer_name ||
+            order.ordered_by_name ||
+            "Customer";
 
 
-orders.forEach(
-    order => {
-
-        const total =
+        const amount =
             Number(
                 order.total_amount || 0
             );
 
 
-        const table =
-            order.table_number ||
-            "Take Away";
-
-
-        const status =
-            order.status ||
-            "New";
-
-
-        const card =
-            document.createElement(
-                "div"
-            );
-
-
-        card.className =
-            `order-card ${status}`;
-
-
         card.innerHTML = `
 
             <h3>
-                Table: ${table}
+                ${customerName}
             </h3>
 
             <p>
@@ -288,227 +495,335 @@ orders.forEach(
 
             <p>
                 Status:
-                ${status}
+                ${order.status || "New"}
             </p>
 
             <p>
                 Amount:
-                RM ${total.toFixed(2)}
+                ${money(amount)}
             </p>
 
-            <button
-                type="button"
-                class="view-order-btn">
-                View
-            </button>
+            <div class="customer-order-actions">
 
-            ${
-                status === "New"
-                    ?
-                    `
-                    <button
-                        type="button"
-                        class="accept-order-btn">
-                        Accept
-                    </button>
-                    `
-                    :
-                    ""
-            }
+                <button
+                    class="open-order-btn">
+
+                    OPEN
+
+                </button>
+
+                <button
+                    class="order-payment-btn">
+
+                    PAYMENT
+
+                </button>
+
+            </div>
 
         `;
 
 
-        const viewBtn =
-            card.querySelector(
-                ".view-order-btn"
-            );
+        card.querySelector(
+            ".open-order-btn"
+        ).onclick = () => {
+
+            openExistingOrder(order);
+
+        };
 
 
-        viewBtn?.addEventListener(
-            "click",
-            () => {
+        card.querySelector(
+            ".order-payment-btn"
+        ).onclick = () => {
 
-                openOrder(
-                    order.id
-                );
+            openPaymentForOrder(order);
 
-            }
+        };
+
+
+        customerOrders.appendChild(card);
+
+    });
+
+}
+
+
+// =====================================================
+// OPEN EXISTING ORDER
+// =====================================================
+
+async function openExistingOrder(order) {
+
+    currentOrder = order;
+
+
+    currentCart =
+        await loadOrderItems(
+            order.id
         );
 
 
-        const acceptBtn =
-            card.querySelector(
-                ".accept-order-btn"
-            );
+    openOrderScreen();
+
+}
 
 
-        acceptBtn?.addEventListener(
-            "click",
-            () => {
+// =====================================================
+// LOAD ORDER ITEMS
+// =====================================================
 
-                acceptOrder(
-                    order.id
-                );
+async function loadOrderItems(orderId) {
 
-            }
+    const {
+        data,
+        error
+    } = await supabase
+        .from("order_items")
+        .select("*")
+        .eq(
+            "order_id",
+            orderId
+        )
+        .order("created_at");
+
+
+    if (error) {
+
+        console.error(
+            "Order items error:",
+            error
         );
 
-
-        orderContainer.appendChild(
-            card
-        );
+        return [];
 
     }
-);
+
+
+    return (data || []).map(item => ({
+
+        id: item.id,
+
+        menuId: null,
+
+        itemName: item.item_name,
+
+        price: Number(
+            item.price || 0
+        ),
+
+        quantity: Number(
+            item.quantity || 1
+        ),
+
+        category: "",
+
+        section_id:
+            item.section_id || null,
+
+        item_note:
+            item.item_note || ""
+
+    }));
 
 }
 
-// ========================================
-// OPEN ORDER
-// ========================================
 
-function openOrder(id) {
+// =====================================================
+// NEW CUSTOMER
+// =====================================================
 
-selectedOrder =
-    orders.find(
-        order =>
-            String(order.id) ===
-            String(id)
+document
+    .getElementById("newCustomerBtn")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            currentOrder = null;
+
+            currentCart = [];
+
+            openOrderScreen();
+
+        }
     );
 
 
-if (!selectedOrder) {
+// =====================================================
+// OPEN ORDER SCREEN
+// =====================================================
 
-    alert(
-        "Order not found."
-    );
+async function openOrderScreen() {
 
-    return;
+    tableSection.style.display =
+        "none";
+
+    customerSection.style.display =
+        "none";
+
+    orderSection.style.display =
+        "block";
+
+
+    orderTableNumber.innerText =
+        selectedTable.table_number;
+
+
+    if (currentOrder) {
+
+        orderNumber.innerText =
+            currentOrder.order_number ||
+            currentOrder.id;
+
+    }
+    else {
+
+        orderNumber.innerText =
+            "New Customer";
+
+    }
+
+
+    await loadCashierMenu();
+
+    showCart();
 
 }
 
 
-localStorage.setItem(
-    "paymentOrder",
-    String(
-        selectedOrder.id
-    )
-);
+// =====================================================
+// LOAD MENU
+// =====================================================
+
+async function loadCashierMenu() {
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("menu")
+        .select(`
+
+            id,
+            category,
+            item_name,
+            image,
+            dine_in_price,
+            take_away_price,
+            section_id
+
+        `)
+        .eq(
+            "status",
+            "active"
+        )
+        .order(
+            "category"
+        )
+        .order(
+            "item_name"
+        );
 
 
-const total =
-    Number(
-        selectedOrder.total_amount ||
-        0
+    if (error) {
+
+        console.error(
+            "Menu error:",
+            error
+        );
+
+        cashierMenuContainer.innerHTML = `
+
+            <div class="empty-message">
+                Unable to load menu.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    menuItems = data || [];
+
+
+    populateCategories();
+
+    showCashierMenu(
+        menuItems
     );
 
+}
 
-if (selectedOrderBox) {
 
-    selectedOrderBox.innerHTML = `
+// =====================================================
+// CATEGORY LIST
+// =====================================================
 
-        <h3>
-            Table:
-            ${
-                selectedOrder.table_number ||
-                "Take Away"
-            }
-        </h3>
+function populateCategories() {
 
-        <p>
-            Order:
-            ${
-                selectedOrder.order_number ||
-                selectedOrder.id
-            }
-        </p>
+    categorySelect.innerHTML = `
 
-        <p>
-            Status:
-            ${
-                selectedOrder.status ||
-                ""
-            }
-        </p>
-
-        <p>
-            Amount:
-            RM ${total.toFixed(2)}
-        </p>
+        <option value="all">
+            Select Category
+        </option>
 
     `;
 
-}
+
+    const categories =
+        [
+            ...new Set(
+                menuItems
+                    .map(item =>
+                        item.category
+                    )
+                    .filter(Boolean)
+            )
+        ];
 
 
-if (orderModal) {
+    categories.forEach(category => {
 
-    orderModal.style.display =
-        "flex";
+        const option =
+            document.createElement(
+                "option"
+            );
 
-}
 
-}
+        option.value =
+            category;
 
-// ========================================
-// ACCEPT ORDER
-// ========================================
 
-async function acceptOrder(id) {
+        option.textContent =
+            category;
 
-const {
-    error
-} =
-    await supabase
-        .from("orders")
-        .update({
-            status: "Accepted"
-        })
-        .eq(
-            "id",
-            id
+
+        categorySelect.appendChild(
+            option
         );
 
-
-if (error) {
-
-    console.error(
-        "Accept order error:",
-        error
-    );
-
-
-    alert(
-        error.message
-    );
-
-
-    return;
+    });
 
 }
 
 
-await loadOrders();
+// =====================================================
+// CATEGORY CHANGE
+// =====================================================
 
-}
+categorySelect?.addEventListener(
+    "change",
+    () => {
 
-// ========================================
-// PAYMENT BUTTON
-// ========================================
+        const category =
+            categorySelect.value;
 
-document
-.getElementById(
-"paymentBtn"
-)
-?.addEventListener(
-"click",
-() => {
 
-        if (!selectedOrder) {
+        if (category === "all") {
 
-            alert(
-                "Select an order first."
+            showCashierMenu(
+                menuItems
             );
 
             return;
@@ -516,187 +831,344 @@ document
         }
 
 
-        localStorage.setItem(
-            "paymentOrder",
-            String(
-                selectedOrder.id
+        showCashierMenu(
+            menuItems.filter(
+                item =>
+                    item.category ===
+                    category
             )
         );
 
-
-        window.location.href =
-            "payment.html";
-
     }
 );
 
-// ========================================
-// INVOICE BUTTON
-// ========================================
 
-document
-.getElementById(
-"invoiceBtn"
-)
-?.addEventListener(
-"click",
-() => {
+// =====================================================
+// SHOW CASHIER MENU
+// =====================================================
 
-        if (invoiceModal) {
+function showCashierMenu(items) {
 
-            invoiceModal.style.display =
-                "flex";
+    cashierMenuContainer.innerHTML =
+        "";
 
-        }
 
+    if (!items.length) {
+
+        cashierMenuContainer.innerHTML = `
+
+            <div class="empty-message">
+                No menu items found.
+            </div>
+
+        `;
+
+        return;
     }
-);
-
-// ========================================
-// NEW ORDER
-// ========================================
-
-document
-.getElementById(
-"newOrderBtn"
-)
-?.addEventListener(
-"click",
-() => {
-
-        window.location.href =
-            "menu.html";
-
-    }
-);
-
-// ========================================
-// CLOSE ORDER MODAL
-// ========================================
-
-document
-.getElementById(
-"closeModalBtn"
-)
-?.addEventListener(
-"click",
-() => {
-
-        if (orderModal) {
-
-            orderModal.style.display =
-                "none";
-
-        }
-
-    }
-);
-
-// ========================================
-// CLOSE INVOICE MODAL
-// ========================================
-
-document
-.getElementById(
-"closeInvoiceBtn"
-)
-?.addEventListener(
-"click",
-() => {
-
-        if (invoiceModal) {
-
-            invoiceModal.style.display =
-                "none";
-
-        }
-
-    }
-);
-
-// ========================================
-// REFRESH
-// ========================================
-
-document
-.getElementById(
-"refreshBtn"
-)
-?.addEventListener(
-"click",
-async () => {
-
-        await loadOrders();
-
-    }
-);
-
-// ========================================
-// LOGOUT
-// ========================================
-
-document
-.getElementById(
-"logoutBtn"
-)
-?.addEventListener(
-"click",
-async () => {
-
-        await logout();
-
-    }
-);
-
-// ========================================
-// REALTIME ORDERS
-// ========================================
-
-const ordersChannel =
-supabase
-.channel(
-"cashier-orders-channel"
-)
-.on(
-"postgres_changes",
-{
-event: "*",
-schema: "public",
-table: "orders"
-},
-() => {
-
-            loadOrders();
-
-        }
-    )
-    .subscribe();
-
-// ========================================
-// INITIALIZE
-// ========================================
-
-async function initializeCashier() {
-
-const allowed =
-    await checkCashierAccess();
 
 
-if (!allowed) {
-    return;
+    items.forEach(item => {
+
+        const price =
+            Number(
+                item.dine_in_price || 0
+            );
+
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "cashier-menu-card";
+
+
+        card.innerHTML = `
+
+            <img
+                src="${
+                    item.image ||
+                    "images/no-image.png"
+                }"
+                onerror="
+                    this.src='images/no-image.png'
+                "
+            >
+
+            <div class="cashier-menu-info">
+
+                <h3>
+                    ${item.item_name}
+                </h3>
+
+                <p class="cashier-menu-category">
+                    ${item.category || ""}
+                </p>
+
+                <p class="cashier-menu-price">
+                    ${money(price)}
+                </p>
+
+                <button
+                    class="cashier-add-btn">
+
+                    ADD
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        card.querySelector(
+            ".cashier-add-btn"
+        ).onclick = () => {
+
+            addItemToCashierCart(
+                item
+            );
+
+        };
+
+
+        cashierMenuContainer.appendChild(
+            card
+        );
+
+    });
+
 }
 
 
-await loadOrders();
+// =====================================================
+// ADD ITEM
+// =====================================================
+
+function addItemToCashierCart(item) {
+
+    const price =
+        Number(
+            item.dine_in_price || 0
+        );
+
+
+    const existing =
+        currentCart.find(
+            cartItem =>
+                cartItem.menuId ===
+                item.id
+        );
+
+
+    if (existing) {
+
+        existing.quantity++;
+
+    }
+    else {
+
+        currentCart.push({
+
+            id: null,
+
+            menuId: item.id,
+
+            itemName:
+                item.item_name,
+
+            price: price,
+
+            quantity: 1,
+
+            category:
+                item.category || "",
+
+            section_id:
+                item.section_id || null,
+
+            item_note: ""
+
+        });
+
+    }
+
+
+    showCart();
 
 }
 
-initializeCashier();
 
-// ========================================
-// READY
-// ========================================
+// =====================================================
+// SHOW CART
+// =====================================================
 
-console.log(
-"Hameed's Bistro cashier.js loaded successfully."
-);
+function showCart() {
+
+    cashierCartItems.innerHTML =
+        "";
+
+
+    if (!currentCart.length) {
+
+        cashierCartItems.innerHTML = `
+
+            <div class="empty-message">
+
+                No items added yet.
+
+            </div>
+
+        `;
+
+        showBill();
+
+        return;
+    }
+
+
+    currentCart.forEach(
+        (item, index) => {
+
+            const amount =
+                Number(item.price) *
+                Number(item.quantity);
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "cashier-cart-item";
+
+
+            row.innerHTML = `
+
+                <div
+                    class="cashier-cart-item-top">
+
+                    <span
+                        class="cashier-cart-item-name">
+
+                        ${item.itemName}
+
+                    </span>
+
+                    <span
+                        class="cashier-cart-item-price">
+
+                        ${money(amount)}
+
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="cashier-cart-controls">
+
+                    <button
+                        class="minus-btn">
+
+                        −
+
+                    </button>
+
+
+                    <span>
+                        ${item.quantity}
+                    </span>
+
+
+                    <button
+                        class="plus-btn">
+
+                        +
+
+                    </button>
+
+
+                    <button
+                        class="cashier-remove-btn">
+
+                        REMOVE
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            row.querySelector(
+                ".minus-btn"
+            ).onclick = () => {
+
+                if (
+                    item.quantity > 1
+                ) {
+
+                    item.quantity--;
+
+                }
+                else {
+
+                    currentCart.splice(
+                        index,
+                        1
+                    );
+
+                }
+
+
+                showCart();
+
+            };
+
+
+            row.querySelector(
+                ".plus-btn"
+            ).onclick = () => {
+
+                item.quantity++;
+
+                showCart();
+
+            };
+
+
+            row.querySelector(
+                ".cashier-remove-btn"
+            ).onclick = () => {
+
+                currentCart.splice(
+                    index,
+                    1
+                );
+
+                showCart();
+
+            };
+
+
+            cashierCartItems.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    showBill();
+
+}
+
+
+// =====================================================
+// SEND ORDER
+// =======
