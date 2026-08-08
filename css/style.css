@@ -1,437 +1,284 @@
-/* pos/css/style.css */
+/* ALL-IN-ONE REPAIRED CSS */
 
-
-
-*{
-
-margin:0;
-
-padding:0;
-
-box-sizing:border-box;
-
-font-family:Arial, sans-serif;
-
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-
-
-
-
-
-body{
-
-
-background:#004c99;
-
-min-height:100vh;
-
-color:white;
-
-
+body {
+    background: #004c99;
+    min-height: 100vh;
+    color: white;
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
 }
-
-
-
-
-
-
-
-
 
 /* TOP HEADER */
-
-
-
-.top-header{
-
-
-height:70px;
-
-display:flex;
-
-justify-content:flex-end;
-
-align-items:center;
-
-padding:15px;
-
-
+.customer-header {
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
 }
 
-
-
-
-
-
-
-.top-actions{
-
-
-display:flex;
-
-gap:12px;
-
-
+.header-actions {
+    display: flex;
+    gap: 12px;
 }
 
-
-
-
-
-
-
-.top-actions button{
-
-
-width:45px;
-
-height:45px;
-
-border:none;
-
-border-radius:50%;
-
-background:white;
-
-color:#003366;
-
-font-size:22px;
-
-cursor:pointer;
-
-
+.header-btn {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #003366;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease;
 }
 
-
-
-
-
-
-
-.top-actions button:hover{
-
-
-transform:scale(1.1);
-
-
+.header-btn:hover {
+    transform: scale(1.1);
 }
 
-
-
-
-
-
-
-
-
-/* WELCOME PAGE */
-
-
-
-.welcome-page{
-
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-padding:20px;
-
-text-align:center;
-
-
+/* CART BADGE */
+#cartCount {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff3333;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 3px 7px;
+    border: 2px solid #004c99;
 }
 
-
-
-
-
-
-
-
-
-.logo-area{
-
-
-margin-top:20px;
-
+/* SIDE MENU */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100%;
+    background: #00264d;
+    color: white;
+    padding: 25px 20px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
 }
 
-
-
-
-
-.restaurant-logo{
-
-
-width:180px;
-
-height:180px;
-
-object-fit:contain;
-
-margin-bottom:20px;
-
-
+.side-menu.active {
+    left: 0;
 }
 
-
-
-
-
-
-
-.logo-area h1{
-
-
-font-size:42px;
-
-margin-bottom:10px;
-
-
+#closeMenu {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
 }
 
-
-
-
-
-
-
-.logo-area h2{
-
-
-font-size:28px;
-
-font-weight:normal;
-
-
+.side-menu h3 {
+    margin: 20px 0 15px 0;
+    font-size: 22px;
+    border-bottom: 1px solid #004080;
+    padding-bottom: 8px;
 }
 
+.side-menu a {
+    text-decoration: none;
+    color: #e6f2ff;
+    padding: 12px 0;
+    font-size: 16px;
+    border-bottom: 1px solid #003366;
+    transition: color 0.2s;
+}
 
+.side-menu a:hover {
+    color: #ffcc00;
+}
 
+#menuLoginBtn {
+    margin-top: auto;
+    padding: 12px;
+    background: #ffcc00;
+    color: #00264d;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
+/* LANGUAGE DROPDOWN BOX */
+.language-box {
+    display: none;
+    position: absolute;
+    top: 65px;
+    right: 70px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 999;
+    overflow: hidden;
+    flex-direction: column;
+}
 
+.language-box.active {
+    display: flex;
+}
 
+.language-box button {
+    background: none;
+    border: none;
+    padding: 12px 25px;
+    text-align: left;
+    color: #003366;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
 
+.language-box button:hover {
+    background: #e6f2ff;
+}
 
+/* HOME & WELCOME CONTAINER */
+.home-container, .welcome-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+}
+
+/* LOGO AREA */
+.logo-area {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.restaurant-logo {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+.logo-area h1, .home-container h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.logo-area h2, .home-container h2 {
+    font-size: 28px;
+    font-weight: normal;
+}
 
 /* BUTTON AREA */
-
-
-
-.main-buttons{
-
-
-margin-top:50px;
-
-display:grid;
-
-grid-template-columns:repeat(
-
-2,
-
-250px
-
-);
-
-gap:25px;
-
-
+.home-order-buttons, .main-buttons {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 220px);
+    gap: 25px;
 }
 
-
-
-
-
-
-
-.main-btn{
-
-
-height:90px;
-
-border:none;
-
-border-radius:15px;
-
-background:white;
-
-color:#003366;
-
-font-size:22px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-
+.home-order-buttons button, .main-btn {
+    height: 80px;
+    border: none;
+    border-radius: 15px;
+    background: white;
+    color: #003366;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
 }
 
-
-
-
-
-
-
-.main-btn:hover{
-
-
-background:#f1f1f1;
-
-transform:translateY(-3px);
-
-
+.home-order-buttons button:hover, .main-btn:hover {
+    background: #f1f1f1;
+    transform: translateY(-3px);
 }
 
-
-
-
-
-
-
-
-
-/* MOBILE */
-
-
-
-@media(max-width:600px){
-
-
-
-.logo-area h1{
-
-
-font-size:30px;
-
-
+/* FOOTER */
+footer {
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.8;
 }
 
+/* MOBILE RESPONSIVE */
+@media(max-width: 600px) {
+    .logo-area h1, .home-container h1 {
+        font-size: 30px;
+    }
 
+    .logo-area h2, .home-container h2 {
+        font-size: 20px;
+    }
 
+    .restaurant-logo {
+        width: 130px;
+        height: 130px;
+    }
 
+    .home-order-buttons, .main-buttons {
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 280px;
+    }
 
-.logo-area h2{
-
-
-font-size:20px;
-
-
+    .home-order-buttons button, .main-btn {
+        width: 100%;
+        height: 70px;
+    }
 }
-
-
-
-
-
-.restaurant-logo{
-
-
-width:130px;
-
-height:130px;
-
-
-}
-
-
-
-
-
-.main-buttons{
-
-
-grid-template-columns:1fr;
-
-width:100%;
-
-
-}
-
-
-
-
-
-.main-btn{
-
-
-width:100%;
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
 
 /* LARGE SCREEN / TV */
+@media(min-width: 1200px) {
+    .restaurant-logo {
+        width: 230px;
+        height: 230px;
+    }
 
+    .logo-area h1, .home-container h1 {
+        font-size: 52px;
+    }
 
+    .logo-area h2, .home-container h2 {
+        font-size: 32px;
+    }
 
-@media(min-width:1200px){
+    .home-order-buttons, .main-buttons {
+        grid-template-columns: repeat(2, 280px);
+    }
 
-
-
-.restaurant-logo{
-
-
-width:250px;
-
-height:250px;
-
-
-}
-
-
-
-
-
-.logo-area h1{
-
-
-font-size:55px;
-
-
-}
-
-
-
-
-
-.logo-area h2{
-
-
-font-size:35px;
-
-
-}
-
-
-
-
-
-.main-btn{
-
-
-height:120px;
-
-font-size:30px;
-
-
-}
-
-
-
-}
+    .home-order-buttons button, .main-btn {
+        height: 100px;
+        font-size: 28px;
+    }
+  }
+  
