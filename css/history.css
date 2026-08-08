@@ -2,14 +2,14 @@
    ORDER HISTORY PAGE SPECIFIC STYLES
    ========================================== */
 
-/* History Container */
+/* Container Setup */
 .history-container {
     max-width: 800px;
     margin: 20px auto;
     padding: 0 15px;
 }
 
-/* Page Title Section */
+/* Page Title Styling */
 .history-title-box {
     display: flex;
     justify-content: space-between;
@@ -25,14 +25,14 @@
     margin: 0;
 }
 
-/* Order List Wrappers */
+/* Orders List Layout */
 #ordersList {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* Individual Order Card */
+/* Individual Order Card Structure */
 .order-card {
     background: #ffffff;
     border: 1px solid #e0e0e0;
@@ -47,7 +47,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Header inside Order Card */
 .order-card-header {
     display: flex;
     justify-content: space-between;
@@ -74,31 +73,14 @@
     color: #ffffff;
 }
 
-.status-pending {
-    background-color: #f39c12;
-}
+.status-pending { background-color: #f39c12; }
+.status-accepted { background-color: #3498db; }
+.status-preparing { background-color: #9b59b6; }
+.status-ready { background-color: #1abc9c; }
+.status-completed { background-color: #27ae60; }
+.status-cancelled { background-color: #e74c3c; }
 
-.status-accepted {
-    background-color: #3498db;
-}
-
-.status-preparing {
-    background-color: #9b59b6;
-}
-
-.status-ready {
-    background-color: #1abc9c;
-}
-
-.status-completed {
-    background-color: #27ae60;
-}
-
-.status-cancelled {
-    background-color: #e74c3c;
-}
-
-/* Order Details Body */
+/* Card Content Details */
 .order-card-body {
     display: flex;
     flex-direction: column;
@@ -135,7 +117,7 @@
     margin-top: 6px;
 }
 
-/* Empty State Box */
+/* Empty State / Error Layout */
 .empty-history-box {
     text-align: center;
     background: #ffffff;
@@ -159,21 +141,11 @@
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
     transition: background 0.2s;
 }
 
 .empty-history-btn:hover {
     background: #002244;
 }
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .order-card-header {
-        flex-direction: row;
-        align-items: center;
-    }
-
-    .history-title-box h2 {
-        font-size: 18px;
-    }
-  }
