@@ -13,13 +13,13 @@
     <header class="customer-header">
         <div style="display: flex; gap: 8px; align-items: center;">
             <button id="menuBtn" class="header-btn" type="button">☰</button>
-            <button onclick="window.history.back()" class="header-btn" title="Go Back">⬅️</button>
+            <button onclick="window.history.back()" class="header-btn" title="Go Back" type="button">⬅️</button>
             <a href="index.html" class="header-btn" title="Go Home" style="text-decoration: none;">🏠</a>
         </div>
 
         <div class="header-actions">
-            <button id="languageBtn" class="header-btn">🌐 EN</button>
-            <button id="refreshBtn" class="header-btn">🔄</button>
+            <button id="languageBtn" class="header-btn" type="button">🌐 EN</button>
+            <button id="refreshBtn" class="header-btn" type="button">🔄</button>
             <a href="cart.html" class="header-btn" style="text-decoration: none;">🛒 <span id="cartCount">0</span></a>
         </div>
     </header>
@@ -36,7 +36,7 @@
         
         <div id="userLoggedInMenu" class="hidden">
             <a href="profile.html">My Profile</a>
-            <button id="logoutBtn" class="side-btn logout-bg">Logout</button>
+            <button id="logoutBtn" class="side-btn logout-bg" type="button">Logout</button>
         </div>
         <div id="userLoggedOutMenu">
             <a href="login.html" class="side-btn">Login / Register</a>
@@ -45,12 +45,12 @@
 
     <!-- LANGUAGE SELECTION POPUP DROPDOWN -->
     <div id="languageBox" class="language-box">
-        <button data-lang="en">English</button>
-        <button data-lang="bn">বাংলা</button>
-        <button data-lang="ms">Bahasa Melayu</button>
-        <button data-lang="zh">中文</button>
-        <button data-lang="ta">தமிழ்</button>
-        <button data-lang="hi">হিন্দি</button>
+        <button data-lang="en" type="button">English</button>
+        <button data-lang="bn" type="button">বাংলা</button>
+        <button data-lang="ms" type="button">Bahasa Melayu</button>
+        <button data-lang="zh" type="button">中文</button>
+        <button data-lang="ta" type="button">தமிழ்</button>
+        <button data-lang="hi" type="button">হিন্দি</button>
     </div>
 
     <!-- MAIN HISTORY CONTAINER -->
@@ -60,7 +60,7 @@
         </div>
         
         <div id="ordersList">
-            <!-- Supabase Data loads here -->
+            <!-- Supabase Data loads dynamically via Javascript -->
         </div>
     </div>
 
