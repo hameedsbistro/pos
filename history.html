@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order History - Food Ordering System</title>
+    <title>My Orders - Food Ordering System</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/history.css">
 </head>
 <body>
 
-    <!-- TOP HEADER WITH HOME & BACK NAVIGATION -->
+    <!-- TOP HEADER WITH NAVIGATION -->
     <header class="customer-header">
         <div style="display: flex; gap: 8px; align-items: center;">
             <button id="menuBtn" class="header-btn">☰</button>
@@ -18,7 +19,7 @@
 
         <div class="header-actions">
             <button id="languageBtn" class="header-btn">🌐 EN</button>
-            <button id="refreshBtn" class="header-btn" onclick="window.location.reload()">🔄</button>
+            <button id="refreshBtn" class="header-btn">🔄</button>
             <a href="cart.html" class="header-btn" style="text-decoration: none;">🛒 <span id="cartCount">0</span></a>
         </div>
     </header>
@@ -31,7 +32,7 @@
         <a href="menu.html">Menu</a>
         <a href="cart.html">View Cart</a>
         <a href="history.html">My Orders</a>
-        <a href="menu.html">Popular Items</a>
+        <a href="menu.html?category=popular">Popular Items</a>
         
         <div id="userLoggedInMenu" class="hidden">
             <a href="profile.html">My Profile</a>
@@ -42,13 +43,24 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT AREA -->
-    <div class="menu-container">
-        <div class="popular-section">
-            <h2 class="section-title">My Order History</h2>
-            <div id="ordersList">
-                <!-- Javascript দিয়ে কাস্টমারের অর্ডারসমূহ এখানে শো করবে -->
-            </div>
+    <!-- LANGUAGE SELECTION POPUP DROPDOWN -->
+    <div id="languageBox" class="language-box">
+        <button data-lang="en">English</button>
+        <button data-lang="bn">বাংলা</button>
+        <button data-lang="ms">Bahasa Melayu</button>
+        <button data-lang="zh">中文</button>
+        <button data-lang="ta">தமிழ்</button>
+        <button data-lang="hi">হিন্দি</button>
+    </div>
+
+    <!-- MAIN HISTORY CONTAINER -->
+    <div class="history-container">
+        <div class="history-title-box">
+            <h2>My Order History</h2>
+        </div>
+        
+        <div id="ordersList">
+            <!-- Supabase Data loads here -->
         </div>
     </div>
 
