@@ -25,16 +25,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     updateCartBadge();
 
-    // 2. Side Menu Drawer Open / Close
-    if (menuBtn && sideMenu && closeMenu) {
-        menuBtn.addEventListener('click', () => {
+    // 2. Side Menu Drawer Toggle Logic
+    if (menuBtn && sideMenu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             sideMenu.classList.add('active');
         });
+    }
 
-        closeMenu.addEventListener('click', () => {
+    if (closeMenu && sideMenu) {
+        closeMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
             sideMenu.classList.remove('active');
         });
     }
+
+    // Close Side Menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (sideMenu && sideMenu.classList.contains('active')) {
+            if (!sideMenu.contains(e.target) && e.target !== menuBtn) {
+                sideMenu.classList.remove('active');
+            }
+        }
+    });
 
     // 3. Header Refresh Button Action
     if (refreshBtn) {
@@ -191,4 +204,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadOrders();
 });
-          
