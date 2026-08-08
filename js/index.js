@@ -1,9 +1,9 @@
-/* js/index.js - Home Page Logic (Order Type Selection, Language Dropdown, & Side Menu) */
+/* js/index.js - Home Page Logic & Direct Link Redirection */
 
 import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. UI Elements
+    // UI Elements
     const dineInBtn = document.getElementById('dineInBtn');
     const takeAwayBtn = document.getElementById('takeAwayBtn');
     const menuBtn = document.getElementById('menuBtn');
@@ -15,8 +15,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const userLoggedInMenu = document.getElementById('userLoggedInMenu');
     const userLoggedOutMenu = document.getElementById('userLoggedOutMenu');
+    const myOrdersLink = document.getElementById('myOrdersLink');
 
-    // 2. Update Cart Badge Count from LocalStorage
+    // 1. Force "My Orders" button to redirect strictly to history.html
+    if (myOrdersLink) {
+        myOrdersLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'history.html';
+        });
+    }
+
+    // 2. Update Cart Badge Count
     function updateCartBadge() {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
@@ -59,14 +68,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             languageBox.classList.toggle('active');
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!languageBox.contains(e.target) && e.target !== languageBtn) {
                 languageBox.classList.remove('active');
             }
         });
 
-        // Language Option Click Logic
         const langButtons = languageBox.querySelectorAll('button');
         langButtons.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -76,12 +83,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     languageBtn.innerText = `🌐 ${selectedLang.toUpperCase()}`;
                 }
                 languageBox.classList.remove('active');
-                // ভবিষ্যতে ভাষা পরিবর্তনের জন্য এখানে ট্রান্সলেশন ফাংশন কল করতে পারেন
             });
         });
     }
 
-    // 6. Check Auth State for User Login / Logout Status in Side Menu
+    // 6. Check Auth State for Side Menu
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session && session.user) {
