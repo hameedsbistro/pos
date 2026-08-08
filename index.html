@@ -33,17 +33,27 @@
         </div>
     </header>
 
-    <!-- SIDE DRAWER MENU (Information Only) -->
+    <!-- SIDE DRAWER MENU -->
     <div id="sideMenu" class="side-menu">
         <button id="closeMenu">✕</button>
         <h3>Information</h3>
         <a href="customer/profile.html">Company Profile</a>
         <a href="customer/popular.html">Popular Top 15 Items</a>
-        <a href="customer/order-history.html">My Orders</a>
         <a href="#">Contact Us</a>
-        <a href="login.html" style="text-decoration: none;">
-            <button id="menuLoginBtn">👤 Login / Register</button>
-        </a>
+
+        <!-- কাস্টমার লগইন থাকলে এই অপশনগুলো দেখাবে -->
+        <div id="userLoggedInMenu" class="hidden">
+            <a href="customer/profile.html">👤 Customer Profile</a>
+            <a href="customer/order-history.html">📜 Order History</a>
+            <button id="logoutBtn" class="side-btn logout-bg">🚪 Logout</button>
+        </div>
+
+        <!-- কাস্টমার লগইন না থাকলে এই অপশনটি দেখাবে -->
+        <div id="userLoggedOutMenu">
+            <a href="login.html" style="text-decoration: none;">
+                <button id="menuLoginBtn" class="side-btn">👤 Login / Register</button>
+            </a>
+        </div>
     </div>
 
     <!-- 6 LANGUAGES SELECTION DROPDOWN -->
@@ -70,8 +80,9 @@
         </div>
     </main>
 
+    <!-- UPDATED FOOTER -->
     <footer>
-        Copyright © Prokash Rakshit
+        Copyright © 2026 Prokash Rakshit. All Rights Reserved.
     </footer>
 
     <script type="module" src="js/index.js"></script>
