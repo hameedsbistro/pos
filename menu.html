@@ -1,180 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
 <head>
-
-
-<meta charset="UTF-8">
-
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-Menu - Hameed's Bistro
-</title>
-
-
-
-
-<link rel="stylesheet" href="css/menu.css">
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Food Ordering System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
-
-
-
-
 <body>
 
-
-
-
-
-
-<header class="menu-header">
-
-
-
-
-
-<div class="menu-left">
-
-
-<button onclick="history.back()">
-
-←
-
-</button>
-
-
-
-<button onclick="location.href='index.html'">
-
-🏠
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-
-
-<h2 data-i18n="menu">
-
-Menu
-
-</h2>
-
-
-
-
-
-
-
-<div class="menu-right">
-
-
-
-<button id="refreshBtn">
-
-🔄
-
-</button>
-
-
-
-
-
-
-<button onclick="location.href='language.html'">
-
-🌐
-
-</button>
-
-
-
-
-
-
-<button onclick="location.href='cart.html'">
-
-🛒
-
-<span id="cartCount">
-
-0
-
-</span>
-
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<!-- CATEGORY -->
-
-
-<div class="category-bar" id="categoryList">
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- MENU ITEMS -->
-
-
-<main class="menu-container" id="menuItems">
-
-
-
-</main>
-
-
-
-
-
-
-
-
-
-<script type="module" src="js/menu.js"></script>
-
-
-
+    <!-- TOP HEADER -->
+    <header class="customer-header">
+        <button id="menuBtn" class="header-btn">☰</button>
+        <div class="header-actions">
+            <button id="languageBtn" class="header-btn">🌐 EN</button>
+            <button id="refreshBtn" class="header-btn">🔄</button>
+            <a href="cart.html" class="header-btn">🛒 <span id="cartCount">0</span></a>
+        </div>
+    </header>
+
+    <!-- SIDE DRAWER MENU -->
+    <div id="sideMenu" class="side-menu">
+        <button id="closeMenu">✕</button>
+        <h3>Navigation</h3>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">View Cart</a>
+        <a href="orders.html">My Orders</a>
+        <a href="popular.html">Popular Items</a>
+        
+        <!-- User Auth Links -->
+        <div id="userLoggedInMenu" class="hidden">
+            <a href="profile.html">My Profile</a>
+            <button id="logoutBtn" class="side-btn logout-bg">Logout</button>
+        </div>
+        <div id="userLoggedOutMenu">
+            <a href="login.html" class="side-btn">Login / Register</a>
+        </div>
+    </div>
+
+    <!-- LANGUAGE SELECTION BOX -->
+    <div id="languageBox" class="language-box">
+        <button data-lang="en">English</button>
+        <button data-lang="bn">বাংলা</button>
+        <button data-lang="ms">Bahasa Melayu</button>
+        <button data-lang="zh">中文</button>
+        <button data-lang="ta">தமிழ்</button>
+        <button data-lang="hi">হিন্দি</button>
+    </div>
+
+    <!-- MAIN MENU CONTENT -->
+    <div class="menu-container">
+        
+        <!-- ORDER TYPE DISPLAY BAR -->
+        <div class="order-type-bar">
+            Order Type: <strong id="orderTypeDisplay">Dine In</strong>
+        </div>
+
+        <!-- CATEGORY SELECTION DROPDOWN (TOP POSITION) -->
+        <div class="category-selection-area">
+            <label for="categorySelect"><strong>Select Category:</strong></label>
+            <select id="categorySelect" class="category-dropdown">
+                <option value="top15">-- Top 15 Items --</option>
+            </select>
+        </div>
+
+        <!-- MENU ITEMS DISPLAY AREA -->
+        <div class="popular-section">
+            <h2 id="sectionTitle" class="section-title">Top 15 Items</h2>
+            <div id="menuItemsGrid" class="items-grid">
+                <!-- Supabase থেকে ডায়নামিক ডাটা আসবে -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Food Ordering System. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT MODULE INCLUDE -->
+    <script type="module" src="js/menu.js"></script>
 </body>
-
-
 </html>
