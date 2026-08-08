@@ -1,281 +1,119 @@
-// js/index.js
+/* COMPLETE js/index.js - Connected with Supabase & LocalStorage */
 
+import { supabase } from './supabase.js';
 
-import { changeLanguage } from "./language.js";
+document.addEventListener('DOMContentLoaded', async () => {
+    // ---------------- UI ELEMENTS ----------------
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenu = document.getElementById('closeMenu');
+    const sideMenu = document.getElementById('sideMenu');
 
-import { getLocalUser } from "./auth.js";
+    const languageBtn = document.getElementById('languageBtn');
+    const languageBox = document.getElementById('languageBox');
 
+    const dineInBtn = document.getElementById('dineInBtn');
+    const takeAwayBtn = document.getElementById('takeAwayBtn');
+    const cartCount = document.getElementById('cartCount');
+    const refreshBtn = document.getElementById('refreshBtn');
 
+    const userLoggedInMenu = document.getElementById('userLoggedInMenu');
+    const userLoggedOutMenu = document.getElementById('userLoggedOutMenu');
+    const logoutBtn = document.getElementById('logoutBtn');
 
+    // ---------------- 1. SIDE MENU (DRAWER) ----------------
+    if (menuBtn && sideMenu && closeMenu) {
+        menuBtn.addEventListener('click', () => {
+            sideMenu.classList.add('active');
+        });
 
-// ===============================
-// CART COUNT
-// ===============================
+        closeMenu.addEventListener('click', () => {
+            sideMenu.classList.remove('active');
+        });
+    }
 
+    // ---------------- 2. USER AUTHENTICATION & SESSION CHECK ----------------
+    async function checkUserSession() {
+        // Supabase এর একটিভ সেশন দেখা
+        const { data: { session } } = await supabase.auth.getSession();
+        const localUser = JSON.parse(localStorage.getItem('currentUser'));
 
-function updateCartCount(){
+        if (session || localUser) {
+            if (userLoggedInMenu) userLoggedInMenu.classList.remove('hidden');
+            if (userLoggedOutMenu) userLoggedOutMenu.classList.add('hidden');
+        } else {
+            if (userLoggedInMenu) userLoggedInMenu.classList.add('hidden');
+            if (userLoggedOutMenu) userLoggedOutMenu.classList.remove('hidden');
+        }
+    }
 
+    // Logout Handler
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully!');
+            window.location.reload();
+        });
+    }
 
+    // ---------------- 3. LANGUAGE DROPDOWN ----------------
+    if (languageBtn && languageBox) {
+        languageBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            languageBox.classList.toggle('active');
+        });
 
-const cart =
+        document.addEventListener('click', (e) => {
+            if (!languageBox.contains(e.target) && e.target !== languageBtn) {
+                languageBox.classList.remove('active');
+            }
+        });
 
-JSON.parse(
+        languageBox.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const langCode = e.target.getAttribute('data-lang');
+                localStorage.setItem('selectedLanguage', langCode);
+                languageBtn.innerHTML = `🌐 ${langCode.toUpperCase()}`;
+                languageBox.classList.remove('active');
+            });
+        });
 
-localStorage.getItem("cart")
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        languageBtn.innerHTML = `🌐 ${savedLang.toUpperCase()}`;
+    }
 
-)
+    // ---------------- 4. DINE IN / TAKE AWAY HANDLER ----------------
+    if (dineInBtn) {
+        dineInBtn.addEventListener('click', () => {
+            localStorage.setItem('selectedOrderType', 'Dine In');
+            window.location.href = 'menu.html';
+        });
+    }
 
-||
+    if (takeAwayBtn) {
+        takeAwayBtn.addEventListener('click', () => {
+            localStorage.setItem('selectedOrderType', 'Take Away');
+            window.location.href = 'menu.html';
+        });
+    }
 
-[];
+    // ---------------- 5. CART BADGE COUNT ----------------
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+        if (cartCount) {
+            cartCount.innerText = totalQty;
+        }
+    }
 
+    // ---------------- 6. REFRESH PAGE ----------------
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            window.location.reload();
+        });
+    }
 
-
-
-
-let count = 0;
-
-
-
-cart.forEach(item=>{
-
-
-count += item.quantity;
-
-
+    // INITIALIZATION
+    await checkUserSession();
+    updateCartBadge();
 });
-
-
-
-
-
-
-
-const cartCount =
-
-document.getElementById(
-"cartCount"
-);
-
-
-
-
-
-if(cartCount){
-
-
-cartCount.innerText =
-count;
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ===============================
-// BUTTON EVENTS
-// ===============================
-
-
-
-document
-.getElementById("menuBtn")
-?.addEventListener(
-"click",
-()=>{
-
-
-window.location.href =
-"menu.html";
-
-
-});
-
-
-
-
-
-
-
-
-document
-.getElementById("cartBtn")
-?.addEventListener(
-"click",
-()=>{
-
-
-window.location.href =
-"cart.html";
-
-
-});
-
-
-
-
-
-
-
-
-
-document
-.getElementById("loginBtn")
-?.addEventListener(
-"click",
-()=>{
-
-
-const user =
-getLocalUser();
-
-
-
-if(user){
-
-
-
-switch(user.role){
-
-
-case "admin":
-
-case "manager":
-
-window.location.href =
-"admin.html";
-
-break;
-
-
-
-case "cashier":
-
-window.location.href =
-"cashier.html";
-
-break;
-
-
-
-case "waiter":
-
-window.location.href =
-"waiter.html";
-
-break;
-
-
-
-case "cook":
-
-window.location.href =
-"kitchen.html";
-
-break;
-
-
-
-default:
-
-window.location.href =
-"profile.html";
-
-
-}
-
-
-
-}
-
-else{
-
-
-window.location.href =
-"login.html";
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-
-
-document
-.getElementById("refreshBtn")
-?.addEventListener(
-"click",
-()=>{
-
-
-location.reload();
-
-
-});
-
-
-
-
-
-
-
-
-
-document
-.getElementById("languageBtn")
-?.addEventListener(
-"click",
-()=>{
-
-
-const lang =
-
-prompt(
-"Language: en / ms / bn / hi / ta / zh"
-);
-
-
-
-if(lang){
-
-
-changeLanguage(lang);
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-
-// ===============================
-// START
-// ===============================
-
-
-updateCartCount();
