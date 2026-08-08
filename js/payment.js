@@ -1,504 +1,702 @@
+// js/payment.js
+
 import { supabase } from "./supabase.js";
 
 
+// ===============================
+// SETTINGS
+// ===============================
+
+const SST_RATE = 0.06;
+
+
+// ===============================
+// ORDER
+// ===============================
 
 let orderId =
-localStorage.getItem("paymentOrder");
-
-
+    localStorage.getItem("paymentOrder");
 
 let selectedMethod = "";
 
 let orderData = null;
 
+let subtotal = 0;
+
+let sst = 0;
+
+let total = 0;
 
 
+// ===============================
+// ELEMENTS
+// ===============================
+
+const orderNo =
+    document.getElementById("orderNo");
+
+const tableNo =
+    document.getElementById("tableNo");
+
+const paymentItems =
+    document.getElementById("paymentItems");
+
+const subtotalAmount =
+    document.getElementById("subtotalAmount");
+
+const sstAmount =
+    document.getElementById("sstAmount");
+
+const totalAmount =
+    document.getElementById("totalAmount");
+
+const cashBox =
+    document.getElementById("cashBox");
+
+const cashAmount =
+    document.getElementById("cashAmount");
+
+const changeAmount =
+    document.getElementById("changeAmount");
+
+const payBtn =
+    document.getElementById("payBtn");
+
+const message =
+    document.getElementById("message");
+
+const addMoreItemsBtn =
+    document.getElementById("addMoreItemsBtn");
+
+const backBtn =
+    document.getElementById("backBtn");
 
 
+// ===============================
+// MONEY FORMAT
+// ===============================
 
+function money(value) {
+
+    return "RM " +
+        Number(value || 0).toFixed(2);
+
+}
+
+
+// ===============================
 // LOAD ORDER
+// ===============================
+
+async function loadOrder() {
+
+    if (!orderId) {
+
+        showMessage(
+            "No order selected."
+        );
+
+        if (payBtn) {
+            payBtn.disabled = true;
+        }
+
+        return;
+    }
 
 
-async function loadOrder(){
+    const {
+        data,
+        error
+    } = await supabase
+
+        .from("orders")
+
+        .select("*")
+
+        .eq(
+            "id",
+            orderId
+        )
+
+        .single();
 
 
-if(!orderId){
+    if (error) {
 
-alert("No Order Selected");
+        console.error(
+            "Load order error:",
+            error
+        );
 
-return;
+        showMessage(
+            "Unable to load order."
+        );
 
-}
-
-
-
-
-
-const {
-
-data,
-
-error
-
-}=await supabase
-
-.from("orders")
-
-.select("*")
-
-.eq(
-"id",
-orderId
-)
-
-.single();
+        return;
+    }
 
 
+    orderData = data;
 
 
-
-
-if(error){
-
-console.log(error);
-
-return;
-
-}
-
-
-
-
-
-orderData=data;
-
-
-
-showOrder();
-
-
+    await loadOrderItems();
 
 }
 
 
+// ===============================
+// LOAD ORDER ITEMS
+// ===============================
+
+async function loadOrderItems() {
+
+    const {
+        data,
+        error
+    } = await supabase
+
+        .from("order_items")
+
+        .select("*")
+
+        .eq(
+            "order_id",
+            orderId
+        )
+
+        .order(
+            "id",
+            {
+                ascending: true
+            }
+        );
 
 
+    if (error) {
+
+        console.error(
+            "Load order items error:",
+            error
+        );
+
+        showMessage(
+            "Unable to load order items."
+        );
+
+        return;
+    }
 
 
+    orderData.order_items =
+        data || [];
 
 
+    showOrder();
+
+}
+
+
+// ===============================
 // SHOW ORDER
+// ===============================
+
+function showOrder() {
+
+    if (!orderData) {
+        return;
+    }
 
 
-function showOrder(){
+    if (orderNo) {
+
+        orderNo.innerText =
+            String(orderData.id)
+                .slice(0, 8);
+
+    }
 
 
+    if (tableNo) {
 
-document.getElementById(
-"orderNo"
-).innerText =
-orderData.id.slice(0,8);
+        tableNo.innerText =
+            orderData.table_number ||
+            "Take Away";
 
-
-
-document.getElementById(
-"tableNo"
-).innerText =
-orderData.table_number || "Take Away";
+    }
 
 
+    if (paymentItems) {
+
+        paymentItems.innerHTML = "";
+
+    }
 
 
-
-let itemsBox =
-document.getElementById(
-"paymentItems"
-);
+    subtotal = 0;
 
 
-
-itemsBox.innerHTML="";
-
-
+    const items =
+        orderData.order_items || [];
 
 
+    if (items.length === 0) {
 
-let total=0;
+        if (paymentItems) {
 
+            paymentItems.innerHTML = `
 
+                <p class="empty-payment">
+                    No items in this order.
+                </p>
 
+            `;
 
-(orderData.order_items || [])
+        }
 
-.forEach(item=>{
-
-
-let amount =
-Number(item.price || 0)
-*
-Number(item.quantity || 1);
-
-
-
-total += amount;
+    }
 
 
+    items.forEach(item => {
 
-itemsBox.innerHTML +=`
+        const price =
+            Number(item.price || 0);
 
+        const quantity =
+            Number(item.quantity || 1);
 
-<div class="payment-item">
-
-
-<span>
-
-${item.item_name}
-
-x
-
-${item.quantity}
-
-</span>
+        const amount =
+            price * quantity;
 
 
-
-<span>
-
-RM ${amount.toFixed(2)}
-
-</span>
+        subtotal += amount;
 
 
+        if (paymentItems) {
 
-</div>
+            paymentItems.innerHTML += `
+
+                <div class="payment-item">
+
+                    <div class="payment-item-name">
+                        ${item.item_name || "Item"}
+                    </div>
+
+                    <div class="payment-item-quantity">
+                        x${quantity}
+                    </div>
+
+                    <div class="payment-item-price">
+                        ${money(amount)}
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    });
 
 
-
-`;
-
-
-
-});
-
-
-
-
-
-document.getElementById(
-"totalAmount"
-).innerText =
-total.toFixed(2);
-
-
+    calculateBill();
 
 }
 
 
+// ===============================
+// CALCULATE BILL
+// ===============================
+
+function calculateBill() {
+
+    sst =
+        subtotal * SST_RATE;
 
 
+    total =
+        subtotal + sst;
 
 
+    if (subtotalAmount) {
+
+        subtotalAmount.innerText =
+            money(subtotal);
+
+    }
 
 
+    if (sstAmount) {
 
+        sstAmount.innerText =
+            money(sst);
+
+    }
+
+
+    if (totalAmount) {
+
+        totalAmount.innerText =
+            money(total);
+
+    }
+
+
+    updateChange();
+
+}
+
+
+// ===============================
 // PAYMENT METHOD
+// ===============================
+
+document
+    .querySelectorAll(".method-btn")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(".method-btn")
+                    .forEach(btn => {
+
+                        btn.classList
+                            .remove("active");
+
+                    });
 
 
-document.querySelectorAll(
-".method-btn"
-)
-
-.forEach(btn=>{
+                button.classList
+                    .add("active");
 
 
-
-btn.onclick=()=>{
-
-
-document.querySelectorAll(
-".method-btn"
-)
-
-.forEach(b=>{
-
-b.classList.remove("active");
-
-});
+                selectedMethod =
+                    button.dataset.method ||
+                    "";
 
 
+                if (
+                    selectedMethod === "Cash"
+                ) {
+
+                    if (cashBox) {
+
+                        cashBox.style.display =
+                            "block";
+
+                    }
+
+                } else {
+
+                    if (cashBox) {
+
+                        cashBox.style.display =
+                            "none";
+
+                    }
 
 
+                    if (cashAmount) {
 
-btn.classList.add("active");
+                        cashAmount.value =
+                            "";
 
-
-
-selectedMethod =
-btn.dataset.method;
-
+                    }
 
 
+                    if (changeAmount) {
+
+                        changeAmount.innerText =
+                            money(0);
+
+                    }
+
+                }
+
+            }
+        );
+
+    });
 
 
-if(selectedMethod==="Cash"){
-
-
-document.getElementById(
-"cashBox"
-).style.display="block";
-
-
-}
-
-else{
-
-
-document.getElementById(
-"cashBox"
-).style.display="none";
-
-
-}
-
-
-
-};
-
-
-
-});
-
-
-
-
-
-
-
-
-
+// ===============================
 // CASH CHANGE
+// ===============================
 
+if (cashAmount) {
 
-document.getElementById(
-"cashAmount"
-)
-
-?.addEventListener(
-"input",
-()=>{
-
-
-let total =
-Number(
-document.getElementById(
-"totalAmount"
-).innerText
-);
-
-
-
-let cash =
-Number(
-document.getElementById(
-"cashAmount"
-).value
-);
-
-
-
-let change =
-cash-total;
-
-
-
-if(change<0){
-
-change=0;
+    cashAmount.addEventListener(
+        "input",
+        updateChange
+    );
 
 }
 
 
+function updateChange() {
 
-document.getElementById(
-"changeAmount"
-).innerText =
-change.toFixed(2);
+    if (!changeAmount) {
+        return;
+    }
 
 
+    const cash =
+        Number(
+            cashAmount?.value || 0
+        );
+
+
+    let change =
+        cash - total;
+
+
+    if (change < 0) {
+
+        change = 0;
+
+    }
+
+
+    changeAmount.innerText =
+        money(change);
 
 }
 
-);
+
+// ===============================
+// ADD MORE ITEMS
+// ===============================
+
+if (addMoreItemsBtn) {
+
+    addMoreItemsBtn.addEventListener(
+        "click",
+        () => {
+
+            if (!orderId) {
+
+                alert(
+                    "No order selected."
+                );
+
+                return;
+            }
 
 
+            localStorage.setItem(
+                "cashierOrderMode",
+                "add"
+            );
 
 
+            localStorage.setItem(
+                "cashierOrderId",
+                orderId
+            );
 
 
+            window.location.href =
+                "cashier-menu.html";
+
+        }
+    );
+
+}
 
 
+// ===============================
+// BACK
+// ===============================
 
+if (backBtn) {
+
+    backBtn.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "cashier.html";
+
+        }
+    );
+
+}
+
+
+// ===============================
 // PAY
+// ===============================
 
+if (payBtn) {
 
-document.getElementById(
-"payBtn"
-)
-
-.onclick=async()=>{
-
-
-
-if(!selectedMethod){
-
-
-alert(
-"Select Payment Method"
-);
-
-
-return;
-
+    payBtn.addEventListener(
+        "click",
+        processPayment
+    );
 
 }
 
 
+async function processPayment() {
+
+    if (!orderData) {
+
+        alert(
+            "Order not loaded."
+        );
+
+        return;
+    }
 
 
-let total =
-Number(
-document.getElementById(
-"totalAmount"
-).innerText
-);
+    if (subtotal <= 0) {
+
+        alert(
+            "This order has no items."
+        );
+
+        return;
+    }
 
 
+    if (!selectedMethod) {
+
+        alert(
+            "Please select payment method."
+        );
+
+        return;
+    }
 
 
+    if (
+        selectedMethod === "Cash"
+    ) {
+
+        const cash =
+            Number(
+                cashAmount?.value || 0
+            );
 
 
-if(selectedMethod==="Cash"){
+        if (cash < total) {
+
+            alert(
+                "Insufficient cash amount."
+            );
+
+            return;
+        }
+
+    }
 
 
-
-let cash =
-Number(
-document.getElementById(
-"cashAmount"
-).value
-);
+    payBtn.disabled = true;
 
 
-
-if(cash < total){
-
-
-alert(
-"Insufficient Amount"
-);
+    showMessage(
+        "Processing payment..."
+    );
 
 
-return;
+    const {
+        error
+    } = await supabase
 
+        .from("orders")
+
+        .update({
+
+            subtotal: subtotal,
+
+            sst: sst,
+
+            total: total,
+
+            payment_status: "Paid",
+
+            payment_method:
+                selectedMethod,
+
+            paid_at:
+                new Date().toISOString(),
+
+            status:
+                "Completed"
+
+        })
+
+        .eq(
+            "id",
+            orderId
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Payment error:",
+            error
+        );
+
+
+        showMessage(
+            "Payment failed."
+        );
+
+
+        payBtn.disabled = false;
+
+
+        return;
+    }
+
+
+    showMessage(
+        "Payment Successful"
+    );
+
+
+    localStorage.setItem(
+        "lastPaidOrder",
+        orderId
+    );
+
+
+    setTimeout(
+        () => {
+
+            window.location.href =
+                "invoice.html";
+
+        },
+        700
+    );
 
 }
 
 
+// ===============================
+// MESSAGE
+// ===============================
+
+function showMessage(text) {
+
+    if (!message) {
+        return;
+    }
+
+
+    message.innerText =
+        text;
 
 }
 
 
-
-
-
-
-
-
-const {
-
-error
-
-}=await supabase
-
-.from("orders")
-
-.update({
-
-payment_status:"Paid",
-
-payment_method:selectedMethod,
-
-paid_at:new Date()
-
-})
-
-.eq(
-"id",
-orderId
-);
-
-
-
-
-
-
-
-
-if(error){
-
-
-console.log(error);
-
-
-alert(
-"Payment Failed"
-);
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-
-document.getElementById(
-"message"
-).innerText =
-"Payment Successful";
-
-
-
-
-
-
-
-setTimeout(()=>{
-
-
-window.location.href=
-"cashier.html";
-
-
-
-},1500);
-
-
-
-
-};
-
-
-
-
-
-
-
-
+// ===============================
+// START
+// ===============================
 
 loadOrder();
