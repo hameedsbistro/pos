@@ -1,91 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hameed's Bistro - Menu & Ordering System</title>
+    <title>Home - Food Ordering System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <!-- TOP HEADER -->
+    <!-- TOP HEADER WITH HOME & BACK NAVIGATION -->
     <header class="customer-header">
-        <!-- Left Drawer Toggle Button -->
-        <button id="menuBtn" class="header-btn" title="Open Menu">☰</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="menuBtn" class="header-btn">☰</button>
+            <button onclick="window.history.back()" class="header-btn" title="Go Back">⬅️</button>
+            <a href="index.html" class="header-btn" title="Go Home" style="text-decoration: none;">🏠</a>
+        </div>
 
-        <!-- Right Header Action Buttons -->
         <div class="header-actions">
-            <button id="languageBtn" class="header-btn" title="Change Language">🌐 EN</button>
-            
-            <a href="cart.html" style="text-decoration: none;">
-                <button id="cartBtn" class="header-btn" title="View Cart">
-                    🛒 <span id="cartCount">0</span>
-                </button>
-            </a>
-
-            <a href="login.html" style="text-decoration: none;">
-                <button id="loginBtn" class="header-btn" title="User Account">👤</button>
-            </a>
-
-            <button id="refreshBtn" class="header-btn" title="Reload Page">🔄</button>
+            <button id="languageBtn" class="header-btn">🌐 EN</button>
+            <button id="refreshBtn" class="header-btn" onclick="window.location.reload()">🔄</button>
+            <a href="cart.html" class="header-btn" style="text-decoration: none;">🛒 <span id="cartCount">0</span></a>
         </div>
     </header>
 
-    <!-- SIDE DRAWER MENU -->
+    <!-- SIDE DRAWER NAVIGATION MENU -->
     <div id="sideMenu" class="side-menu">
         <button id="closeMenu">✕</button>
-        <h3>Information</h3>
-        <a href="customer/profile.html">Company Profile</a>
-        <a href="customer/popular.html">Popular Top 15 Items</a>
-        <a href="#">Contact Us</a>
-
-        <!-- কাস্টমার লগইন থাকলে এই অপশনগুলো দেখাবে -->
+        <h3>Navigation</h3>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">View Cart</a>
+        <a href="orders.html">My Orders</a>
+        <!-- Popular Items চাপলে সরাসরি menu.html-এ নিয়ে যাবে যেখানে Top 15 শো করে -->
+        <a href="menu.html">Popular Items</a>
+        
+        <!-- User Auth Links -->
         <div id="userLoggedInMenu" class="hidden">
-            <a href="customer/profile.html">👤 Customer Profile</a>
-            <a href="customer/order-history.html">📜 Order History</a>
-            <button id="logoutBtn" class="side-btn logout-bg">🚪 Logout</button>
+            <a href="profile.html">My Profile</a>
+            <button id="logoutBtn" class="side-btn logout-bg">Logout</button>
         </div>
-
-        <!-- কাস্টমার লগইন না থাকলে এই অপশনটি দেখাবে -->
         <div id="userLoggedOutMenu">
-            <a href="login.html" style="text-decoration: none;">
-                <button id="menuLoginBtn" class="side-btn">👤 Login / Register</button>
-            </a>
+            <a href="login.html" class="side-btn">Login / Register</a>
         </div>
     </div>
 
-    <!-- 6 LANGUAGES SELECTION DROPDOWN -->
+    <!-- LANGUAGE SELECTION POPUP DROPDOWN -->
     <div id="languageBox" class="language-box">
         <button data-lang="en">English</button>
-        <button data-lang="ms">Malay (Bahasa Melayu)</button>
-        <button data-lang="ta">Tamil (தமிழ்)</button>
-        <button data-lang="zh">Chinese (中文)</button>
-        <button data-lang="hi">Hindi (हिंदी)</button>
-        <button data-lang="bn">Bengali (বাংলা)</button>
+        <button data-lang="bn">বাংলা</button>
+        <button data-lang="ms">Bahasa Melayu</button>
+        <button data-lang="zh">中文</button>
+        <button data-lang="ta">தமிழ்</button>
+        <button data-lang="hi">হিন্দি</button>
     </div>
 
-    <!-- MAIN WELCOME / HOME CONTAINER -->
-    <main class="home-container">
-        <div class="logo-area">
-            <img src="images/logo.png" alt="Hameed's Bistro Logo" class="restaurant-logo">
-            <h1>Hameed's Bistro</h1>
-            <h2>Menu & Ordering System</h2>
+    <!-- MAIN HOME CONTAINER -->
+    <div class="main-container">
+        
+        <!-- LOGO AND WELCOME BANNER -->
+        <div class="welcome-section">
+            <img src="images/logo.png" alt="Restaurant Logo" class="restaurant-logo" onerror="this.src='https://via.placeholder.com/120?text=Logo'">
+            <h1 class="restaurant-title">Welcome to Our Restaurant</h1>
+            <p class="tagline">Please select your order type to continue</p>
         </div>
 
-        <div class="home-order-buttons">
-            <button id="dineInBtn" class="main-btn">Dine In</button>
-            <button id="takeAwayBtn" class="main-btn">Take Away</button>
+        <!-- DINE IN / TAKE AWAY ORDER TYPE SELECTION BUTTONS -->
+        <div class="order-type-container">
+            <button id="dineInBtn" class="order-type-btn dine-in">
+                <span class="btn-icon">🍽️</span>
+                <span class="btn-text">Dine In</span>
+            </button>
+            
+            <button id="takeAwayBtn" class="order-type-btn take-away">
+                <span class="btn-icon">🛍️</span>
+                <span class="btn-text">Take Away</span>
+            </button>
         </div>
-    </main>
 
-    <!-- UPDATED FOOTER -->
+    </div>
+
+    <!-- FOOTER -->
     <footer>
-        Copyright © 2026 Prokash Rakshit. All Rights Reserved.
+        <p>&copy; 2026 Food Ordering System. All rights reserved.</p>
     </footer>
 
+    <!-- JAVASCRIPT MODULE INCLUDE -->
     <script type="module" src="js/index.js"></script>
 </body>
-
 </html>
