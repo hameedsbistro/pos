@@ -1,211 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
 <head>
-
-
-<meta charset="UTF-8">
-
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-Cart - Hameed's Bistro
-</title>
-
-
-
-
-<link rel="stylesheet" href="css/cart.css">
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - Food Ordering System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
-
-
-
-
 <body>
 
-
-
-
-
-
-<header class="cart-header">
-
-
-
-<div class="cart-left">
-
-
-<button id="backBtn">
-
-←
-
-</button>
-
-
-<button id="homeBtn">
-
-🏠
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<h2 data-i18n="cart">
-
-Cart
-
-</h2>
-
-
-
-
-
-
-
-<div class="cart-right">
-
-
-
-<button id="refreshBtn">
-
-🔄
-
-</button>
-
-
-
-
-
-
-<button onclick="location.href='language.html'">
-
-🌐
-
-</button>
-
-
-
-</div>
-
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<main class="cart-container">
-
-
-
-
-
-<h1 data-i18n="cart">
-
-Your Cart
-
-</h1>
-
-
-
-
-
-
-
-
-
-<div id="cartItems">
-
-</div>
-
-
-
-
-
-
-
-
-
-<div class="cart-summary">
-
-
-
-<h2>
-
-
-<span data-i18n="total">
-
-Total
-
-</span>
-
-
-:
-
-RM <span id="cartTotal">
-
-0.00
-
-</span>
-
-
-</h2>
-
-
-
-
-
-
-
-<button id="checkoutBtn">
-
-Checkout
-
-</button>
-
-
-
-
-</div>
-
-
-
-
-
-
-</main>
-
-
-
-
-
-
-
-
-
-<script type="module" src="js/cart.js"></script>
-
-
-
+    <!-- TOP HEADER -->
+    <header class="customer-header">
+        <button id="menuBtn" class="header-btn">☰</button>
+        <div class="header-actions">
+            <button id="languageBtn" class="header-btn">🌐 EN</button>
+            <button id="refreshBtn" class="header-btn">🔄</button>
+            <a href="cart.html" class="header-btn">🛒 <span id="cartCount">0</span></a>
+        </div>
+    </header>
+
+    <!-- SIDE DRAWER MENU -->
+    <div id="sideMenu" class="side-menu">
+        <button id="closeMenu">✕</button>
+        <h3>Navigation</h3>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">View Cart</a>
+        <a href="orders.html">My Orders</a>
+        
+        <div id="userLoggedInMenu" class="hidden">
+            <a href="profile.html">My Profile</a>
+            <button id="logoutBtn" class="side-btn logout-bg">Logout</button>
+        </div>
+        <div id="userLoggedOutMenu">
+            <a href="login.html" class="side-btn">Login / Register</a>
+        </div>
+    </div>
+
+    <!-- MAIN CART CONTENT -->
+    <div class="menu-container">
+        <div class="popular-section">
+            <h2 class="section-title">Your Selected Items</h2>
+            
+            <div id="cartItemsList">
+                <!-- Javascript দিয়ে কার্টের ডাটা এখানে রেন্ডার হবে -->
+            </div>
+
+            <!-- CART SUMMARY AREA -->
+            <div id="cartSummary" class="hidden" style="margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 15px; text-align: right;">
+                <h3>Total Amount: ৳ <span id="cartTotalPrice">0</span></h3>
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <a href="menu.html" class="add-cart-btn" style="text-decoration: none; background: #666; display: inline-block; width: auto;">+ Add More Food</a>
+                    <a href="checkout.html" class="add-cart-btn" style="text-decoration: none; background: #27ae60; display: inline-block; width: auto;">Proceed to Checkout →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Food Ordering System. All rights reserved.</p>
+    </footer>
+
+    <script type="module" src="js/cart.js"></script>
 </body>
-
-
 </html>
