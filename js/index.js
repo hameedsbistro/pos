@@ -1,88 +1,32 @@
-/* COMPLETE js/index.js - Connected with Supabase & LocalStorage */
+/* js/index.js - Home Page Logic (Order Type Selection, Language Dropdown, & Side Menu) */
 
 import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // ---------------- UI ELEMENTS ----------------
+    // 1. UI Elements
+    const dineInBtn = document.getElementById('dineInBtn');
+    const takeAwayBtn = document.getElementById('takeAwayBtn');
     const menuBtn = document.getElementById('menuBtn');
     const closeMenu = document.getElementById('closeMenu');
     const sideMenu = document.getElementById('sideMenu');
-
     const languageBtn = document.getElementById('languageBtn');
     const languageBox = document.getElementById('languageBox');
-
-    const dineInBtn = document.getElementById('dineInBtn');
-    const takeAwayBtn = document.getElementById('takeAwayBtn');
     const cartCount = document.getElementById('cartCount');
-    const refreshBtn = document.getElementById('refreshBtn');
-
+    const logoutBtn = document.getElementById('logoutBtn');
     const userLoggedInMenu = document.getElementById('userLoggedInMenu');
     const userLoggedOutMenu = document.getElementById('userLoggedOutMenu');
-    const logoutBtn = document.getElementById('logoutBtn');
 
-    // ---------------- 1. SIDE MENU (DRAWER) ----------------
-    if (menuBtn && sideMenu && closeMenu) {
-        menuBtn.addEventListener('click', () => {
-            sideMenu.classList.add('active');
-        });
-
-        closeMenu.addEventListener('click', () => {
-            sideMenu.classList.remove('active');
-        });
-    }
-
-    // ---------------- 2. USER AUTHENTICATION & SESSION CHECK ----------------
-    async function checkUserSession() {
-        // Supabase এর একটিভ সেশন দেখা
-        const { data: { session } } = await supabase.auth.getSession();
-        const localUser = JSON.parse(localStorage.getItem('currentUser'));
-
-        if (session || localUser) {
-            if (userLoggedInMenu) userLoggedInMenu.classList.remove('hidden');
-            if (userLoggedOutMenu) userLoggedOutMenu.classList.add('hidden');
-        } else {
-            if (userLoggedInMenu) userLoggedInMenu.classList.add('hidden');
-            if (userLoggedOutMenu) userLoggedOutMenu.classList.remove('hidden');
+    // 2. Update Cart Badge Count from LocalStorage
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+        if (cartCount) {
+            cartCount.innerText = totalQty;
         }
     }
+    updateCartBadge();
 
-    // Logout Handler
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            localStorage.removeItem('currentUser');
-            alert('Logged out successfully!');
-            window.location.reload();
-        });
-    }
-
-    // ---------------- 3. LANGUAGE DROPDOWN ----------------
-    if (languageBtn && languageBox) {
-        languageBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            languageBox.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!languageBox.contains(e.target) && e.target !== languageBtn) {
-                languageBox.classList.remove('active');
-            }
-        });
-
-        languageBox.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const langCode = e.target.getAttribute('data-lang');
-                localStorage.setItem('selectedLanguage', langCode);
-                languageBtn.innerHTML = `🌐 ${langCode.toUpperCase()}`;
-                languageBox.classList.remove('active');
-            });
-        });
-
-        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
-        languageBtn.innerHTML = `🌐 ${savedLang.toUpperCase()}`;
-    }
-
-    // ---------------- 4. DINE IN / TAKE AWAY HANDLER ----------------
+    // 3. Dine In & Take Away Button Actions
     if (dineInBtn) {
         dineInBtn.addEventListener('click', () => {
             localStorage.setItem('selectedOrderType', 'Dine In');
@@ -97,23 +41,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ---------------- 5. CART BADGE COUNT ----------------
-    function updateCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-        if (cartCount) {
-            cartCount.innerText = totalQty;
-        }
-    }
+    // 4. Side Drawer Navigation Open/Close
+    if (menuBtn && sideMenu && closeMenu) {
+        menuBtn.addEventListener('click', () => {
+            sideMenu.classList.add('active');
+        });
 
-    // ---------------- 6. REFRESH PAGE ----------------
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            window.location.reload();
+        closeMenu.addEventListener('click', () => {
+            sideMenu.classList.remove('active');
         });
     }
 
-    // INITIALIZATION
-    await checkUserSession();
-    updateCartBadge();
+    // 5. Language Selection Dropdown Toggle
+    if (languageBtn && languageBox) {
+        languageBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            languageBox.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageBox.contains(e.target) && e.target !== languageBtn) {
+                languageBox.classList.remove('active');
+            }
+        });
+
+        // Language Option Click Logic
+        const langButtons = languageBox.querySelectorAll('button');
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedLang = btn.getAttribute('data-lang');
+                localStorage.setItem('appLanguage', selectedLang);
+                if (languageBtn) {
+                    languageBtn.innerText = `🌐 ${selectedLang.toUpperCase()}`;
+                }
+                languageBox.classList.remove('active');
+                // ভবিষ্যতে ভাষা পরিবর্তনের জন্য এখানে ট্রান্সলেশন ফাংশন কল করতে পারেন
+            });
+        });
+    }
+
+    // 6. Check Auth State for User Login / Logout Status in Side Menu
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+            if (userLoggedInMenu) userLoggedInMenu.classList.remove('hidden');
+            if (userLoggedOutMenu) userLoggedOutMenu.classList.add('hidden');
+        } else {
+            if (userLoggedInMenu) userLoggedInMenu.classList.add('hidden');
+            if (userLoggedOutMenu) userLoggedOutMenu.classList.remove('hidden');
+        }
+    } catch (err) {
+        console.warn('Supabase Auth status check error:', err);
+    }
+
+    // 7. Logout Button Action
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        });
+    }
 });
