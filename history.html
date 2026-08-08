@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - Food Ordering System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- TOP HEADER WITH HOME & BACK NAVIGATION -->
+    <header class="customer-header">
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="menuBtn" class="header-btn">☰</button>
+            <button onclick="window.history.back()" class="header-btn" title="Go Back">⬅️</button>
+            <a href="index.html" class="header-btn" title="Go Home" style="text-decoration: none;">🏠</a>
+        </div>
+
+        <div class="header-actions">
+            <button id="languageBtn" class="header-btn">🌐 EN</button>
+            <button id="refreshBtn" class="header-btn" onclick="window.location.reload()">🔄</button>
+            <a href="cart.html" class="header-btn" style="text-decoration: none;">🛒 <span id="cartCount">0</span></a>
+        </div>
+    </header>
+
+    <!-- SIDE DRAWER NAVIGATION MENU -->
+    <div id="sideMenu" class="side-menu">
+        <button id="closeMenu">✕</button>
+        <h3>Navigation</h3>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">View Cart</a>
+        <a href="history.html">My Orders</a>
+        <a href="menu.html">Popular Items</a>
+        
+        <div id="userLoggedInMenu" class="hidden">
+            <a href="profile.html">My Profile</a>
+            <button id="logoutBtn" class="side-btn logout-bg">Logout</button>
+        </div>
+        <div id="userLoggedOutMenu">
+            <a href="login.html" class="side-btn">Login / Register</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="menu-container">
+        <div class="popular-section">
+            <h2 class="section-title">My Order History</h2>
+            <div id="ordersList">
+                <!-- Javascript দিয়ে কাস্টমারের অর্ডারসমূহ এখানে শো করবে -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Food Ordering System. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT MODULE INCLUDE -->
+    <script type="module" src="js/history.js"></script>
+</body>
+</html>
